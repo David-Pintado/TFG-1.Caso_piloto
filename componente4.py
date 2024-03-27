@@ -1,5 +1,6 @@
 
 import re
+import math
 from itertools import product
 
 def extract_llm_answers(llm_answer):
@@ -170,3 +171,69 @@ def get_preliminar_answer(word, llm_prompt_asnwer_list):
            preliminar_answer = "NULL"
     return preliminar_answer
     
+# ///////////////////////////////////////////////////////////////////////////////////
+
+def get_preliminar_answer2(word, llm_prompt_asnwer_list):
+    
+    # Inicializamos las variables necesarias
+    count_masculino = 0
+    count_femenino = 0
+    plural_word = pluralize_word(word)
+    male_word_appearence = ""
+    female_word_appearence = ""
+    preliminar_answer = ""
+    list_minimum_appearences = len(llm_prompt_asnwer_list[0])/2
+    max_difference = list_minimum_appearences/2
+    array_fem = ['la','las','una','unas']
+    array_mas = ['el', 'del', 'los', 'un', 'unos', 'al']
+    
+    # Contamos las apariciones de las palabras y articulos para saber su genero
+    for element in llm_prompt_asnwer_list[0]:
+        male_word_appearence = ""
+        for item in plural_word:
+            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
+            if re.search(pattern, element):
+                male_word_appearence = item
+                break
+        if male_word_appearence != "":
+            search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
+            if len(search_article_phrase) == 1:
+                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_masculino += 1
+            elif len(search_article_phrase) > 1:
+                reversed_search_article_phrase = search_article_phrase[::-1][:2]
+                if reversed_search_article_phrase[0].lower() in array_mas:
+                    count_masculino += 1
+                elif reversed_search_article_phrase[1].lower() in array_mas:
+                    count_masculino += 0.5
+    for element in llm_prompt_asnwer_list[1]:
+        female_word_appearence = ""
+        for item in plural_word:
+            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
+            if re.search(pattern, element):
+                female_word_appearence = item
+                break
+        if female_word_appearence != "":
+            search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
+            if len(search_article_phrase) == 1:
+                if search_article_phrase[-1].lower() in array_fem:
+                    count_femenino += 1
+            elif len(search_article_phrase) > 1:
+                reversed_search_article_phrase = search_article_phrase[::-1][:2]
+                if reversed_search_article_phrase[0].lower() in array_fem:
+                    count_femenino += 1
+                elif reversed_search_article_phrase[1].lower() in array_fem:
+                    count_femenino += 0.5
+
+    print(count_masculino)
+    print(count_femenino)
+
+    if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+        preliminar_answer = "Masculino"
+    elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+        preliminar_answer = "Femenino"
+    elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
+        preliminar_answer = "Neutro"
+    else:
+        preliminar_answer = "NULL"
+    return preliminar_answer
