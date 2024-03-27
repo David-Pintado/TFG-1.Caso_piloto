@@ -26,4 +26,4 @@ class Componente6:
 
                 # Unir los valores con comas
                 line = ', '.join(valores_con_comillas) + ","
-                f.append(line)
+                f.write(line)

@@ -76,7 +76,7 @@ def knowledge_exploitation():
             # Añadir la lista de las respuestas al data structure
             llm_extracted_answers_list.append(llm_extracted_answer_list)
         preliminar_answer = componente4.get_preliminar_answer(word,llm_extracted_answers_list)
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_answers_list, preliminar_answer]
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], preliminar_answer]
         exploited_information[offset_word] = item_list
     
     # Generamos un JSON con la estructura de datos, para una mejor visualizacion
