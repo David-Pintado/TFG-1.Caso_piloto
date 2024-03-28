@@ -23,7 +23,7 @@ def knowledge_exploitation():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Inicializamos la clase para importar los datos de las fuentes 
-    componente1 = Componente1(config['file_path']['word_mcr_file'], config['file_path']['synset_mcr_file'], config['file_path']['synset_eng_mcr_file'])
+    componente1 = Componente1(config['file_path']['word_mcr_file'], config['file_path']['synset_mcr_file'], config['file_path']['synset_eng_mcr_file'], config['file_path']['500_most_used_words_spa_file'])
     
     # Inicializamos la clase con el llm que vamos a utilizar
     componente3 = Componente3(config['file_path']['language_model_path'])
@@ -50,7 +50,7 @@ def knowledge_exploitation():
             llm_answer = componente3.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
             spa_gloss = componente4.extract_llm_answers(llm_answer).replace("\\", "").replace("\"", "")
             spa_gloss = spa_gloss.strip().split("\n")[0]
-            if ": " in str and ": " not in eng_gloss:
+            if ": " in spa_gloss and ": " not in eng_gloss:
                 spa_gloss = spa_gloss.split(': ')[1]
             source_information_structure[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
             
