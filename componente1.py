@@ -2,17 +2,46 @@ import random
 
 class Componente1:
     
-    def __init__(self, word_mcr_file, synset_mcr_file, synset_eng_mcr_file):
+    def __init__(self, word_mcr_file, synset_mcr_file, synset_eng_mcr_file, most_used_words_file):
         self.word_mcr_file = word_mcr_file 
         self.synset_mcr_file = synset_mcr_file
         self.synset_eng_mcr_file = synset_eng_mcr_file
+        self.most_used_words_file = most_used_words_file
 
     # Método para generar el 'source_information_structure'
-    # Esta estructura será un diccionario, la cual tendrá: Key=offset_word. Value = gloss, sense, part_of_speech, language
+    # Esta estructura será un diccionario, la cual seguirá el siguiente esquema: 
+    # Key=offset_word. Value = gloss, sense, part_of_speech, language
     def generate_data_structure(self):
         source_information_structure = {}
         offsets_glosses_array = {}
-        count = 0
+        words_set = {}        
+        
+        # Leer el archivo de las 1000 palabras más usadas y almacenar las palabras en un conjunto
+        try:
+            with open(self.most_used_words_file, "r", encoding="utf-8") as most_used_words_file:
+                words_set = set(most_used_words_file.read().split())
+                
+        except FileNotFoundError:
+            print(f'Archivo "{self.word_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta') 
+            
+        # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario llamado offsets_glosses_array
+        # El esquema de este es: Key=offset. Value = gloss
+        try:
+            # Intentar abrir el archivo que se encuentra en la ruta proporcionada
+            with open(self.synset_mcr_file, 'r', encoding="utf-8") as archivo:
+                # Recorremos cada línea
+                for linea in archivo:
+                    # Obtenemos una lista en la que cada elemento es una columna del synset
+                    linea = linea.replace('"', '')
+                    # Eliminamos las comillas de los elemento
+                    synset = linea.strip().split(',')
+                    # Añadimos a la lista una tupla (offset, gloss)
+                    offsets_glosses_array[synset[0]] = synset[6]
+        except FileNotFoundError:
+            print(f'Archivo "{self.synset_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')
+        
+        # Leer el archivo que contiene los variant en español y almacenarlo en un diccionario llamado source_information_structure
+        # El esquema de este es: Key=offset_word. Value = sense, part_of_speech, language
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
             with open(self.word_mcr_file, 'r', encoding="utf-8") as archivo:
@@ -37,31 +66,16 @@ class Componente1:
                     # Clave compuesta (offset_word)
                     offset_word = offset + '_' + word
                     # Si es un synset en español y el tipo de palabra es sustantivo (noun=n)
-                    if language == "spa" and part_of_speech == "n":
+                    if language == "spa" and part_of_speech == "n" and word in words_set:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         # if round(random.random()*10) == 10:
                         source_information_structure[offset_word] = [sense, part_of_speech, language]
-                        count += 1
-                    if count > 0:
-                        break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.word_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')   
-            
-        try:
-            # Intentar abrir el archivo que se encuentra en la ruta proporcionada
-            with open(self.synset_mcr_file, 'r', encoding="utf-8") as archivo:
-                # Recorremos cada línea
-                for linea in archivo:
-                    # Obtenemos una lista en la que cada elemento es una columna del synset
-                    linea = linea.replace('"', '')
-                    # Eliminamos las comillas de los elemento
-                    synset = linea.strip().split(',')
-                    # Añadimos a la lista una tupla (offset, gloss)
-                    offsets_glosses_array[synset[0]] = synset[6]
-        except FileNotFoundError:
-            print(f'Archivo "{self.synset_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')
-            
+          
+        # Modificar el source_information_structure añadiendo los glosses del offsets_glosses_array
+        # El esquema del source_information_structure será:  Key=offset_word. Value = sense, gloss, part_of_speech, language
         for word, element in source_information_structure.items(): 
             item_list = []
             item_list = [element[0], offsets_glosses_array[word.split('_')[0]].replace('_',' '), element[1], element[2]]
