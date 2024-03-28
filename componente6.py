@@ -19,7 +19,7 @@ class Componente6:
                 part_of_speech = attributes[2]
                 language = attributes[3]
                 knowledge = attributes[4]
-                final_element = "------"
+                final_element = "------\n"
                 
                 # Almacenar los valores entre comillas en una lista
                 valores_con_comillas = [f'"{offset}"', f'"{word}"', f'"{sense}"', f'"{gloss}"', f'"{part_of_speech}"', f'"{language}"', f'"{knowledge}"', f'"{final_element}"']
