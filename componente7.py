@@ -8,6 +8,7 @@ from componente1 import Componente1
 import componente2
 from componente3 import Componente3
 import componente4
+from componente5 import Componente5
 from componente6 import Componente6
 
 
@@ -22,14 +23,14 @@ def knowledge_exploitation():
     # Ruta del archivo donde escribir la estructura de datos 'source_gloss_structure_eng'
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
-    # Inicializamos la clase para importar los datos de las fuentes 
+    # Inicializamos el componente1 para importar los datos de las fuentes 
     componente1 = Componente1(config['file_path']['word_mcr_file'], config['file_path']['synset_mcr_file'], config['file_path']['synset_eng_mcr_file'], config['file_path']['500_most_used_words_spa_file'])
     
-    # Inicializamos la clase con el llm que vamos a utilizar
-    componente3 = Componente3(config['file_path']['language_model_path'])
+    # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
+    componente3_provisional = Componente3(config['file_path']['provisional_answers_language_model_path'])
     
-    # Cargamos el modelo de lenguaje
-    componente3.load_model()
+    # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
+    componente3_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
     source_information_structure = componente1.generate_data_structure()
@@ -47,7 +48,7 @@ def knowledge_exploitation():
         if element[1] == 'NULL':
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
-            llm_answer = componente3.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
+            llm_answer = componente3_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
             spa_gloss = componente4.extract_llm_answers(llm_answer).replace("\\", "").replace("\"", "")
             spa_gloss = spa_gloss.strip().split("\n")[0]
             if ": " in spa_gloss and ": " not in eng_gloss:
@@ -55,28 +56,117 @@ def knowledge_exploitation():
             source_information_structure[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
             
     
-    # Explotar conocimiento 
+    # Explotar conocimiento (Al parecer da problemas si se cargan dos modelos a la vez, 
+    # ya que ocupa demasiada memoria y ralentiza el proceso de forma importante)
+    # Es por ello que se recorrerá el source_information_structure dos veces:
+    #     La primera para conseguir las respuesta provisionales, y para validar las que tienen 'Neutro' como resultado provisional
+    #     La segunda para validar las que tienen el valor del resultado provisional 'Femenino' o 'Masculino'
+    
     for (offset_word,attributes) in source_information_structure.items():
+        llm_extracted_provisional_answers_list = []  
+        llm_extracted_final_answers_list = []
+        provisional_answer = ""
+        final_answer = ""
         
-        # (Preliminar)
-        preliminar_prompt_list = componente2.generate_preliminar_prompts((offset_word,attributes))
-        llm_extracted_answers_list = []
+        # (respuesta provisional)
+        provisional_prompt_list = componente2.generate_provisional_prompts((offset_word,attributes))
         word = offset_word.split('_')[1]
-        for prompt in preliminar_prompt_list:
+        for prompt in provisional_prompt_list:
             # Reallizar la pregunta al modelo de lenguaje 
-            llm_answer = componente3.run_the_model(prompt)
+            llm_answer = componente3_provisional.run_the_model(prompt)
             # Extraer la parte de la respuesta para su posterior tratado
             llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
             # Eliminar los saltos de linea
             llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
             # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-            llm_extracted_answer_list = re.split(r'\d+\.', llm_extracted_answer[0])[1:]
+            llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
             # Quitar los espacios blancos del principio y final de las frases 
-            llm_extracted_answer_list = [answer.strip() for answer in llm_extracted_answer_list]
+            llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+            # Quitar las comillas y barras de las frases
+            llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
             # Añadir la lista de las respuestas al data structure
-            llm_extracted_answers_list.append(llm_extracted_answer_list)
-        preliminar_answer = componente4.get_preliminar_answer(word,llm_extracted_answers_list)
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], preliminar_answer]
+            llm_extracted_provisional_answers_list.append(llm_extracted_answer)
+        # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
+        provisional_answer = componente4.get_provisional_answer3(word,llm_extracted_provisional_answers_list)
+        
+        # (validación de 'Neutro'
+        if provisional_answer == "Neutro":
+            final_prompt_list = componente2.generate_provisional_prompts((offset_word,attributes))
+            for prompt in final_prompt_list:
+                # Reallizar la pregunta al modelo de lenguaje 
+                llm_answer = componente3_provisional.run_the_model(prompt)
+                # Extraer la parte de la respuesta para su posterior tratado
+                llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
+                # Eliminar los saltos de linea
+                llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
+                # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
+                llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
+                # Quitar los espacios blancos del principio y final de las frases 
+                llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+                # Quitar las comillas y barras de las frases
+                llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
+                # Añadir la lista de las respuestas al data structure
+                llm_extracted_final_answers_list.append(llm_extracted_answer)
+            # Conseguir la respuesta final en base a lo devuelto por el modelo de lenguaje
+            final_answer = componente4.get_provisional_answer3(word,llm_extracted_final_answers_list)
+            if final_answer != "Neutro":
+                final_answer = "NULL"
+        answer = ""
+        if final_answer == "":
+            answer = provisional_answer
+        else:
+            answer = final_answer
+            
+        # Añadirlo al source_information_structure
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, answer]
+        source_information_structure[offset_word] = item_list
+        
+    componente3_provisional.llm = None
+        
+    # Inicializamos el componente3 con el llm que vamos a utilizar para validar las respuestas provisionales
+    componente3_final = Componente3(config['file_path']['final_answers_language_model_path'])
+    
+    # Cargamos el modelo de lenguaje que vamos a utilizar para validar las respuestas provisionales
+    componente3_final.load_model()    
+    
+    for (offset_word,attributes) in source_information_structure.items():    
+        # (validacion de 'Femenino' o 'Masculino')
+        final_answer = ""
+        llm_extracted_final_answers_list = []
+        word = offset_word.split('_')[1]
+        if attributes[5] == "Femenino" or attributes[5] == "Masculino":
+            final_prompt_list = componente2.generate_final_prompts((offset_word,attributes), attributes[6])
+            
+            for prompt in final_prompt_list:
+                # Reallizar la pregunta al modelo de lenguaje 
+                llm_answer = componente3_final.run_the_model(prompt)
+                # Extraer la parte de la respuesta para su posterior tratado
+                llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
+                # Eliminar los saltos de linea
+                llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
+                # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
+                llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
+                # Quitar los espacios blancos del principio y final de las frases 
+                llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+                # Quitar las comillas y barras de las frases
+                llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
+                # Añadir la lista de las respuestas al data structure
+                llm_extracted_final_answers_list.append(llm_extracted_answer)
+            
+            # Inicializamos la clase 5 con los datos necesarios
+            componente5 = Componente5(len(attributes[4][0]))
+            # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
+            final_answer = componente5.get_final_answer(word, llm_extracted_final_answers_list, attributes[6])
+
+            
+        answer = ""
+        if final_answer == "":
+            answer = attributes[5]
+        else:
+            answer = final_answer
+        
+        # Añadirlo al exploited_information
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], answer]
         exploited_information[offset_word] = item_list
     
     # Generamos un JSON con la estructura de datos, para una mejor visualizacion
