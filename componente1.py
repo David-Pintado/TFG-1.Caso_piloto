@@ -8,13 +8,14 @@ class Componente1:
         self.synset_eng_mcr_file = synset_eng_mcr_file
         self.most_used_words_file = most_used_words_file
 
-    # Método para generar el 'source_information_structure'
+    # Método para generar el 'source_information'
     # Esta estructura será un diccionario, la cual seguirá el siguiente esquema: 
     # Key=offset_word. Value = gloss, sense, part_of_speech, language
     def generate_data_structure(self):
-        source_information_structure = {}
+        source_information = {}
         offsets_glosses_array = {}
-        words_set = {}        
+        words_set = {}
+        count = 0        
         
         # Leer el archivo de las 1000 palabras más usadas y almacenar las palabras en un conjunto
         try:
@@ -40,7 +41,7 @@ class Componente1:
         except FileNotFoundError:
             print(f'Archivo "{self.synset_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
-        # Leer el archivo que contiene los variant en español y almacenarlo en un diccionario llamado source_information_structure
+        # Leer el archivo que contiene los variant en español y almacenarlo en un diccionario llamado source_information
         # El esquema de este es: Key=offset_word. Value = sense, part_of_speech, language
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
@@ -66,22 +67,28 @@ class Componente1:
                     # Clave compuesta (offset_word)
                     offset_word = offset + '_' + word
                     # Si es un synset en español y el tipo de palabra es sustantivo (noun=n)
-                    if language == "spa" and part_of_speech == "n" and word in words_set:
+                    if language == "spa" and part_of_speech == "n" and word in words_set and word == "estudiante":
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         # if round(random.random()*10) == 10:
-                        source_information_structure[offset_word] = [sense, part_of_speech, language]
+                        source_information[offset_word] = [sense, part_of_speech, language]
+                        count += 1
+                    elif language == "spa" and part_of_speech == "n" and word in words_set:
+                        source_information[offset_word] = [sense, part_of_speech, language]
+                        count += 1
+                    if count > 9:
+                        break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.word_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')   
           
-        # Modificar el source_information_structure añadiendo los glosses del offsets_glosses_array
-        # El esquema del source_information_structure será:  Key=offset_word. Value = sense, gloss, part_of_speech, language
-        for word, element in source_information_structure.items(): 
+        # Modificar el source_information añadiendo los glosses del offsets_glosses_array
+        # El esquema del source_information será:  Key=offset_word. Value = sense, gloss, part_of_speech, language
+        for word, element in source_information.items(): 
             item_list = []
             item_list = [element[0], offsets_glosses_array[word.split('_')[0]].replace('_',' '), element[1], element[2]]
-            source_information_structure[word] = item_list
+            source_information[word] = item_list
         
-        return source_information_structure
+        return source_information
 
     # Método para generar el data_structure del mcr en ingles. De esta manera las glosses que no tenga el de castellano
     # se conseguirán de aquí, siendo traducidos por un modelo de lenguaje.

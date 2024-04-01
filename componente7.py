@@ -17,8 +17,8 @@ def knowledge_exploitation():
     config = ConfigParser()
     config.read('./config.ini')
     
-    # Ruta del archivo donde escribir la estructura de datos 'source_information_structure'
-    file_path_source_information_structure_json = config['file_path']['source_information_structure']
+    # Ruta del archivo donde escribir la estructura de datos 'source_information'
+    file_path_source_information_json = config['file_path']['source_information']
     
     # Ruta del archivo donde escribir la estructura de datos 'source_gloss_structure_eng'
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
@@ -33,7 +33,7 @@ def knowledge_exploitation():
     componente3_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
-    source_information_structure = componente1.generate_data_structure()
+    source_information = componente1.generate_data_structure()
     
     # Creamos la estructura de datos que guardará el conocimiento que se haya explotado en los modelos de lenguaje, 
     # junto con la información extraída de la(s) fuente(s).
@@ -42,9 +42,9 @@ def knowledge_exploitation():
     # Generar la estructura de datos en ingles para poder conseguir sus glosses 
     source_gloss_structure_eng = componente1.generate_eng_data_structure()
     
-    # Recorrer el 'source_information_structure', para ver que si no tiene el gloss (está NULL) accder al de
+    # Recorrer el 'source_information', para ver que si no tiene el gloss (está NULL) accder al de
     # 'source_gloss_structure_eng' y traducirlo
-    for offset_word, element in source_information_structure.items():
+    for offset_word, element in source_information.items():
         if element[1] == 'NULL':
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
@@ -53,16 +53,16 @@ def knowledge_exploitation():
             spa_gloss = spa_gloss.strip().split("\n")[0]
             if ": " in spa_gloss and ": " not in eng_gloss:
                 spa_gloss = spa_gloss.split(': ')[1]
-            source_information_structure[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
+            source_information[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
             
     
     # Explotar conocimiento (Al parecer da problemas si se cargan dos modelos a la vez, 
     # ya que ocupa demasiada memoria y ralentiza el proceso de forma importante)
-    # Es por ello que se recorrerá el source_information_structure dos veces:
+    # Es por ello que se recorrerá el source_information dos veces:
     #     La primera para conseguir las respuesta provisionales, y para validar las que tienen 'Neutro' como resultado provisional
     #     La segunda para validar las que tienen el valor del resultado provisional 'Femenino' o 'Masculino'
     
-    for (offset_word,attributes) in source_information_structure.items():
+    for (offset_word,attributes) in source_information.items():
         llm_extracted_provisional_answers_list = []  
         llm_extracted_final_answers_list = []
         provisional_answer = ""
@@ -117,9 +117,9 @@ def knowledge_exploitation():
         else:
             answer = final_answer
             
-        # Añadirlo al source_information_structure
+        # Añadirlo al source_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, answer]
-        source_information_structure[offset_word] = item_list
+        source_information[offset_word] = item_list
         
     componente3_provisional.llm = None
         
@@ -129,13 +129,13 @@ def knowledge_exploitation():
     # Cargamos el modelo de lenguaje que vamos a utilizar para validar las respuestas provisionales
     componente3_final.load_model()    
     
-    for (offset_word,attributes) in source_information_structure.items():    
+    for (offset_word,attributes) in source_information.items():    
         # (validacion de 'Femenino' o 'Masculino')
         final_answer = ""
         llm_extracted_final_answers_list = []
         word = offset_word.split('_')[1]
         if attributes[5] == "Femenino" or attributes[5] == "Masculino":
-            final_prompt_list = componente2.generate_final_prompts((offset_word,attributes), attributes[6])
+            final_prompt_list = componente2.generate_final_prompts((offset_word,attributes), attributes[5])
             
             for prompt in final_prompt_list:
                 # Reallizar la pregunta al modelo de lenguaje 
@@ -156,7 +156,7 @@ def knowledge_exploitation():
             # Inicializamos la clase 5 con los datos necesarios
             componente5 = Componente5(len(attributes[4][0]))
             # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-            final_answer = componente5.get_final_answer(word, llm_extracted_final_answers_list, attributes[6])
+            final_answer = componente5.get_final_answer(word, llm_extracted_final_answers_list, attributes[5])
 
             
         answer = ""
@@ -175,8 +175,8 @@ def knowledge_exploitation():
     # Generamos un JSON con la estructura de datos en ingles, para una mejor visualizacion
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
     
-    # Guardar el 'source_information_structure' en formato json en un archivo    
-    componente1.save_json(file_path_source_information_structure_json,json_exploited_information)
+    # Guardar el 'source_information' en formato json en un archivo    
+    componente1.save_json(file_path_source_information_json,json_exploited_information)
     
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
     componente1.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
