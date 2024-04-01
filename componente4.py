@@ -70,9 +70,9 @@ def pluralize_word(word):
     return pluralize_word_list
 
 
-def get_preliminar_answer(word, llm_prompt_asnwer_list):
+def get_provisional_answer(word, llm_prompt_asnwer_list):
     
-    """Función para la respuesta preliminar al conocimiento a obtener en base a una palabra y una lista de frases
+    """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
@@ -81,7 +81,7 @@ def get_preliminar_answer(word, llm_prompt_asnwer_list):
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
-        - preliminar_answer (string)
+        - provisional_answer (string)
                 - "Neutro": La palabra es de género neutro
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
@@ -94,7 +94,7 @@ def get_preliminar_answer(word, llm_prompt_asnwer_list):
     plural_word = pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    preliminar_answer = ""
+    provisional_answer = ""
     max_difference = len(llm_prompt_asnwer_list[0])-round((len(llm_prompt_asnwer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_prompt_asnwer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
@@ -155,18 +155,18 @@ def get_preliminar_answer(word, llm_prompt_asnwer_list):
     
     # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
     if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
-        preliminar_answer = "Masculino"
+        provisional_answer = "Masculino"
     elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
-        preliminar_answer = "Femenino"
+        provisional_answer = "Femenino"
     elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-        preliminar_answer = "Neutro"
+        provisional_answer = "Neutro"
     else:
-        preliminar_answer = "NULL"
-    return preliminar_answer
+        provisional_answer = "NULL"
+    return provisional_answer
     
 # ///////////////////////////////////////////////////////////////////////////////////
 
-def get_preliminar_answer2(word, llm_prompt_asnwer_list):
+def get_provisional_answer2(word, llm_prompt_asnwer_list):
     
     # Inicializamos las variables necesarias
     count_masculino = 0
@@ -174,7 +174,7 @@ def get_preliminar_answer2(word, llm_prompt_asnwer_list):
     plural_word = pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    preliminar_answer = ""
+    provisional_answer = ""
     list_minimum_appearences = len(llm_prompt_asnwer_list[0])/2
     max_difference = list_minimum_appearences/2
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
@@ -222,18 +222,18 @@ def get_preliminar_answer2(word, llm_prompt_asnwer_list):
     print(count_femenino)
 
     if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
-        preliminar_answer = "Masculino"
+        provisional_answer = "Masculino"
     elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
-        preliminar_answer = "Femenino"
+        provisional_answer = "Femenino"
     elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-        preliminar_answer = "Neutro"
+        provisional_answer = "Neutro"
     else:
-        preliminar_answer = "NULL"
-    return preliminar_answer
+        provisional_answer = "NULL"
+    return provisional_answer
 
-def get_preliminar_answer3(word, llm_prompt_asnwer_list):
+def get_provisional_answer3(word, llm_prompt_asnwer_list):
     
-    """Función para la respuesta preliminar al conocimiento a obtener en base a una palabra y una lista de frases
+    """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
@@ -242,7 +242,7 @@ def get_preliminar_answer3(word, llm_prompt_asnwer_list):
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
-        - preliminar_answer (string)
+        - provisional_answer (string)
                 - "Neutro": La palabra es de género neutro
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
@@ -255,11 +255,17 @@ def get_preliminar_answer3(word, llm_prompt_asnwer_list):
     plural_word = pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    preliminar_answer = ""
+    provisional_answer = ""
     max_difference = len(llm_prompt_asnwer_list[0])-round((len(llm_prompt_asnwer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_prompt_asnwer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    
+    # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
+    minimun_number_of_sentences = min(len(llm_prompt_asnwer_list[0]), len(llm_prompt_asnwer_list[1]))
+    maximun_number_of_sentences = max(len(llm_prompt_asnwer_list[0]), len(llm_prompt_asnwer_list[1]))
+    llm_prompt_asnwer_list[0] = llm_prompt_asnwer_list[0][:minimun_number_of_sentences]
+    llm_prompt_asnwer_list[1] = llm_prompt_asnwer_list[1][:minimun_number_of_sentences]
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for element in llm_prompt_asnwer_list[0]:
@@ -314,13 +320,16 @@ def get_preliminar_answer3(word, llm_prompt_asnwer_list):
     print(count_masculino)
     print(count_femenino)
     
-    # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
-    if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
-        preliminar_answer = "Masculino"
-    elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
-        preliminar_answer = "Femenino"
-    elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-        preliminar_answer = "Neutro"
+    if len(llm_prompt_asnwer_list[0]) > 0 and len(llm_prompt_asnwer_list[0]) >= maximun_number_of_sentences/2:
+        # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
+        if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+            provisional_answer = "Masculino"
+        elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+            provisional_answer = "Femenino"
+        elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
+            provisional_answer = "Neutro"
+        else: 
+            provisional_answer = "NULL"
     else:
-        preliminar_answer = "NULL"
-    return preliminar_answer
+        provisional_answer = "NULL"
+    return provisional_answer
