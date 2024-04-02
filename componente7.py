@@ -3,6 +3,8 @@
 import json
 from configparser import ConfigParser
 import re
+import sys
+sys.path.append("./auxFunctionLibrary")
 
 from componente1 import Componente1
 import componente2
@@ -82,7 +84,7 @@ def knowledge_exploitation():
         provisional_answer = componente4.get_provisional_answer3(word,llm_extracted_provisional_answers_list)
             
         # Añadirlo al source_information
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], provisional_answer]
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
         exploited_information[offset_word] = item_list
         
     componente3_provisional.llm = None
@@ -98,7 +100,7 @@ def knowledge_exploitation():
         final_answer = ""
         llm_extracted_final_answers_list = []
         word = offset_word.split('_')[1]
-        if attributes[5] == "Femenino" or attributes[5] == "Masculino":
+        if attributes[4] == "Femenino" or attributes[4] == "Masculino":
             final_prompt_list = componente2.generate_validation_prompts((offset_word,attributes), attributes[5])
             
             for prompt in final_prompt_list:

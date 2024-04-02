@@ -1,6 +1,5 @@
 
 import re
-import pythonLib
 from pythonLib import auxFunctions
 
 class Componente5:

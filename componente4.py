@@ -1,6 +1,5 @@
 
 import re
-import pythonLib
 from pythonLib import auxFunctions
 
 def extract_llm_answers(llm_answer):
