@@ -15,12 +15,12 @@ class Componente3:
         print("Model loaded.")
     
     # Metodo para realizar la pregunta al modelo. Devuelve lo obtenido.
-    def run_the_model(self, question):
+    def run_the_model(self, prompt):
         # run the model
         print("Running model...")
-        prompt = f"Question: {question} Answer:"
+        question = f"Question: {prompt} Answer:"
         output = self.llm(
-        prompt, # Prompt
+        question, # Prompt
         max_tokens= 200, # Generate up to 16 tokens, set to None to generate up to the end of the context window
         # stop = [ "\n", "###" ], # Stop generating just before the model would generate a new question
         echo=True # Echo the prompt back in the output

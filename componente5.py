@@ -1,20 +1,21 @@
 
-import componente4
 import re
+import pythonLib
+from pythonLib import auxFunctions
 
 class Componente5:
     
     def __init__(self, minimun_number_of_sentences):
         self.minimun_number_of_sentences = minimun_number_of_sentences 
 
-    def get_final_answer(self, word, llm_prompt_asnwer_list, provisional_answer):
+    def get_final_answer(self, word, llm_prompt_answer_list, provisional_answer):
         
         """Función para la respuesta final al conocimiento a obtener en base a una palabra y una lista de frases
         con la palabra en el género de provisional_answer
         
         Parámetros:
             - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
-            - llm_prompt_asnwer_list (list) = Lista que se compone de una lista
+            - llm_prompt_answer_list (list) = Lista que se compone de una lista
                             - Contiene frases con la palabra en género provisional_answer
         Retorna:
             - final_answer (string)
@@ -25,7 +26,7 @@ class Componente5:
         
         # Inicializamos las variables necesarias
         gender_points = 0
-        plural_word = componente4.pluralize_word(word)
+        plural_word = auxFunctions.pluralize_word(word)
         word_appearence = ""
         final_answer = ""
         gender_terms = []
@@ -35,11 +36,11 @@ class Componente5:
             gender_terms = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
             
         # Si las listas de conseguir la respuesta provisionale tienen menos frases, se acorta la lista a la cantidad mínima de frases
-        llm_prompt_asnwer_list[0] = llm_prompt_asnwer_list[0][:self.minimun_number_of_sentences]
-        list_minimum_appearences = len(llm_prompt_asnwer_list[0]) * 0.7
+        llm_prompt_answer_list[0] = llm_prompt_answer_list[0][:self.minimun_number_of_sentences]
+        list_minimum_appearences = len(llm_prompt_answer_list[0]) * 0.7
         
         # Contamos las apariciones de las palabras y articulos para saber su genero
-        for element in llm_prompt_asnwer_list[0]:
+        for element in llm_prompt_answer_list[0]:
             word_appearence = ""
             for item in plural_word:
                 pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -66,8 +67,7 @@ class Componente5:
 
         print(gender_points)
 
-        if len(llm_prompt_asnwer_list[0]) >= self.minimun_number_of_sentences:
-            print('A')
+        if len(llm_prompt_answer_list[0]) >= self.minimun_number_of_sentences:
             # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
             if gender_points >=  list_minimum_appearences:
                 final_answer = provisional_answer

@@ -12,7 +12,7 @@ def generate_provisional_prompts(element):
     
     return prompt_list
 
-def generate_final_prompts(element, provisional_answer):
+def generate_validation_prompts(element, provisional_answer):
     
     offset_word = element[0]
     word = offset_word.split('_')[1]

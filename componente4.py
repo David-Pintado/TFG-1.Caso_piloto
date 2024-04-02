@@ -1,7 +1,7 @@
 
 import re
-import math
-from itertools import product
+import pythonLib
+from pythonLib import auxFunctions
 
 def extract_llm_answers(llm_answer):
 
@@ -9,75 +9,27 @@ def extract_llm_answers(llm_answer):
     return_answer_value = llm_answer['choices'][0]['text']
     # Dividirlo en dos partes (la parte de la pregunta, la parte de la respuesta)
     llm_extracted_answer = return_answer_value.split('Answer:')[1]
+    # Eliminar los saltos de linea
+    llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
+    # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
+    llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
+    # Quitar los espacios blancos del principio y final de las frases 
+    llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+    # Quitar las comillas y barras de las frases
+    llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
 
 
     return llm_extracted_answer
 
 
-def pluralize_word(word):
-    """Función para obtener la forma plural de una palabra (En el caso de que esta sea plural, devolverá su plural)
-       En el caso de que la palabra sea compuesta, devolverá las permutaciones plurales de esa palabra en español
-       
-       Parámetros:
-        - word (string)= Palabra a pluralizar (Puede ser simple o compuesta)
-        
-       Retorna:
-        - pluralize_word_list (Array<string>)
-                - Si la palabra es simple la lista contendrá solo un elemento
-                - Si la palabra es compuesta la lista contendrá las permutaciones plurales de la palabra
-                    () 
-    """
-    # Lista de sufijos comunes para la formación del plural en español
-    suffixes = {
-        'z': 'ces',
-        'l': 'les',
-        'r': 'res',
-        'n': 'nes',
-        'y': 'yes',
-        'j': 'jes',
-        'd': 'des',
-        's': 'ses',
-        'x': 'xes'
-    }
-
-    prepositions = ["a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "durante", "en", "entre", "hacia", "hasta", "mediante", "para", "por", "según", "sin", "so", "sobre", "tras"]
-
-    words = word.split()
-
-    # Función para pluralizar una palabra individual
-    def pluralize(word):
-        for suffix, plural in suffixes.items():
-            if word.endswith(suffix):
-                return word[:-1] + plural
-        return word + 's'
-
-    plural_permutations = []
-    for word in words:
-        if word in prepositions:
-            plural_permutations.append([word])
-        else:
-            plural = pluralize(word)
-            if plural != word:
-                plural_permutations.append([word, plural])
-            else:
-                plural_permutations.append([word])
-
-    composite_permutations = product(*plural_permutations)
-    pluralize_word_list = []
-    for permutation in composite_permutations:
-        pluralize_word_list.append(" ".join(permutation))
-
-    return pluralize_word_list
-
-
-def get_provisional_answer(word, llm_prompt_asnwer_list):
+def get_provisional_answer(word, llm_prompt_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
         - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
-        - llm_prompt_asnwer_list (list) = Lista que se compone de dos listas de misma longud
+        - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
@@ -91,17 +43,17 @@ def get_provisional_answer(word, llm_prompt_asnwer_list):
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
-    plural_word = pluralize_word(word)
+    plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    max_difference = len(llm_prompt_asnwer_list[0])-round((len(llm_prompt_asnwer_list[0])*2)/3) + 1
-    list_minimum_appearences = len(llm_prompt_asnwer_list[0]) * 0.8
+    max_difference = len(llm_prompt_answer_list[0])-round((len(llm_prompt_answer_list[0])*2)/3) + 1
+    list_minimum_appearences = len(llm_prompt_answer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_asnwer_list[0]:
+    for element in llm_prompt_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -125,7 +77,7 @@ def get_provisional_answer(word, llm_prompt_asnwer_list):
                     elif reversed_element.lower() in array_fem:
                         count_femenino += 1
                         break
-    for element in llm_prompt_asnwer_list[1]:
+    for element in llm_prompt_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -166,22 +118,22 @@ def get_provisional_answer(word, llm_prompt_asnwer_list):
     
 # ///////////////////////////////////////////////////////////////////////////////////
 
-def get_provisional_answer2(word, llm_prompt_asnwer_list):
+def get_provisional_answer2(word, llm_prompt_answer_list):
     
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
-    plural_word = pluralize_word(word)
+    plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    list_minimum_appearences = len(llm_prompt_asnwer_list[0])/2
+    list_minimum_appearences = len(llm_prompt_answer_list[0])/2
     max_difference = list_minimum_appearences/2
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_asnwer_list[0]:
+    for element in llm_prompt_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -199,7 +151,7 @@ def get_provisional_answer2(word, llm_prompt_asnwer_list):
                     count_masculino += 1
                 elif reversed_search_article_phrase[1].lower() in array_mas:
                     count_masculino += 0.5
-    for element in llm_prompt_asnwer_list[1]:
+    for element in llm_prompt_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -231,14 +183,14 @@ def get_provisional_answer2(word, llm_prompt_asnwer_list):
         provisional_answer = "NULL"
     return provisional_answer
 
-def get_provisional_answer3(word, llm_prompt_asnwer_list):
+def get_provisional_answer3(word, llm_prompt_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
         - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
-        - llm_prompt_asnwer_list (list) = Lista que se compone de dos listas de misma longud
+        - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
@@ -252,23 +204,23 @@ def get_provisional_answer3(word, llm_prompt_asnwer_list):
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
-    plural_word = pluralize_word(word)
+    plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    max_difference = len(llm_prompt_asnwer_list[0])-round((len(llm_prompt_asnwer_list[0])*2)/3) + 1
-    list_minimum_appearences = len(llm_prompt_asnwer_list[0]) * 0.8
+    max_difference = len(llm_prompt_answer_list[0])-round((len(llm_prompt_answer_list[0])*2)/3) + 1
+    list_minimum_appearences = len(llm_prompt_answer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
-    minimun_number_of_sentences = min(len(llm_prompt_asnwer_list[0]), len(llm_prompt_asnwer_list[1]))
-    maximun_number_of_sentences = max(len(llm_prompt_asnwer_list[0]), len(llm_prompt_asnwer_list[1]))
-    llm_prompt_asnwer_list[0] = llm_prompt_asnwer_list[0][:minimun_number_of_sentences]
-    llm_prompt_asnwer_list[1] = llm_prompt_asnwer_list[1][:minimun_number_of_sentences]
+    minimun_number_of_sentences = min(len(llm_prompt_answer_list[0]), len(llm_prompt_answer_list[1]))
+    maximun_number_of_sentences = max(len(llm_prompt_answer_list[0]), len(llm_prompt_answer_list[1]))
+    llm_prompt_answer_list[0] = llm_prompt_answer_list[0][:minimun_number_of_sentences]
+    llm_prompt_answer_list[1] = llm_prompt_answer_list[1][:minimun_number_of_sentences]
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_asnwer_list[0]:
+    for element in llm_prompt_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -292,7 +244,7 @@ def get_provisional_answer3(word, llm_prompt_asnwer_list):
                     count_femenino += 0.5
                 elif reversed_search_article_phrase[1].lower() in array_fem:
                     count_femenino += 0.25
-    for element in llm_prompt_asnwer_list[1]:
+    for element in llm_prompt_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -320,7 +272,7 @@ def get_provisional_answer3(word, llm_prompt_asnwer_list):
     print(count_masculino)
     print(count_femenino)
     
-    if len(llm_prompt_asnwer_list[0]) > 0 and len(llm_prompt_asnwer_list[0]) >= maximun_number_of_sentences/2:
+    if len(llm_prompt_answer_list[0]) > 0 and len(llm_prompt_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
         if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
             provisional_answer = "Masculino"

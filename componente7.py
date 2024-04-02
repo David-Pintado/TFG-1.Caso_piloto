@@ -76,14 +76,6 @@ def knowledge_exploitation():
             llm_answer = componente3_provisional.run_the_model(prompt)
             # Extraer la parte de la respuesta para su posterior tratado
             llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
-            # Eliminar los saltos de linea
-            llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
-            # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-            llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
-            # Quitar los espacios blancos del principio y final de las frases 
-            llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
-            # Quitar las comillas y barras de las frases
-            llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
             # Añadir la lista de las respuestas al data structure
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
@@ -97,14 +89,6 @@ def knowledge_exploitation():
                 llm_answer = componente3_provisional.run_the_model(prompt)
                 # Extraer la parte de la respuesta para su posterior tratado
                 llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
-                # Eliminar los saltos de linea
-                llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
-                # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-                llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
-                # Quitar los espacios blancos del principio y final de las frases 
-                llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
-                # Quitar las comillas y barras de las frases
-                llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
                 # Añadir la lista de las respuestas al data structure
                 llm_extracted_final_answers_list.append(llm_extracted_answer)
             # Conseguir la respuesta final en base a lo devuelto por el modelo de lenguaje
@@ -118,8 +102,8 @@ def knowledge_exploitation():
             answer = final_answer
             
         # Añadirlo al source_information
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, answer]
-        source_information[offset_word] = item_list
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], answer]
+        exploited_information[offset_word] = item_list
         
     componente3_provisional.llm = None
         
@@ -135,21 +119,13 @@ def knowledge_exploitation():
         llm_extracted_final_answers_list = []
         word = offset_word.split('_')[1]
         if attributes[5] == "Femenino" or attributes[5] == "Masculino":
-            final_prompt_list = componente2.generate_final_prompts((offset_word,attributes), attributes[5])
+            final_prompt_list = componente2.generate_validation_prompts((offset_word,attributes), attributes[5])
             
             for prompt in final_prompt_list:
                 # Reallizar la pregunta al modelo de lenguaje 
                 llm_answer = componente3_final.run_the_model(prompt)
                 # Extraer la parte de la respuesta para su posterior tratado
                 llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
-                # Eliminar los saltos de linea
-                llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
-                # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-                llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
-                # Quitar los espacios blancos del principio y final de las frases 
-                llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
-                # Quitar las comillas y barras de las frases
-                llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
                 # Añadir la lista de las respuestas al data structure
                 llm_extracted_final_answers_list.append(llm_extracted_answer)
             
