@@ -34,7 +34,6 @@ def get_provisional_answer(word, llm_prompt_answer_list):
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
         - provisional_answer (string)
-                - "Neutro": La palabra es de género neutro
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
                 - "NULL": No se ha conseguido encontrar el género de la palabra
@@ -110,8 +109,6 @@ def get_provisional_answer(word, llm_prompt_answer_list):
         provisional_answer = "Masculino"
     elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
         provisional_answer = "Femenino"
-    elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-        provisional_answer = "Neutro"
     else:
         provisional_answer = "NULL"
     return provisional_answer
@@ -177,8 +174,6 @@ def get_provisional_answer2(word, llm_prompt_answer_list):
         provisional_answer = "Masculino"
     elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
         provisional_answer = "Femenino"
-    elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-        provisional_answer = "Neutro"
     else:
         provisional_answer = "NULL"
     return provisional_answer
@@ -278,8 +273,6 @@ def get_provisional_answer3(word, llm_prompt_answer_list):
             provisional_answer = "Masculino"
         elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
             provisional_answer = "Femenino"
-        elif count_masculino >=  list_minimum_appearences and count_femenino >=  list_minimum_appearences and 0 <= abs(count_masculino-count_femenino) <= max_difference: 
-            provisional_answer = "Neutro"
         else: 
             provisional_answer = "NULL"
     else:

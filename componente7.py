@@ -80,29 +80,9 @@ def knowledge_exploitation():
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
         provisional_answer = componente4.get_provisional_answer3(word,llm_extracted_provisional_answers_list)
-        
-        # (validación de 'Neutro'
-        if provisional_answer == "Neutro":
-            final_prompt_list = componente2.generate_provisional_prompts((offset_word,attributes))
-            for prompt in final_prompt_list:
-                # Reallizar la pregunta al modelo de lenguaje 
-                llm_answer = componente3_provisional.run_the_model(prompt)
-                # Extraer la parte de la respuesta para su posterior tratado
-                llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
-                # Añadir la lista de las respuestas al data structure
-                llm_extracted_final_answers_list.append(llm_extracted_answer)
-            # Conseguir la respuesta final en base a lo devuelto por el modelo de lenguaje
-            final_answer = componente4.get_provisional_answer3(word,llm_extracted_final_answers_list)
-            if final_answer != "Neutro":
-                final_answer = "NULL"
-        answer = ""
-        if final_answer == "":
-            answer = provisional_answer
-        else:
-            answer = final_answer
             
         # Añadirlo al source_information
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], answer]
+        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], provisional_answer]
         exploited_information[offset_word] = item_list
         
     componente3_provisional.llm = None
