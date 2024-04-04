@@ -51,7 +51,7 @@ def knowledge_exploitation():
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
             llm_answer = componente3_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
-            spa_gloss = componente4.extract_llm_answers(llm_answer).replace("\\", "").replace("\"", "")
+            spa_gloss = componente4.extract_llm_answers(llm_answer)
             spa_gloss = spa_gloss.strip().split("\n")[0]
             if ": " in spa_gloss and ": " not in eng_gloss:
                 spa_gloss = spa_gloss.split(': ')[1]
@@ -81,7 +81,7 @@ def knowledge_exploitation():
             # Añadir la lista de las respuestas al data structure
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-        provisional_answer = componente4.get_provisional_answer3(word,llm_extracted_provisional_answers_list)
+        provisional_answer = componente4.get_provisional_answer3((offset_word,attributes),llm_extracted_provisional_answers_list)
             
         # Añadirlo al source_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
@@ -95,12 +95,12 @@ def knowledge_exploitation():
     # Cargamos el modelo de lenguaje que vamos a utilizar para validar las respuestas provisionales
     componente3_final.load_model()    
     
-    for (offset_word,attributes) in source_information.items():    
+    for (offset_word,attributes) in exploited_information.items():    
         # (validacion de 'Femenino' o 'Masculino')
         final_answer = ""
         llm_extracted_final_answers_list = []
         word = offset_word.split('_')[1]
-        if attributes[4] == "Femenino" or attributes[4] == "Masculino":
+        if attributes[5] == "Femenino" or attributes[5] == "Masculino":
             final_prompt_list = componente2.generate_validation_prompts((offset_word,attributes), attributes[5])
             
             for prompt in final_prompt_list:
@@ -114,7 +114,7 @@ def knowledge_exploitation():
             # Inicializamos la clase 5 con los datos necesarios
             componente5 = Componente5(len(attributes[4][0]))
             # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-            final_answer = componente5.get_final_answer(word, llm_extracted_final_answers_list, attributes[5])
+            final_answer = componente5.get_final_answer((offset_word,attributes), llm_extracted_final_answers_list, attributes[5])
 
             
         answer = ""

@@ -15,19 +15,19 @@ def extract_llm_answers(llm_answer):
     # Quitar los espacios blancos del principio y final de las frases 
     llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
     # Quitar las comillas y barras de las frases
-    llm_extracted_answer = [answer.replace('"', '').replace('\\', '') for answer in llm_extracted_answer]
+    llm_extracted_answer = [answer.replace('"', '').replace('\\', '').replace("\"", "") for answer in llm_extracted_answer]
 
 
     return llm_extracted_answer
 
 
-def get_provisional_answer(word, llm_prompt_answer_list):
+def get_provisional_answer(element, llm_prompt_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
-        - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
+        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
         - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
@@ -41,6 +41,7 @@ def get_provisional_answer(word, llm_prompt_answer_list):
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
+    word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
@@ -114,11 +115,12 @@ def get_provisional_answer(word, llm_prompt_answer_list):
     
 # ///////////////////////////////////////////////////////////////////////////////////
 
-def get_provisional_answer2(word, llm_prompt_answer_list):
+def get_provisional_answer2(element, llm_prompt_answer_list):
     
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
+    word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
@@ -177,13 +179,13 @@ def get_provisional_answer2(word, llm_prompt_answer_list):
         provisional_answer = "NULL"
     return provisional_answer
 
-def get_provisional_answer3(word, llm_prompt_answer_list):
+def get_provisional_answer3(element, llm_prompt_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
-        - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
+        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
         - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
@@ -198,6 +200,7 @@ def get_provisional_answer3(word, llm_prompt_answer_list):
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
+    word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""

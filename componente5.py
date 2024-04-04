@@ -7,13 +7,13 @@ class Componente5:
     def __init__(self, minimun_number_of_sentences):
         self.minimun_number_of_sentences = minimun_number_of_sentences 
 
-    def get_final_answer(self, word, llm_prompt_answer_list, provisional_answer):
+    def get_final_answer(self, element, llm_prompt_answer_list, provisional_answer):
         
         """Función para la respuesta final al conocimiento a obtener en base a una palabra y una lista de frases
         con la palabra en el género de provisional_answer
         
         Parámetros:
-            - word (string)= Palabra que se analiza en busca del conocimiento (género en este caso)
+            - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
             - llm_prompt_answer_list (list) = Lista que se compone de una lista
                             - Contiene frases con la palabra en género provisional_answer
         Retorna:
@@ -25,6 +25,7 @@ class Componente5:
         
         # Inicializamos las variables necesarias
         gender_points = 0
+        word = element[0].split('_')[1]
         plural_word = auxFunctions.pluralize_word(word)
         word_appearence = ""
         final_answer = ""
