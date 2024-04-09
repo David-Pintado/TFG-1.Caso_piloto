@@ -2,10 +2,10 @@ import random
 
 class Componente1:
     
-    def __init__(self, word_mcr_file, synset_mcr_file, synset_eng_mcr_file, most_used_words_file):
-        self.word_mcr_file = word_mcr_file 
-        self.synset_mcr_file = synset_mcr_file
-        self.synset_eng_mcr_file = synset_eng_mcr_file
+    def __init__(self, spa_variant_file, spa_synset_file, eng_synset_file, most_used_words_file):
+        self.spa_variant_file = spa_variant_file 
+        self.spa_synset_file = spa_synset_file
+        self.eng_synset_file = eng_synset_file
         self.most_used_words_file = most_used_words_file
 
     # Método para generar el 'source_information'
@@ -23,13 +23,13 @@ class Componente1:
                 words_set = set(most_used_words_file.read().split())
                 
         except FileNotFoundError:
-            print(f'Archivo "{self.word_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta') 
+            print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta') 
             
         # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario llamado offsets_glosses_array
         # El esquema de este es: Key=offset. Value = gloss
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
-            with open(self.synset_mcr_file, 'r', encoding="utf-8") as archivo:
+            with open(self.spa_synset_file, 'r', encoding="utf-8") as archivo:
                 # Recorremos cada línea
                 for linea in archivo:
                     # Obtenemos una lista en la que cada elemento es una columna del synset
@@ -39,13 +39,13 @@ class Componente1:
                     # Añadimos a la lista una tupla (offset, gloss)
                     offsets_glosses_array[synset[0]] = synset[6]
         except FileNotFoundError:
-            print(f'Archivo "{self.synset_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')
+            print(f'Archivo "{self.spa_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
         # Leer el archivo que contiene los variant en español y almacenarlo en un diccionario llamado source_information
         # El esquema de este es: Key=offset_word. Value = sense, part_of_speech, language
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
-            with open(self.word_mcr_file, 'r', encoding="utf-8") as archivo:
+            with open(self.spa_variant_file, 'r', encoding="utf-8") as archivo:
                 # Recorremos cada línea
                 for linea in archivo:
                     # Obtenemos una lista en la que cada elemento es una columna del synset
@@ -79,7 +79,7 @@ class Componente1:
                         break
                         
         except FileNotFoundError:
-            print(f'Archivo "{self.word_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')   
+            print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta')   
           
         # Modificar el source_information añadiendo los glosses del offsets_glosses_array
         # El esquema del source_information será:  Key=offset_word. Value = sense, gloss, part_of_speech, language
@@ -96,7 +96,7 @@ class Componente1:
         eng_data_structure = {}
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
-            with open(self.synset_eng_mcr_file, 'r', encoding="utf-8") as archivo:
+            with open(self.eng_synset_file, 'r', encoding="utf-8") as archivo:
                 # Recorremos cada línea
                 for linea in archivo:
                     # Obtenemos una lista en la que cada elemento es una columna del synset
@@ -106,7 +106,7 @@ class Componente1:
                     # Añadimos a la lista una tupla (offset, gloss)
                     eng_data_structure[synset[0].replace('eng','spa')] = synset[6]
         except FileNotFoundError:
-            print(f'Archivo "{self.synset_mcr_file}" no encontrado. Vuelve a introducir una nueva ruta')
+            print(f'Archivo "{self.spa_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
         return eng_data_structure   
 
