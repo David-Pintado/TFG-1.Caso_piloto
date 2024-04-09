@@ -1,5 +1,7 @@
 
 import re
+import sys
+sys.path.append("./auxFunctionLibrary")
 from pythonLib import auxFunctions
 
 def extract_llm_answers(llm_answer):
@@ -21,14 +23,14 @@ def extract_llm_answers(llm_answer):
     return llm_extracted_answer
 
 
-def get_provisional_answer(element, llm_prompt_answer_list):
+def get_provisional_answer(element, llm_extracted_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
         - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
-        - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
+        - llm_extracted_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
@@ -37,7 +39,6 @@ def get_provisional_answer(element, llm_prompt_answer_list):
                 - "Femenino": La palabra es de género femenino
                 - "NULL": No se ha conseguido encontrar el género de la palabra
     """
-    
     # Inicializamos las variables necesarias
     count_masculino = 0
     count_femenino = 0
@@ -46,13 +47,13 @@ def get_provisional_answer(element, llm_prompt_answer_list):
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    max_difference = len(llm_prompt_answer_list[0])-round((len(llm_prompt_answer_list[0])*2)/3) + 1
-    list_minimum_appearences = len(llm_prompt_answer_list[0]) * 0.8
+    max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
+    list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_answer_list[0]:
+    for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -76,7 +77,7 @@ def get_provisional_answer(element, llm_prompt_answer_list):
                     elif reversed_element.lower() in array_fem:
                         count_femenino += 1
                         break
-    for element in llm_prompt_answer_list[1]:
+    for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -101,8 +102,17 @@ def get_provisional_answer(element, llm_prompt_answer_list):
                         count_femenino += 1
                         break
 
-    print(count_masculino)
-    print(count_femenino)
+    # print(' ')
+    # print('Puntos masculinos: ')
+    # print(count_masculino) 
+    # print(' ')
+    # print('Puntos femeninos')
+    # print(count_femenino)
+    # print(' ')
+    # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
+    # print(list_minimum_appearences)
+    # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
+    # print(max_difference)
     
     # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
     if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
@@ -115,7 +125,7 @@ def get_provisional_answer(element, llm_prompt_answer_list):
     
 # ///////////////////////////////////////////////////////////////////////////////////
 
-def get_provisional_answer2(element, llm_prompt_answer_list):
+def get_provisional_answer2(element, llm_extracted_answer_list):
     
     # Inicializamos las variables necesarias
     count_masculino = 0
@@ -125,13 +135,13 @@ def get_provisional_answer2(element, llm_prompt_answer_list):
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    list_minimum_appearences = len(llm_prompt_answer_list[0])/2
+    list_minimum_appearences = len(llm_extracted_answer_list[0])/2
     max_difference = list_minimum_appearences/2
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_answer_list[0]:
+    for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -149,7 +159,7 @@ def get_provisional_answer2(element, llm_prompt_answer_list):
                     count_masculino += 1
                 elif reversed_search_article_phrase[1].lower() in array_mas:
                     count_masculino += 0.5
-    for element in llm_prompt_answer_list[1]:
+    for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -168,8 +178,17 @@ def get_provisional_answer2(element, llm_prompt_answer_list):
                 elif reversed_search_article_phrase[1].lower() in array_fem:
                     count_femenino += 0.5
 
-    print(count_masculino)
-    print(count_femenino)
+    # print(' ')
+    # print('Puntos masculinos: ')
+    # print(count_masculino) 
+    # print(' ')
+    # print('Puntos femeninos')
+    # print(count_femenino)
+    # print(' ')
+    # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
+    # print(list_minimum_appearences)
+    # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
+    # print(max_difference)
 
     if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
         provisional_answer = "Masculino"
@@ -179,14 +198,14 @@ def get_provisional_answer2(element, llm_prompt_answer_list):
         provisional_answer = "NULL"
     return provisional_answer
 
-def get_provisional_answer3(element, llm_prompt_answer_list):
+def get_provisional_answer3(element, llm_extracted_answer_list):
     
     """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
         - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
-        - llm_prompt_answer_list (list) = Lista que se compone de dos listas de misma longud
+        - llm_extracted_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
@@ -205,19 +224,19 @@ def get_provisional_answer3(element, llm_prompt_answer_list):
     male_word_appearence = ""
     female_word_appearence = ""
     provisional_answer = ""
-    max_difference = len(llm_prompt_answer_list[0])-round((len(llm_prompt_answer_list[0])*2)/3) + 1
-    list_minimum_appearences = len(llm_prompt_answer_list[0]) * 0.8
+    max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
+    list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
     array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
     array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
-    minimun_number_of_sentences = min(len(llm_prompt_answer_list[0]), len(llm_prompt_answer_list[1]))
-    maximun_number_of_sentences = max(len(llm_prompt_answer_list[0]), len(llm_prompt_answer_list[1]))
-    llm_prompt_answer_list[0] = llm_prompt_answer_list[0][:minimun_number_of_sentences]
-    llm_prompt_answer_list[1] = llm_prompt_answer_list[1][:minimun_number_of_sentences]
+    minimun_number_of_sentences = min(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
+    maximun_number_of_sentences = max(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
+    llm_extracted_answer_list[0] = llm_extracted_answer_list[0][:minimun_number_of_sentences]
+    llm_extracted_answer_list[1] = llm_extracted_answer_list[1][:minimun_number_of_sentences]
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
-    for element in llm_prompt_answer_list[0]:
+    for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -241,7 +260,7 @@ def get_provisional_answer3(element, llm_prompt_answer_list):
                     count_femenino += 0.5
                 elif reversed_search_article_phrase[1].lower() in array_fem:
                     count_femenino += 0.25
-    for element in llm_prompt_answer_list[1]:
+    for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
         for item in plural_word:
             pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
@@ -266,10 +285,19 @@ def get_provisional_answer3(element, llm_prompt_answer_list):
                 elif reversed_search_article_phrase[1].lower() in array_fem:
                     count_femenino += 0.5
 
-    print(count_masculino)
-    print(count_femenino)
+    # print(' ')
+    # print('Puntos masculinos: ')
+    # print(count_masculino) 
+    # print(' ')
+    # print('Puntos femeninos')
+    # print(count_femenino)
+    # print(' ')
+    # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
+    # print(list_minimum_appearences)
+    # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
+    # print(max_difference)
     
-    if len(llm_prompt_answer_list[0]) > 0 and len(llm_prompt_answer_list[0]) >= maximun_number_of_sentences/2:
+    if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
         if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
             provisional_answer = "Masculino"
