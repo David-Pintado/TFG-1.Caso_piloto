@@ -26,7 +26,7 @@ def knowledge_exploitation():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Inicializamos el componente1 para importar los datos de las fuentes 
-    componente1 = Componente1(config['file_path']['word_mcr_file'], config['file_path']['synset_mcr_file'], config['file_path']['synset_eng_mcr_file'], config['file_path']['500_most_used_words_spa_file'])
+    componente1 = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['500_most_used_words_spa_file'])
     
     # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
     componente3_provisional = Componente3(config['file_path']['provisional_answers_language_model_path'])
