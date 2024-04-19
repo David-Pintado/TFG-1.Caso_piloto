@@ -72,7 +72,6 @@ def knowledge_exploitation():
         
         # (respuesta provisional)
         provisional_prompt_list = componente2.generate_provisional_prompts((offset_word,attributes))
-        word = offset_word.split('_')[1]
         for prompt in provisional_prompt_list:
             # Reallizar la pregunta al modelo de lenguaje 
             llm_answer = componente3_provisional.run_the_model(prompt)
@@ -86,6 +85,7 @@ def knowledge_exploitation():
         # Añadirlo al source_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
         exploited_information[offset_word] = item_list
+        source_information[offset_word] = item_list
         
     componente3_provisional.llm = None
         
@@ -99,7 +99,6 @@ def knowledge_exploitation():
         # (validacion de 'Femenino' o 'Masculino')
         final_answer = ""
         llm_extracted_final_answers_list = []
-        word = offset_word.split('_')[1]
         if attributes[5] == "Femenino" or attributes[5] == "Masculino":
             final_prompt_list = componente2.generate_validation_prompts((offset_word,attributes), attributes[5])
             
@@ -126,9 +125,10 @@ def knowledge_exploitation():
         # Añadirlo al exploited_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], answer]
         exploited_information[offset_word] = item_list
+        source_information[offset_word] = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], llm_extracted_final_answers_list, answer]
     
     # Generamos un JSON con la estructura de datos, para una mejor visualizacion
-    json_exploited_information = json.dumps(exploited_information, indent=2, ensure_ascii=False)
+    json_exploited_information = json.dumps(source_information, indent=2, ensure_ascii=False)
     
     # Generamos un JSON con la estructura de datos en ingles, para una mejor visualizacion
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
