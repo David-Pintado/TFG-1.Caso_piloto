@@ -11,14 +11,15 @@ def extract_llm_answers(llm_answer):
     # Dividirlo en dos partes (la parte de la pregunta, la parte de la respuesta)
     llm_extracted_answer = return_answer_value.split('Answer:')[1]
     # Eliminar los saltos de linea
-    llm_extracted_answer = [llm_extracted_answer.replace('\n',' ').strip()]
-    # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-    llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer[0])[1:]
-    # Quitar los espacios blancos del principio y final de las frases 
-    llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
-    # Quitar las comillas y barras de las frases
-    llm_extracted_answer = [answer.replace('"', '').replace('\\', '').replace("\"", "") for answer in llm_extracted_answer]
-
+    llm_extracted_answer = llm_extracted_answer.replace('\n',' ').strip()
+    # Comprabar si tiene separadores de frases. Si no tiene es que es una traduccion
+    if(re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != []):    
+        # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
+        llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:]
+        # Quitar los espacios blancos del principio y final de las frases 
+        llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+        # Quitar las comillas y barras de las frases
+        llm_extracted_answer = [answer.replace('"', '').replace('\\', '').replace("\"", "") for answer in llm_extracted_answer]
 
     return llm_extracted_answer
 
@@ -322,7 +323,6 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
         - provisional_answer (string)
-                - "Neutro": La palabra es de género neutro
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
                 - "NULL": No se ha conseguido encontrar el género de la palabra

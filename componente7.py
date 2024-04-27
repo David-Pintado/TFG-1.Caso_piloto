@@ -26,7 +26,7 @@ def knowledge_exploitation():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Inicializamos el componente1 para importar los datos de las fuentes 
-    componente1 = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['500_most_used_words_spa_file'])
+    componente1 = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
     
     # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
     componente3_provisional = Componente3(config['file_path']['provisional_answers_language_model_path'])
@@ -52,6 +52,11 @@ def knowledge_exploitation():
             eng_gloss = source_gloss_structure_eng[offset]
             llm_answer = componente3_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
             spa_gloss = componente4.extract_llm_answers(llm_answer)
+            if type(spa_gloss) is list:
+                if len(spa_gloss) > 0:
+                    spa_gloss = spa_gloss[0]
+                elif len(spa_gloss) == 0:
+                    spa_gloss = ""
             spa_gloss = spa_gloss.strip().split("\n")[0]
             if ": " in spa_gloss and ": " not in eng_gloss:
                 spa_gloss = spa_gloss.split(': ')[1]

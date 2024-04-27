@@ -7,8 +7,8 @@
 /prueba3.py
 /random_15_preliminar.json
 /source_gloss_structure_eng.json
-/source_information_structure.json
-/source_information_structure_sin_gloss.json
+/source_information.json
+/source_information_sin_gloss.json
 /wei_spa_30_word_genders.csv
 /Zephyr-7b-beta.txt
 /__pycache__

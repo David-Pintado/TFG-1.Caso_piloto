@@ -15,7 +15,6 @@ class Componente1:
         source_information = {}
         offsets_glosses_array = {}
         words_set = {}
-        count = 0        
         
         # Leer el archivo de las 1000 palabras más usadas y almacenar las palabras en un conjunto
         try:
@@ -67,16 +66,9 @@ class Componente1:
                     # Clave compuesta (offset_word)
                     offset_word = offset + '_' + word
                     # Si es un synset en español y el tipo de palabra es sustantivo (noun=n)
-                    if language == "spa" and part_of_speech == "n" and word in words_set and word == "estudiante":
+                    if language == "spa" and part_of_speech == "n" and word in words_set:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
-                        # if round(random.random()*10) == 10:
                         source_information[offset_word] = [sense, part_of_speech, language]
-                        count += 1
-                    elif language == "spa" and part_of_speech == "n" and word in words_set:
-                        source_information[offset_word] = [sense, part_of_speech, language]
-                        count += 1
-                    if count > 9:
-                        break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta')   
