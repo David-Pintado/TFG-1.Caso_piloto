@@ -22,7 +22,7 @@ class Componente1:
                 words_set = set(most_used_words_file.read().split())
                 
         except FileNotFoundError:
-            print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta') 
+            print(f'Archivo "{self.most_used_words_file}" no encontrado. Vuelve a introducir una nueva ruta') 
             
         # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario llamado offsets_glosses_array
         # El esquema de este es: Key=offset. Value = gloss
