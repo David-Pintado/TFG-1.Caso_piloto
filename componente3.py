@@ -1,4 +1,5 @@
 
+import json
 from llama_cpp import Llama
 
 class Componente3:
@@ -10,8 +11,11 @@ class Componente3:
     # Metodo para cargar el modelo
     def load_model(self):
         # load the model
-        print("Loading the model...")   
-        self.llm = Llama(model_path= self.language_model_path)
+        print("Loading the model...")
+        try:
+            self.llm = Llama(model_path= self.language_model_path)
+        except ValueError:
+            print(f'LLM "{self.language_model_path}" no encontrado. Vuelve a introducir una nueva ruta') 
         print("Model loaded.")
     
     # Metodo para realizar la pregunta al modelo. Devuelve lo obtenido.
