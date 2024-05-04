@@ -3,6 +3,7 @@ import re
 import sys
 sys.path.append("./auxFunctionLibrary")
 from pythonLib import auxFunctions
+from unidecode import unidecode
 
 class Componente5:
     
@@ -44,10 +45,12 @@ class Componente5:
         # Contamos las apariciones de las palabras y articulos para saber su genero
         for element in llm_extracted_answer_list[0]:
             word_appearence = ""
+            element_copy = str(element)  # Crear una copia de element
             for item in plural_word:
-                pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-                if re.search(pattern, element):
-                    word_appearence = item
+                pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+                match = re.search(pattern, unidecode(element_copy))
+                if match:
+                    word_appearence = element_copy[match.start():match.end()]
                     break
             if word_appearence != "":
                 search_article_phrase = element.split(word_appearence)[0].strip().split(' ')
@@ -62,12 +65,6 @@ class Componente5:
                         gender_points += 1
                     elif reversed_search_article_phrase[1].lower() in gender_terms:
                         gender_points += 0.5
-                    elif reversed_search_article_phrase[0].lower() in gender_terms:
-                        gender_points += 0.5
-                    elif reversed_search_article_phrase[1].lower() in gender_terms:
-                        gender_points += 0.25
-
-        print(gender_points)
 
         if len(llm_extracted_answer_list[0]) >= self.minimun_number_of_sentences:
             # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 

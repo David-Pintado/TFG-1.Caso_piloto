@@ -3,6 +3,7 @@ import re
 import sys
 sys.path.append("./auxFunctionLibrary")
 from pythonLib import auxFunctions
+from unidecode import unidecode
 
 def extract_llm_answers(llm_answer):
 
@@ -19,7 +20,7 @@ def extract_llm_answers(llm_answer):
         # Quitar los espacios blancos del principio y final de las frases 
         llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
-        llm_extracted_answer = [answer.replace('"', '').replace('\\', '').replace("\"", "") for answer in llm_extracted_answer]
+        llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
 
     return llm_extracted_answer
 
@@ -41,8 +42,8 @@ def get_provisional_answer(element, llm_extracted_answer_list):
                 - "NULL": No se ha conseguido encontrar el género de la palabra
     """
     # Inicializamos las variables necesarias
-    count_masculino = 0
-    count_femenino = 0
+    count_male = 0
+    count_female = 0
     word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
@@ -50,65 +51,67 @@ def get_provisional_answer(element, llm_extracted_answer_list):
     provisional_answer = ""
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
-    array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
-    array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
+    array_male = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                count_masculino += 1
-                male_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 1
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 1
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_female += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:4]
                 for reversed_element in reversed_search_article_phrase:
-                    if reversed_element.lower() in array_mas:
-                        count_masculino += 1
+                    if reversed_element.lower() in array_male:
+                        count_male += 1
                         break
-                    elif reversed_element.lower() in array_fem:
-                        count_femenino += 1
+                    elif reversed_element.lower() in array_female:
+                        count_female += 1
                         break
     for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                count_femenino += 1
-                female_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 1
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 1
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_female += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:4]
                 for reversed_element in reversed_search_article_phrase:
-                    if reversed_element.lower() in array_mas:
-                        count_masculino += 1
+                    if reversed_element.lower() in array_male:
+                        count_male += 1
                         break
-                    elif reversed_element.lower() in array_fem:
-                        count_femenino += 1
+                    elif reversed_element.lower() in array_female:
+                        count_female += 1
                         break
 
     # print(' ')
     # print('Puntos masculinos: ')
-    # print(count_masculino) 
+    # print(count_male) 
     # print(' ')
     # print('Puntos femeninos')
-    # print(count_femenino)
+    # print(count_female)
     # print(' ')
     # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
     # print(list_minimum_appearences)
@@ -116,9 +119,9 @@ def get_provisional_answer(element, llm_extracted_answer_list):
     # print(max_difference)
     
     # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
-    if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+    if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
         provisional_answer = "Masculino"
-    elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+    elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
         provisional_answer = "Femenino"
     else:
         provisional_answer = "NULL"
@@ -129,8 +132,8 @@ def get_provisional_answer(element, llm_extracted_answer_list):
 def get_provisional_answer2(element, llm_extracted_answer_list):
     
     # Inicializamos las variables necesarias
-    count_masculino = 0
-    count_femenino = 0
+    count_male = 0
+    count_female = 0
     word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
@@ -138,62 +141,66 @@ def get_provisional_answer2(element, llm_extracted_answer_list):
     provisional_answer = ""
     list_minimum_appearences = len(llm_extracted_answer_list[0])/2
     max_difference = list_minimum_appearences/2
-    array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
-    array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
+    array_male = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                male_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_mas:
-                    count_masculino += 1
-                elif reversed_search_article_phrase[1].lower() in array_mas:
-                    count_masculino += 0.5
+                if reversed_search_article_phrase[0].lower() in array_male:
+                    count_male += 1
+                elif reversed_search_article_phrase[1].lower() in array_male:
+                    count_male += 0.5
     for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                female_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 1
+                if search_article_phrase[-1].lower() in array_female:
+                    count_female += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_fem:
-                    count_femenino += 1
-                elif reversed_search_article_phrase[1].lower() in array_fem:
-                    count_femenino += 0.5
+                if reversed_search_article_phrase[0].lower() in array_female:
+                    count_female += 1
+                elif reversed_search_article_phrase[1].lower() in array_female:
+                    count_female += 0.5
 
     # print(' ')
     # print('Puntos masculinos: ')
-    # print(count_masculino) 
+    # print(count_male) 
     # print(' ')
     # print('Puntos femeninos')
-    # print(count_femenino)
+    # print(count_female)
     # print(' ')
     # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
     # print(list_minimum_appearences)
     # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
     # print(max_difference)
 
-    if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+    if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
         provisional_answer = "Masculino"
-    elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+    elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
         provisional_answer = "Femenino"
     else:
         provisional_answer = "NULL"
@@ -218,8 +225,8 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     """
     
     # Inicializamos las variables necesarias
-    count_masculino = 0
-    count_femenino = 0
+    count_male = 0
+    count_female = 0
     word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
@@ -227,8 +234,8 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     provisional_answer = ""
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
-    array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
-    array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
+    array_male = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
     minimun_number_of_sentences = min(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
@@ -239,59 +246,63 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                male_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 1
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 0.5
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 1
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_female += 0.5
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_mas:
-                    count_masculino += 1
-                elif reversed_search_article_phrase[1].lower() in array_mas:
-                    count_masculino += 0.5
-                elif reversed_search_article_phrase[0].lower() in array_fem:
-                    count_femenino += 0.5
-                elif reversed_search_article_phrase[1].lower() in array_fem:
-                    count_femenino += 0.25
+                if reversed_search_article_phrase[0].lower() in array_male:
+                    count_male += 1
+                elif reversed_search_article_phrase[1].lower() in array_male:
+                    count_male += 0.5
+                elif reversed_search_article_phrase[0].lower() in array_female:
+                    count_female += 0.5
+                elif reversed_search_article_phrase[1].lower() in array_female:
+                    count_female += 0.25
     for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                female_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 0.5
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 0.5
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_female += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_mas:
-                    count_masculino += 0.5
-                elif reversed_search_article_phrase[1].lower() in array_mas:
-                    count_masculino += 0.25
-                elif reversed_search_article_phrase[0].lower() in array_fem:
-                    count_femenino += 1
-                elif reversed_search_article_phrase[1].lower() in array_fem:
-                    count_femenino += 0.5
+                if reversed_search_article_phrase[0].lower() in array_male:
+                    count_male += 0.5
+                elif reversed_search_article_phrase[1].lower() in array_male:
+                    count_male += 0.25
+                elif reversed_search_article_phrase[0].lower() in array_female:
+                    count_female += 1
+                elif reversed_search_article_phrase[1].lower() in array_female:
+                    count_female += 0.5
 
     # print(' ')
     # print('Puntos masculinos: ')
-    # print(count_masculino) 
+    # print(count_male) 
     # print(' ')
     # print('Puntos femeninos')
-    # print(count_femenino)
+    # print(count_female)
     # print(' ')
     # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
     # print(list_minimum_appearences)
@@ -300,9 +311,9 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     
     if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
-        if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+        if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
             provisional_answer = "Masculino"
-        elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+        elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
             provisional_answer = "Femenino"
         else: 
             provisional_answer = "NULL"
@@ -329,8 +340,8 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
     """
     
     # Inicializamos las variables necesarias
-    count_masculino = 0
-    count_femenino = 0
+    count_male = 0
+    count_female = 0
     word = element[0].split('_')[1]
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
@@ -338,8 +349,8 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
     provisional_answer = ""
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
-    array_fem = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
-    array_mas = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
+    array_male = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
     
     # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
     minimun_number_of_sentences = min(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
@@ -350,59 +361,63 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for element in llm_extracted_answer_list[0]:
         male_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                male_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_masculino += 1
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_masculino += -1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_male += 1
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_male += -1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_mas:
-                    count_masculino += 1
-                elif reversed_search_article_phrase[1].lower() in array_mas:
-                    count_masculino += 0.5
-                elif reversed_search_article_phrase[0].lower() in array_fem:
-                    count_masculino += -1
-                elif reversed_search_article_phrase[1].lower() in array_fem:
-                    count_masculino += -0.5
+                if reversed_search_article_phrase[0].lower() in array_male:
+                    count_male += 1
+                elif reversed_search_article_phrase[1].lower() in array_male:
+                    count_male += 0.5
+                elif reversed_search_article_phrase[0].lower() in array_female:
+                    count_male += -1
+                elif reversed_search_article_phrase[1].lower() in array_female:
+                    count_male += -0.5
     for element in llm_extracted_answer_list[1]:
         female_word_appearence = ""
+        element_copy = str(element)  # Crear una copia de element
         for item in plural_word:
-            pattern = r'\b' + re.escape(item) + r'(?=[^\w]|$)'
-            if re.search(pattern, element):
-                female_word_appearence = item
+            pattern = r'\b' + re.escape(unidecode(item)) + r'(?=[^\w]|$)'
+            match = re.search(pattern, unidecode(element_copy))
+            if match:
+                female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
-                if search_article_phrase[-1].lower() in array_mas:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
-                    count_femenino += -1
-                elif search_article_phrase[-1].lower() in array_fem:
-                    count_femenino += 1
+                if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
+                    count_female += -1
+                elif search_article_phrase[-1].lower() in array_female:
+                    count_female += 1
             elif len(search_article_phrase) > 1:
                 reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                if reversed_search_article_phrase[0].lower() in array_mas:
-                    count_femenino += -1
-                elif reversed_search_article_phrase[1].lower() in array_mas:
-                    count_femenino += -0.5
-                elif reversed_search_article_phrase[0].lower() in array_fem:
-                    count_femenino += 1
-                elif reversed_search_article_phrase[1].lower() in array_fem:
-                    count_femenino += 0.5
+                if reversed_search_article_phrase[0].lower() in array_male:
+                    count_female += -1
+                elif reversed_search_article_phrase[1].lower() in array_male:
+                    count_female += -0.5
+                elif reversed_search_article_phrase[0].lower() in array_female:
+                    count_female += 1
+                elif reversed_search_article_phrase[1].lower() in array_female:
+                    count_female += 0.5
 
     # print(' ')
     # print('Puntos masculinos: ')
-    # print(count_masculino) 
+    # print(count_male) 
     # print(' ')
     # print('Puntos femeninos')
-    # print(count_femenino)
+    # print(count_female)
     # print(' ')
     # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
     # print(list_minimum_appearences)
@@ -411,9 +426,9 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
     
     if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
-        if count_masculino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_masculino > count_femenino:
+        if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
             provisional_answer = "Masculino"
-        elif count_femenino >=  list_minimum_appearences and 0 <= max_difference < abs(count_masculino-count_femenino) and count_femenino > count_masculino:
+        elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
             provisional_answer = "Femenino"
         else: 
             provisional_answer = "NULL"
