@@ -6,12 +6,12 @@ import re
 import sys
 sys.path.append("./auxFunctionLibrary")
 
-from componente1 import Componente1
-import componente2
-from componente3 import Componente3
-import componente4
-from componente5 import Componente5
-from componente6 import Componente6
+from componenteImporter import ComponenteImporter
+import componenteQuestionMaker
+from componenteLLMCommunicator import Componente3
+import componenteExtractor
+from componenteValidator import Componente5
+from componenteExporter import Componente6
 
 
 def knowledge_exploitation():
@@ -25,8 +25,8 @@ def knowledge_exploitation():
     # Ruta del archivo donde escribir la estructura de datos 'source_gloss_structure_eng'
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
-    # Inicializamos el componente1 para importar los datos de las fuentes 
-    componente1 = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
+    # Inicializamos el ComponenteImporter para importar los datos de las fuentes 
+    ComponenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
     
     # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
     componente3_provisional = Componente3(config['file_path']['provisional_answers_language_model_path'])
@@ -35,14 +35,14 @@ def knowledge_exploitation():
     componente3_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
-    source_information = componente1.generate_data_structure()
+    source_information = ComponenteImporter.generate_data_structure()
     
     # Creamos la estructura de datos que guardará el conocimiento que se haya explotado en los modelos de lenguaje, 
     # junto con la información extraída de la(s) fuente(s).
     exploited_information = {}
     
     # Generar la estructura de datos en ingles para poder conseguir sus glosses 
-    source_gloss_structure_eng = componente1.generate_eng_data_structure()
+    source_gloss_structure_eng = ComponenteImporter.generate_eng_data_structure()
     
     # Recorrer el 'source_information', para ver que si no tiene el gloss (está NULL) accder al de
     # 'source_gloss_structure_eng' y traducirlo
@@ -51,7 +51,7 @@ def knowledge_exploitation():
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
             llm_answer = componente3_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
-            spa_gloss = componente4.extract_llm_answers(llm_answer)
+            spa_gloss = componenteExtractor.extract_llm_answers(llm_answer)
             if type(spa_gloss) is list:
                 if len(spa_gloss) > 0:
                     spa_gloss = spa_gloss[0]
@@ -76,16 +76,16 @@ def knowledge_exploitation():
         final_answer = ""
         
         # (respuesta provisional)
-        provisional_prompt_list = componente2.generate_provisional_prompts((offset_word,attributes))
+        provisional_prompt_list = componenteQuestionMaker.generate_provisional_prompts((offset_word,attributes))
         for prompt in provisional_prompt_list:
             # Reallizar la pregunta al modelo de lenguaje 
             llm_answer = componente3_provisional.run_the_model(prompt)
             # Extraer la parte de la respuesta para su posterior tratado
-            llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
+            llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
             # Añadir la lista de las respuestas al data structure
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-        provisional_answer = componente4.get_provisional_answer3((offset_word,attributes),llm_extracted_provisional_answers_list)
+        provisional_answer = componenteExtractor.get_provisional_answer3((offset_word,attributes),llm_extracted_provisional_answers_list)
             
         # Añadirlo al source_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
@@ -105,13 +105,13 @@ def knowledge_exploitation():
         final_answer = ""
         llm_extracted_final_answers_list = []
         if attributes[5] == "Femenino" or attributes[5] == "Masculino":
-            final_prompt_list = componente2.generate_validation_prompts((offset_word,attributes), attributes[5])
+            final_prompt_list = componenteQuestionMaker.generate_validation_prompts((offset_word,attributes), attributes[5])
             
             for prompt in final_prompt_list:
                 # Reallizar la pregunta al modelo de lenguaje 
                 llm_answer = componente3_final.run_the_model(prompt)
                 # Extraer la parte de la respuesta para su posterior tratado
-                llm_extracted_answer = componente4.extract_llm_answers(llm_answer)
+                llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
                 # Añadir la lista de las respuestas al data structure
                 llm_extracted_final_answers_list.append(llm_extracted_answer)
             
@@ -139,10 +139,10 @@ def knowledge_exploitation():
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
     
     # Guardar el 'source_information' en formato json en un archivo    
-    componente1.save_json(file_path_source_information_json,json_exploited_information)
+    ComponenteImporter.save_json(file_path_source_information_json,json_exploited_information)
     
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
-    componente1.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
+    ComponenteImporter.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
     
     return exploited_information
 
