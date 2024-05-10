@@ -26,7 +26,7 @@ def knowledge_exploitation():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Inicializamos el ComponenteImporter para importar los datos de las fuentes 
-    ComponenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
+    componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
     
     # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
     componenteLLMCommunicator_provisional = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
@@ -35,14 +35,14 @@ def knowledge_exploitation():
     componenteLLMCommunicator_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
-    source_information = ComponenteImporter.generate_data_structure()
+    source_information = componenteImporter.generate_data_structure()
     
     # Creamos la estructura de datos que guardará el conocimiento que se haya explotado en los modelos de lenguaje, 
     # junto con la información extraída de la(s) fuente(s).
     exploited_information = {}
     
     # Generar la estructura de datos en ingles para poder conseguir sus glosses 
-    source_gloss_structure_eng = ComponenteImporter.generate_eng_data_structure()
+    source_gloss_structure_eng = componenteImporter.generate_eng_data_structure()
     
     # Recorrer el 'source_information', para ver que si no tiene el gloss (está NULL) accder al de
     # 'source_gloss_structure_eng' y traducirlo
@@ -139,10 +139,10 @@ def knowledge_exploitation():
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
     
     # Guardar el 'source_information' en formato json en un archivo    
-    ComponenteImporter.save_json(file_path_source_information_json,json_exploited_information)
+    componenteImporter.save_json(file_path_source_information_json,json_exploited_information)
     
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
-    ComponenteImporter.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
+    componenteImporter.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
     
     return exploited_information
 
