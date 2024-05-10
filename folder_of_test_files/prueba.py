@@ -1,14 +1,14 @@
 
-import componente4
-from componente5 import Componente5
+import componenteExtractor
+from componenteValidator import ComponenteValidator
 import re
 
 
 array = {'id': 'cmpl-cd76e688-6c34-4cc7-a6d8-67651240e997', 'object': 'text_completion', 'created': 1711043421, 'model': './models/zephyr-7b-alpha.Q4_K_M.gguf', 'choices': [{'text': "Question: Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'entidad' se utilice en género masculino en todo momento, con el sentido de 'aquello que se percibe o se sabe o se infiere que tiene su existencia propia distinta (viva o no viva)'. Cada frase debe contener la palabra 'entidad' en género masculino, asegurándote de mantener este género en todas las instancias dentro de la frase. Answer:\n1. El roedor es una entidad pequeña y oculta, que a veces causa daño a nuestras cosechas.\n2. La noche es una entidad oscura y misteriosa, que nos inspire a relatar historias y leyendas.\n3. El bosque es una entidad silenciosa y vasto, que nos hace pensar en nuestro propósito y nuestra relación con la naturaleza.\n4. El círculo vicioso es una entidad destructiva y autosostenible, que nos mantiene alejados de nuestros objetivos y nos hace creer que no tenemos otras opciones.\n5. El poema es una entidad artística y emocionante, que nos ayuda a escapar de nuestras preocupaciones y a ver el mundo desde una perspect", 'index': 0, 'logprobs': None, 'finish_reason': 'length'}], 'usage': {'prompt_tokens': 130, 'completion_tokens': 200, 'total_tokens': 330}}
 array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_completion', 'created': 1711043525, 'model': './models/zephyr-7b-alpha.Q4_K_M.gguf', 'choices': [{'text': "Question: Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'entidad' se utilice en género femenino en todo momento, con el sentido de 'aquello que se percibe o se sabe o se infiere que tiene su existencia propia distinta (viva o no viva)'. Cada frase debe contener la palabra 'entidad' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase. Answer: 1. La entidad política es una fuerza poderosa en nuestro mundo. 2. La entidad geográfica del desierto es difícil de cruzar. 3. La entidad económica es un indicador clave de la salud de una nación. 4. La entidad social es crucial para nuestra existencia humana. 5. La entidad legal es una estructura bien definida para resolver conflictos.", 'index': 0, 'logprobs': None, 'finish_reason': 'stop'}], 'usage': {'prompt_tokens': 132, 'completion_tokens': 102, 'total_tokens': 234}}
 
-# llm_extracted_answer1 = componente4.extract_llm_answers(array)
-# llm_extracted_answer2 = componente4.extract_llm_answers(array2)
+# llm_extracted_answer1 = componenteExtractor.extract_llm_answers(array)
+# llm_extracted_answer2 = componenteExtractor.extract_llm_answers(array2)
 
 # print('1------------------')
 # print(llm_extracted_answer1)
@@ -37,7 +37,7 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 
 
 # Devolver el resultado provisional
-# print(componente4.get_provisional_answer('entidad',[llm_extracted_answer_list1, llm_extracted_answer_list2]))
+# print(componenteExtractor.get_provisional_answer('entidad',[llm_extracted_answer_list1, llm_extracted_answer_list2]))
 
 # a = [
 #       [
@@ -69,17 +69,17 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 # print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
 # print('')
 # print('Get_provisional_answer 1')
-# print(componente4.get_provisional_answer('conjunto',a))
+# print(componenteExtractor.get_provisional_answer('conjunto',a))
 # print('')
 # print('Get_provisional_answer 2')
-# print(componente4.get_provisional_answer2('conjunto',a))
+# print(componenteExtractor.get_provisional_answer2('conjunto',a))
 # print('')
 # print('Get_provisional_answer 3')
-# print(componente4.get_provisional_answer3('conjunto',a))
+# print(componenteExtractor.get_provisional_answer3('conjunto',a))
 # print(' ')
 # print(' ')
 # print('Validación')
-# print(componente5.get_final_answer('conjunto', b, 'Masculino'))
+# print(componenteValidator.get_final_answer('conjunto', b, 'Masculino'))
 
 
 # b = [
@@ -112,15 +112,15 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 # print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
 # print('')
 # print('Get_provisional_answer 1')
-# print(componente4.get_provisional_answer('causa',c))
+# print(componenteExtractor.get_provisional_answer('causa',c))
 # print('')
 # print('Get_provisional_answer 2')
-# print(componente4.get_provisional_answer2('causa',c))
+# print(componenteExtractor.get_provisional_answer2('causa',c))
 # print('')
 # print('Get_provisional_answer 3')
-# print(componente4.get_provisional_answer3('causa',c))
+# print(componenteExtractor.get_provisional_answer3('causa',c))
 
-# conponente5 = Componente5(5)
+# conponente5 = ComponenteValidator(5)
 # print(' ')
 # print(' ')
 # print('Validación')
@@ -158,17 +158,17 @@ element = ["spa-30-00002137-n_abstracción", [
 # print('Get_provisional_answer 1')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componente4.get_provisional_answer(element,a))
+# print(componenteExtractor.get_provisional_answer(element,a))
 # print('')
 # print('Get_provisional_answer 2')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componente4.get_provisional_answer2(element,a))
+# print(componenteExtractor.get_provisional_answer2(element,a))
 # print('')
 # print('Get_provisional_answer 3')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componente4.get_provisional_answer3(element,a))
+# print(componenteExtractor.get_provisional_answer3(element,a))
 
 # /////////////////
 
@@ -203,18 +203,18 @@ print('')
 print('Get_provisional_answer 1')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componente4.get_provisional_answer(element,a))
+print(componenteExtractor.get_provisional_answer(element,a))
 print('')
 print('Get_provisional_answer 2')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componente4.get_provisional_answer2(element,a))
+print(componenteExtractor.get_provisional_answer2(element,a))
 print('')
 print('Get_provisional_answer 3')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componente4.get_provisional_answer3(element,a))
+print(componenteExtractor.get_provisional_answer3(element,a))
 print('Get_provisional_answer 4')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componente4.get_provisional_answer4(element,a))
+print(componenteExtractor.get_provisional_answer4(element,a))

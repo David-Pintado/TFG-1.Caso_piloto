@@ -8,12 +8,12 @@ import sys
 sys.path.append('..')  # Agrega la carpeta superior al sys.path
 sys.path.append("../auxFunctionLibrary") #Agrega la carpeta superior al sys.path
 
-from componente1 import Componente1
-import componente2
-from componente3 import Componente3
-import componente4
-from componente5 import Componente5
-from componente6 import Componente6
+from componenteImporter import ComponenteImporter
+import componenteQuestionMaker
+from componenteLLMCommunicator import ComponenteLLMCommunicator
+import componenteExtractor
+from componenteValidator import ComponenteValidator
+from componenteExporter import ComponenteExporter
 
 
 def component_importer_test():
@@ -21,8 +21,8 @@ def component_importer_test():
     config = ConfigParser()
     config.read('./config.ini')
     
-    # Inicializamos el componente1 para importar los datos de las fuentes 
-    component1 = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['words_spa_file'])
+    # Inicializamos el componenteImporter para importar los datos de las fuentes 
+    component1 = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['words_spa_file'])
     
     # Guarda el flujo original de salida estándar
     stdout_orig = sys.stdout
@@ -34,7 +34,7 @@ def component_importer_test():
     sys.stdout = archivo_salida
 
     # Si el path no es correcto debe entrar en la excepcion
-    component1_test = Componente1(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['words_spa_file_test'])
+    component1_test = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['words_spa_file_test'])
     test_data_structure = component1_test.generate_data_structure()
 
     # Cierra el archivo
@@ -107,8 +107,8 @@ def component_question_maker_test():
     element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n","spa"])
     element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
     
-    provisional_prompts_piloto = componente2.generate_provisional_prompts(element_piloto)
-    provisional_prompts_tierra = componente2.generate_provisional_prompts(element_tierra)
+    provisional_prompts_piloto = componenteQuestionMaker.generate_provisional_prompts(element_piloto)
+    provisional_prompts_tierra = componenteQuestionMaker.generate_provisional_prompts(element_tierra)
     assert provisional_prompts_piloto == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'piloto' se utilice " +
                                         "en género masculino en todo momento, con el sentido de 'NULL'. Cada frase debe contener la palabra 'piloto' en género masculino, " +
                                         "asegurándote de mantener este género en todas las instancias dentro de la frase.", "Como experto en lingüística, por favor, " +
@@ -121,8 +121,8 @@ def component_question_maker_test():
                                         "'la parte sólida de la superficie de la Tierra'. Cada frase debe contener la palabra 'tierra' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase."], "Shold be true"
         
     
-    validation_prompts_piloto = componente2.generate_validation_prompts(element_piloto, "masculino")
-    validation_prompts_tierra = componente2.generate_validation_prompts(element_tierra, "femenino")
+    validation_prompts_piloto = componenteQuestionMaker.generate_validation_prompts(element_piloto, "masculino")
+    validation_prompts_tierra = componenteQuestionMaker.generate_validation_prompts(element_tierra, "femenino")
     
     assert validation_prompts_piloto == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'piloto' se utilice " +
                                         "en género masculino en todo momento, con el sentido de 'NULL'. Cada frase debe contener la palabra 'piloto' en género masculino, " +
@@ -147,8 +147,8 @@ def component_llm_communicator_test():
     sys.stdout = archivo_salida
 
     # Si el path del modelo no es correcto no debe dar error, si no indicar el motivo por consola
-    componente3_test = Componente3(config['file_path']['provisional_answers_language_model_path_test']) 
-    componente3_test.load_model()
+    componenteLLMCommunicator_test = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path_test']) 
+    componenteLLMCommunicator_test.load_model()
 
     # Cierra el archivo
     archivo_salida.close()
@@ -189,23 +189,23 @@ def component_llm_communicator_test():
         # Redirige la salida de error al archivo
         sys.stderr = archivo_salida
         
-        # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
-        componente3 = Componente3(config['file_path']['provisional_answers_language_model_path'])
+        # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
+        componenteLLMCommunicator = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
         
         # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
-        componente3.load_model()
+        componenteLLMCommunicator.load_model()
         
         # Elementos de prueba
         element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n","spa"])
         element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
                 
         # Pruebas de preguntas
-        provisional_prompts_piloto = componente2.generate_provisional_prompts(element_tierra)
-        provisional_prompts_tierra = componente2.generate_provisional_prompts(element_piloto)
+        provisional_prompts_piloto = componenteQuestionMaker.generate_provisional_prompts(element_tierra)
+        provisional_prompts_tierra = componenteQuestionMaker.generate_provisional_prompts(element_piloto)
         for element in provisional_prompts_piloto:
-            componente3.run_the_model(element) 
+            componenteLLMCommunicator.run_the_model(element) 
         for element in provisional_prompts_tierra:
-            componente3.run_the_model(element) 
+            componenteLLMCommunicator.run_the_model(element) 
         
         # Lee todas las líneas del archivo
         lines = archivo.readlines()
@@ -279,7 +279,7 @@ def component_extractor_test():
                               "La tierra es más que un lugar, es un sistema complejo que afecta a todas las formas de vida.",
                               "La tierra es la fuente de todos los recursos que necesitamos para sobrevivir y prosperar.",
                               "La tierra es un legado que debemos preservar para las generaciones futuras."]
-    assert expected_output_piloto_masculino == componente4.extract_llm_answers(elemento_prueba_piloto_masculino), "Should be true"
+    assert expected_output_piloto_masculino == componenteExtractor.extract_llm_answers(elemento_prueba_piloto_masculino), "Should be true"
     
     elemento_prueba_piloto_femenino = {
                                         "id": "cmpl-ec164673-25fb-4d96-be5c-5638e83dc102",
@@ -311,7 +311,7 @@ def component_extractor_test():
                                        "La tierra es una madre que nos da un lugar en la que compartir nuestras vidas.",
                                        "La tierra es una madre que nos da un lugar en la que vivir y crecer juntos.",
                                        "La tierra es una madre que nos da una oportunidad de crecer y desarrollarnos."]
-    assert expected_output_piloto_femenino == componente4.extract_llm_answers(elemento_prueba_piloto_femenino), "Should be true"
+    assert expected_output_piloto_femenino == componenteExtractor.extract_llm_answers(elemento_prueba_piloto_femenino), "Should be true"
     
     
     elemento_prueba_traducción = {
@@ -335,7 +335,7 @@ def component_extractor_test():
                                    }
     
     expected_output_traduccion = "Alguien que posee una licencia para operar un avión en vuelo."
-    assert expected_output_traduccion == componente4.extract_llm_answers(elemento_prueba_traducción), "Should be true"
+    assert expected_output_traduccion == componenteExtractor.extract_llm_answers(elemento_prueba_traducción), "Should be true"
     
     # Tests de obtener el provisional answer -----------------------------------
     
@@ -345,7 +345,7 @@ def component_extractor_test():
     
     llm_extracted_answer_list = [expected_output_piloto_masculino, expected_output_piloto_femenino]
     
-    provisional_answer = componente4.get_provisional_answer4(element_tierra, llm_extracted_answer_list)
+    provisional_answer = componenteExtractor.get_provisional_answer4(element_tierra, llm_extracted_answer_list)
     
     assert provisional_answer == "Femenino", "Should be Femenino"
     
@@ -380,7 +380,7 @@ def component_extractor_test():
                                         ]
                                     ]
     
-    provisional_answer_intitución = componente4.get_provisional_answer4(element_institución, llm_extracted_answer_list_2)
+    provisional_answer_intitución = componenteExtractor.get_provisional_answer4(element_institución, llm_extracted_answer_list_2)
     
     assert provisional_answer_intitución == "Femenino", "Should be Femenino"
     
@@ -415,7 +415,7 @@ def component_extractor_test():
                                         ]
                                     ]
     
-    provisional_answer_intitución_plural = componente4.get_provisional_answer4(element_institución_plural, llm_extracted_answer_list_3)
+    provisional_answer_intitución_plural = componenteExtractor.get_provisional_answer4(element_institución_plural, llm_extracted_answer_list_3)
     
     assert provisional_answer_intitución_plural == "Femenino", "Should be Femenino"
     
@@ -450,7 +450,7 @@ def component_extractor_test():
       ]
     ]
     
-    provisional_answer_universal = componente4.get_provisional_answer4(element_universal, llm_extracted_answer_list_4)
+    provisional_answer_universal = componenteExtractor.get_provisional_answer4(element_universal, llm_extracted_answer_list_4)
     
     assert provisional_answer_universal == "NULL", "Should be NULL"
     
@@ -485,7 +485,7 @@ def component_extractor_test():
       ]
     ]
     
-    provisional_answer_científico = componente4.get_provisional_answer4(element_científico, llm_extracted_answer_list_5)
+    provisional_answer_científico = componenteExtractor.get_provisional_answer4(element_científico, llm_extracted_answer_list_5)
     
     assert provisional_answer_científico == "Masculino", "Should be Masculino"
     
@@ -510,15 +510,15 @@ def component_validator_test():
       ]
     ]
     
-    componente5 = Componente5(10)
+    componenteValidator = ComponenteValidator(10)
     
-    final_answer_cosa = componente5.get_final_answer(element_realización, llm_extracted_answer_list_1, "Femenino")
+    final_answer_cosa = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Femenino")
     
     assert final_answer_cosa == "Femenino", "Should be Femenino"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
-    final_answer_cosa_2 = componente5.get_final_answer(element_realización, llm_extracted_answer_list_1, "Masculino")
+    final_answer_cosa_2 = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Masculino")
     
     assert final_answer_cosa_2 == "NULL", "Should be NULL"
     
@@ -541,13 +541,13 @@ def component_validator_test():
       ]
     ]
     
-    final_answer_error = componente5.get_final_answer(element_error, llm_extracted_answer_list_2, "Masculino")
+    final_answer_error = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Masculino")
     
     assert final_answer_error == "Masculino", "Should be Masculino"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
-    final_answer_error_2 = componente5.get_final_answer(element_error, llm_extracted_answer_list_2, "Femenino")
+    final_answer_error_2 = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Femenino")
     
     assert final_answer_error_2 == "NULL", "Should be NULL"
     
@@ -625,9 +625,9 @@ def component_exporter_test():
     config = ConfigParser()
     config.read('./config.ini')
     
-    componente6 = Componente6(config['file_path']['exploited_information_file_path'])
+    componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])
     
-    componente6.export_knowledge(exploited_information)
+    componenteExporter.export_knowledge(exploited_information)
     
     # Abrir el archivo en modo lectura
     try:
@@ -671,7 +671,5 @@ if __name__ == "__main__":
     print("Everything in Validator component passed")
     print("Testing over Exporter component...")
     # component_exporter_test() # Tested correctly
-    print("Everything in Exporter component passed")  
+    print("Everything in Exporter component passed")
     print("Everything passed")
-    
-    # TODO TEST TRADUCCIONES !!!!!
