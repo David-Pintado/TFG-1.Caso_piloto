@@ -5,7 +5,7 @@ sys.path.append("./auxFunctionLibrary")
 from pythonLib import auxFunctions
 from unidecode import unidecode
 
-class Componente5:
+class ComponenteValidator:
     
     def __init__(self, minimun_number_of_sentences):
         self.minimun_number_of_sentences = minimun_number_of_sentences 

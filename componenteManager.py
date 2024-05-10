@@ -8,10 +8,10 @@ sys.path.append("./auxFunctionLibrary")
 
 from componenteImporter import ComponenteImporter
 import componenteQuestionMaker
-from componenteLLMCommunicator import Componente3
+from componenteLLMCommunicator import ComponenteLLMCommunicator
 import componenteExtractor
-from componenteValidator import Componente5
-from componenteExporter import Componente6
+from componenteValidator import ComponenteValidator
+from componenteExporter import ComponenteExporter
 
 
 def knowledge_exploitation():
@@ -28,11 +28,11 @@ def knowledge_exploitation():
     # Inicializamos el ComponenteImporter para importar los datos de las fuentes 
     ComponenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
     
-    # Inicializamos el componente3 con el llm que vamos a utilizar para conseguir las respuestas provisionales
-    componente3_provisional = Componente3(config['file_path']['provisional_answers_language_model_path'])
+    # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
+    componenteLLMCommunicator_provisional = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
     
     # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
-    componente3_provisional.load_model()
+    componenteLLMCommunicator_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
     source_information = ComponenteImporter.generate_data_structure()
@@ -50,7 +50,7 @@ def knowledge_exploitation():
         if element[1] == 'NULL':
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
-            llm_answer = componente3_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
+            llm_answer = componenteLLMCommunicator_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
             spa_gloss = componenteExtractor.extract_llm_answers(llm_answer)
             if type(spa_gloss) is list:
                 if len(spa_gloss) > 0:
@@ -79,7 +79,7 @@ def knowledge_exploitation():
         provisional_prompt_list = componenteQuestionMaker.generate_provisional_prompts((offset_word,attributes))
         for prompt in provisional_prompt_list:
             # Reallizar la pregunta al modelo de lenguaje 
-            llm_answer = componente3_provisional.run_the_model(prompt)
+            llm_answer = componenteLLMCommunicator_provisional.run_the_model(prompt)
             # Extraer la parte de la respuesta para su posterior tratado
             llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
             # Añadir la lista de las respuestas al data structure
@@ -92,13 +92,13 @@ def knowledge_exploitation():
         exploited_information[offset_word] = item_list
         source_information[offset_word] = item_list
         
-    componente3_provisional.llm = None
+    componenteLLMCommunicator_provisional.llm = None
         
-    # Inicializamos el componente3 con el llm que vamos a utilizar para validar las respuestas provisionales
-    componente3_final = Componente3(config['file_path']['final_answers_language_model_path'])
+    # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para validar las respuestas provisionales
+    componenteLLMCommunicator_final = ComponenteLLMCommunicator(config['file_path']['final_answers_language_model_path'])
     
     # Cargamos el modelo de lenguaje que vamos a utilizar para validar las respuestas provisionales
-    componente3_final.load_model()    
+    componenteLLMCommunicator_final.load_model()    
     
     for (offset_word,attributes) in exploited_information.items():    
         # (validacion de 'Femenino' o 'Masculino')
@@ -109,16 +109,16 @@ def knowledge_exploitation():
             
             for prompt in final_prompt_list:
                 # Reallizar la pregunta al modelo de lenguaje 
-                llm_answer = componente3_final.run_the_model(prompt)
+                llm_answer = componenteLLMCommunicator_final.run_the_model(prompt)
                 # Extraer la parte de la respuesta para su posterior tratado
                 llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
                 # Añadir la lista de las respuestas al data structure
                 llm_extracted_final_answers_list.append(llm_extracted_answer)
             
             # Inicializamos la clase 5 con los datos necesarios
-            componente5 = Componente5(len(attributes[4][0]))
+            componenteValidator = ComponenteValidator(len(attributes[4][0]))
             # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-            final_answer = componente5.get_final_answer((offset_word,attributes), llm_extracted_final_answers_list, attributes[5])
+            final_answer = componenteValidator.get_final_answer((offset_word,attributes), llm_extracted_final_answers_list, attributes[5])
 
             
         answer = ""
@@ -156,10 +156,10 @@ def knowledge_exploitation_process():
     print('Knowledge exploitation process FINISHED')
     
     # Inicializamos la clase para con la ruta del archivo a exportar
-    componente6 = Componente6(config['file_path']['exploited_information_file_path'])
+    componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])
     
     print('Knowledge export process STARTED')
-    componente6.export_knowledge(exploited_information)
+    componenteExporter.export_knowledge(exploited_information)
     print('Knowledge export process FINISHED')
 
 

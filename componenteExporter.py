@@ -1,6 +1,6 @@
 
 
-class Componente6:
+class ComponenteExporter:
     
     def __init__(self, exploited_information_file_path):
         self.exploited_information_file_path = exploited_information_file_path

@@ -1,6 +1,6 @@
 import random
 
-class Componente1:
+class ComponenteImporter:
     
     def __init__(self, spa_variant_file, spa_synset_file, eng_synset_file, most_used_words_file):
         self.spa_variant_file = spa_variant_file 

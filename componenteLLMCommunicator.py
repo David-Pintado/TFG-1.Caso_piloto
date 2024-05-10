@@ -2,7 +2,7 @@
 import json
 from llama_cpp import Llama
 
-class Componente3:
+class ComponenteLLMCommunicator:
     
     def __init__(self, language_model_path):
         self.language_model_path = language_model_path 
