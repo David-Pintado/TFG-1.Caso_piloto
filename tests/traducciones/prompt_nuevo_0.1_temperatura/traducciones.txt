@@ -1,0 +1,39 @@
+
+-- Mejores resultados --
+
+Prompt: 'Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: "' + eng_gloss +'"'
+
+spa-30-00023773-n:  La característica psicológica que desencadena a una acción en un organismo hacia un objetivo deseado;
+    el motivo de la acción; lo que da sentido y dirección a la conducta.
+spa-30-00034213-n:  Cualquier estado o proceso conocido a través de los sentidos en lugar de por intuición o razonamiento.
+spa-30-00035189-n:  La acción de lograr algo.
+spa-30-00039297-n:  It found that instagram is the worst social media platform for young people’s mental health and wellbeing, 
+    followed by snapchat, facebook and twitter.
+spa-30-00046522-n:  El acto de colocar dos cosas juntas sin espacio entre ellas.
+spa-30-00048374-n:  El acto de llegar a un lugar determinado.
+spa-30-00049789-n:  El acto de entrar.
+spa-30-00050195-n:  La acción de aparecer en la vista pública.
+spa-30-00050693-n:  El acto de emerger.
+spa-30-00052334-n:  El acto de llegar a tierra después de un viaje.
+spa-30-00061917-n:  Algo que se hace real o concreto.
+spa-30-00062451-n:  El acto de cumplir con algo (una promesa o deseo, por ejemplo).
+spa-30-00063014-n:  Un logro extremadamente exitoso; el mejor (o peor) rendimiento jamás atestiguado (como en un deporte).
+spa-30-00065855-n:  Reconocimiento por una universidad o colegio de que se ha completado con éxito un curso de estudios; 
+    usualmente medido en horas semestrales.
+spa-30-00068333-n:  Una falta de mantener un estado superior.
+spa-30-00070965-n:  Una acción equivocada atribuible a un mal juicio, ignorancia o falta de atención.
+spa-30-00076884-n:  Una repentina caída desde una posición vertical.
+spa-30-00079398-n:  Comprando o vendiendo valores o mercancías.
+spa-30-00082870-n:  El acto de tomar posesión o poder sobre algo.
+spa-30-00097504-n:  La acción de hacer algo con éxito; el uso del conocimiento en lugar de solo poseerlo.
+spa-30-00100543-n:  La acción de interpretar algo como se expresa en una actuación artística.
+spa-30-00113113-n:  La acción de presionar; el esfuerzo de presión.
+spa-30-00115036-n:  El acto de dibujar o arrastrar algo.
+spa-30-00133338-n:  El acto de golpear con fuerza.
+spa-30-00142361-n:  Una exhaustiva examen físico; incluye una variedad de pruebas dependiendo de la edad y el sexo y el estado de salud de la persona.
+spa-30-00157081-n:  Causando algo sin esfuerzo directo o aparente.
+spa-30-00157463-n:  La acción de someter a alguien a una experiencia influyente.
+spa-30-00161243-n:  La elección o selección.
+spa-30-00161243-n:  La elección o selección.
+
+
