@@ -65,6 +65,7 @@ def get_provisional_answer(element, llm_extracted_answer_list):
                 male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
+            male_word_appearence = " " + male_word_appearence + " "
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -90,6 +91,7 @@ def get_provisional_answer(element, llm_extracted_answer_list):
                 female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
+            female_word_appearence = " " + female_word_appearence + " "
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -155,6 +157,7 @@ def get_provisional_answer2(element, llm_extracted_answer_list):
                 male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
+            male_word_appearence = " " + male_word_appearence + " "
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -175,6 +178,7 @@ def get_provisional_answer2(element, llm_extracted_answer_list):
                 female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
+            female_word_appearence = " " + female_word_appearence + " "
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_female:
@@ -254,6 +258,7 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
                 male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
+            male_word_appearence = " " + male_word_appearence + " "
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -280,6 +285,7 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
                 female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
+            female_word_appearence = " " + female_word_appearence + " "
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -369,6 +375,7 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                 male_word_appearence = element_copy[match.start():match.end()]
                 break
         if male_word_appearence != "":
+            male_word_appearence = " " + male_word_appearence + " "
             search_article_phrase = element.split(male_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -395,6 +402,7 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                 female_word_appearence = element_copy[match.start():match.end()]
                 break
         if female_word_appearence != "":
+            female_word_appearence = " " + female_word_appearence + " "
             search_article_phrase = element.split(female_word_appearence)[0].strip().split(' ')
             if len(search_article_phrase) == 1:
                 if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas

@@ -13,3 +13,6 @@
 /__pycache__
 auxFunctionLibrary/pythonLib/__pycache__/__init__.cpython-310.pyc
 auxFunctionLibrary/pythonLib/__pycache__/auxFunctions.cpython-310.pyc
+files/wei_spa_30_word_genders.csv
+files/source_gloss_structure_eng.json
+files/source_information.json

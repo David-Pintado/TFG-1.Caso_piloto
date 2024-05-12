@@ -50,7 +50,7 @@ def knowledge_exploitation():
         if element[1] == 'NULL':
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
-            llm_answer = componenteLLMCommunicator_provisional.run_the_model('Como experto en traducción, cual es la traducción de la siguiente frase en ingles al español : "' + eng_gloss +'"?  Responde solamente con la traducción.')
+            llm_answer = componenteLLMCommunicator_provisional.run_the_model('Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: "' + eng_gloss +'".')
             spa_gloss = componenteExtractor.extract_llm_answers(llm_answer)
             if type(spa_gloss) is list:
                 if len(spa_gloss) > 0:
@@ -60,6 +60,8 @@ def knowledge_exploitation():
             spa_gloss = spa_gloss.strip().split("\n")[0]
             if ": " in spa_gloss and ": " not in eng_gloss:
                 spa_gloss = spa_gloss.split(': ')[1]
+            if not spa_gloss.endswith('.'):
+                spa_gloss += '.'
             source_information[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
             
     

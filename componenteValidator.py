@@ -53,6 +53,7 @@ class ComponenteValidator:
                     word_appearence = element_copy[match.start():match.end()]
                     break
             if word_appearence != "":
+                word_appearence = " " + word_appearence + " "
                 search_article_phrase = element.split(word_appearence)[0].strip().split(' ')
                 if len(search_article_phrase) == 1:
                     if search_article_phrase[-1].lower() in gender_terms:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
@@ -66,7 +67,7 @@ class ComponenteValidator:
                     elif reversed_search_article_phrase[1].lower() in gender_terms:
                         gender_points += 0.5
 
-        if len(llm_extracted_answer_list[0]) >= self.minimun_number_of_sentences:
+        if (self.minimun_number_of_sentences+1) >= len(llm_extracted_answer_list[0]) >= (self.minimun_number_of_sentences-1):
             # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
             if gender_points >=  list_minimum_appearences:
                 final_answer = provisional_answer

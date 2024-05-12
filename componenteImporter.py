@@ -15,6 +15,7 @@ class ComponenteImporter:
         source_information = {}
         offsets_glosses_array = {}
         words_set = {}
+        count = 0
         
         # Leer el archivo de las 1000 palabras más usadas y almacenar las palabras en un conjunto
         try:
@@ -36,7 +37,15 @@ class ComponenteImporter:
                     # Eliminamos las comillas de los elemento
                     synset = linea.strip().split(',')
                     # Añadimos a la lista una tupla (offset, gloss)
-                    offsets_glosses_array[synset[0]] = synset[6]
+                    gloss = synset[6]
+                    # Tratar el gloss
+                    if gloss != "NULL":
+                        if ":" in gloss:
+                            gloss = gloss.split(':')[0]
+                        gloss = gloss.strip().capitalize()
+                        if not gloss.endswith('.'):
+                            gloss += '.'
+                    offsets_glosses_array[synset[0]] = gloss
         except FileNotFoundError:
             print(f'Archivo "{self.spa_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
@@ -69,6 +78,9 @@ class ComponenteImporter:
                     if language == "spa" and part_of_speech == "n" and word in words_set:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         source_information[offset_word] = [sense, part_of_speech, language]
+                        count += 1
+                    if count > 2:
+                        break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta')   
