@@ -85,7 +85,7 @@ def knowledge_exploitation():
             # Añadir la lista de las respuestas al data structure
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-        provisional_answer = componenteExtractor.get_provisional_answer3((offset_word,attributes),llm_extracted_provisional_answers_list)
+        provisional_answer = componenteExtractor.get_provisional_answer4((offset_word,attributes),llm_extracted_provisional_answers_list)
             
         # Añadirlo al source_information
         item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
