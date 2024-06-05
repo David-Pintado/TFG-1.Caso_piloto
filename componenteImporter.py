@@ -15,6 +15,7 @@ class ComponenteImporter:
         source_information = {}
         offsets_glosses_array = {}
         words_set = {}
+        
         count = 0
         
         # Leer el archivo de las 1000 palabras más usadas y almacenar las palabras en un conjunto
@@ -79,7 +80,7 @@ class ComponenteImporter:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         source_information[offset_word] = [sense, part_of_speech, language]
                         count += 1
-                    if count > 2:
+                    if count > 14:
                         break
                         
         except FileNotFoundError:

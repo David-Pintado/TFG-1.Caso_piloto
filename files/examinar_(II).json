@@ -1,0 +1,497 @@
+{
+  "spa-30-00002684-n_cosa": [
+    "2",
+    "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+    "n",
+    "spa",
+    [
+      [
+        "La cosa que se proyecta en la pared es una sombra.",
+        "El objeto que refleja la luz es una sombra.",
+        "La figura que se mueve en el suelo es una sombra.",
+        "El contorno que sigue al hombre es una sombra.",
+        "La imagen que se proyecta en la pantalla es una sombra."
+      ],
+      [
+        "La cosa que creó la luna es una sombra oscura en el suelo.",
+        "La cosa que refleja el agua es una sombra blanca en la superficie.",
+        "La cosa que sigue a los pájaros es una sombra gris en el aire.",
+        "La cosa que sigue al viento es una sombra oscura en la tierra.",
+        "La cosa que sigue a las nubes es una sombra blanca en el cielo."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La cosa era tan hermosa que no podía creer lo que veía.",
+        "No sabía qué cosa estaba pasando, pero se sentía incómoda.",
+        "Aunque la cosa parecía difícil, finalmente logró superarla.",
+        "La cosa más importante era mantenerse unido a su familia.",
+        "Al ver esa cosa, se dio cuenta de que su vida había cambiado para siempre."
+      ]
+    ],
+    "Femenino"
+  ],
+  "spa-30-00002684-n_objeto": [
+    "1",
+    "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+    "n",
+    "spa",
+    [
+      [
+        "El objeto reflejaba la luna brillante en su superficie.",
+        "La sombra del objeto se proyectó sobre el piso oscuro.",
+        "El objeto tenía un contorno definido, como si hubiera sido tallado con cuidado.",
+        "La sombra del objeto se deslizaba lentamente a lo largo de la pared.",
+        "El objeto parecía haberse mover en el espacio, dejando una sombra que seguía su camino."
+      ],
+      [
+        "La piedra es un objeto tangible y visible, que puede moldear una sombra.",
+        "El cuadro en la pared es un objeto tangible y visible, que puede moldear una sombra.",
+        "La escultura de bronce en el parque es un objeto tangible y visible, que puede moldear una sombra.",
+        "La lámpara de cristal en la mesa es un objeto tangible y visible, que puede moldear una sombra.",
+        "El árbol en la plaza es un objeto tangible y visible, que puede moldear una sombra."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El objeto de mi deseo es viajar por Europa.",
+        "El objeto de mi investigación es comprender la historia de la humanidad.",
+        "El objeto de mi admiración es el talento y habilidades de un artista.",
+        "El objeto de mi curiosidad es descubrir los secretos del universo.",
+        "El objeto de mi ambición es alcanzar la cima de la montaña más alta del mundo."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00003553-n_conjunto": [
+    "2",
+    "Un conjunto de partes que se considera como una sola entidad.",
+    "n",
+    "spa",
+    [
+      [
+        "Un conjunto de piezas mecánicas es un motor completo.",
+        "El conjunto de huesos del pie forma la estructura de apoyo para el cuerpo.",
+        "La unión de los dientes en una mandíbula constituye un mordedor eficaz.",
+        "Un conjunto de lentes correctivas permite a la persona ver mejor.",
+        "El conjunto de piezas del reloj mecánico es el motor que hace funcionar el reloj."
+      ],
+      [
+        "El equipo es un conjunto de jugadores que actúan como una sola unidad.",
+        "La orquesta es un conjunto de instrumentos y músicos que crean una melodía única.",
+        "La familia es un conjunto de personas relacionadas entre sí que forman una entidad familiar.",
+        "El equipo de trabajo es un conjunto de profesionales con habilidades específicas que trabajan juntos para lograr un objetivo común.",
+        "La colección es un conjunto de objetos o artículos que se consideran como una sola entidad debido a su significado cultural, histórico o estético."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El conjunto de piezas se ensambló fácilmente.",
+        "El conjunto de datos proporciona información valiosa.",
+        "El conjunto de herramientas es muy completo.",
+        "El conjunto de reglas facilita el proceso de toma de decisiones.",
+        "El conjunto de soluciones ofrece múltiples opciones."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00004258-n_ser": [
+    "4",
+    "Una entidad viva.",
+    "n",
+    "spa",
+    [
+      [
+        "El león es un animal salvaje y poderoso.",
+        "El árbol es una entidad viva que crece y se desarrolla a lo largo del tiempo.",
+        "El hombre es una criatura compleja, con sentimientos y emociones.",
+        "El río es un ser vivo que fluye y cambia constantemente.",
+        "El sol es una entidad viva que ilumina nuestro planeta y nos da calor."
+      ],
+      [
+        "La madre es la fuente de vida para sus hijos.",
+        "La naturaleza es una entidad viva que nos rodea y nos alimenta.",
+        "La luna es un cuerpo celeste vital en nuestro sistema solar.",
+        "La cultura es una entidad viva que evoluciona a lo largo del tiempo.",
+        "La conciencia es una entidad viva que permite a los seres humanos comprender y experimentar el mundo alrededor de ellos."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 8
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00004475-n_ser": [
+    "2",
+    "Un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente.",
+    "n",
+    "spa",
+    [
+      [
+        "Un ser humano es un organismo biológico complejo que posee la habilidad de pensar, razonar y tomar decisiones.",
+        "El hombre es una entidad social y cultural que puede actuar libremente en su entorno y interactuar con otros seres humanos.",
+        "La mente humana es un sistema complejo de procesamiento de información que permite a los seres humanos aprender, crear y innovar.",
+        "El ser humano es una especie biológica única en la naturaleza, dotada de habilidades cognitivas y emocionales que le permiten adaptarse a su entorno y superar las dificultades.",
+        "La conciencia humana es un fenómeno misterioso y complejo que permite a los seres humanos percibir, interpret"
+      ],
+      [
+        "La planta es una entidad biológica autónoma que puede realizar procesos metabólicos y responder a estímulos ambientales.",
+        "La computadora es un dispositivo electrónico programable capaz de recibir, almacenar, procesar y presentar información.",
+        "La nación es una comunidad política organizada que tiene la capacidad de actuar como un ente soberano en el ámbito internacional.",
+        "La cultura es una colección de valores, creencias y tradiciones compartidas por una sociedad o grupo humano.",
+        "La mente es un sistema biológico que permite a los seres humanos procesar información, razonar y tomar decisiones."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El ser humano es un individuo capaz de tomar decisiones y actuar de forma autónoma.",
+        "La inteligencia artificial es un ser que simula la capacidad de pensamiento y acción humana.",
+        "Un robot es un ser mecánico programado para realizar tareas específicas de manera independiente.",
+        "El embrión es un ser en desarrollo que aún no ha alcanzado su plena capacidad funcional.",
+        "La conciencia es un ser abstracto que permite la experiencia y reflexión sobre el mundo y uno mismo.  ¿Qué frases podrías dar?  Respuesta:"
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00006269-n_vida": [
+    "12",
+    "Cosas vivas en su conjunto.",
+    "n",
+    "spa",
+    [
+      [
+        "La vida animal es una variedad maravillosa y compleja de seres vivientes que habitan nuestro planeta.",
+        "El bosque es un mundo mágico lleno de vida, donde los árboles se alzan como gigantes y las hojas brillan en el sol.",
+        "La marina es una enorme mesa de vida, donde miles de especies de peces, corales y plantas crecen y prosperan.",
+        "El campo es un paisaje tranquilo y pacífico lleno de vida, donde los campos de cerealos se extienden como lechos de oro y las aves cantan en el aire.",
+        "La ciudad es una enorme jaula de vida, donde miles de personas viven, trabajan y interactúan con la naturaleza y entre sí."
+      ],
+      [
+        "La vida marina es un mundo misterioso y atractivo.",
+        "La vida vegetal es la base de la cadena alimentaria.",
+        "La vida animal es una variedad infinita de formas y tamaños.",
+        "La vida en el desierto es difícil y exigente, pero también es muy resiliente.",
+        "La vida en la selva tropical es un entorno lleno de vida y color."
+      ]
+    ],
+    "Femenino",
+    [
+      "La vi"
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 5
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007347-n_causa": [
+    "5",
+    "Una entidad que produce o causa algo.",
+    "n",
+    "spa",
+    [
+      [
+        "La lluvia es la causa de la crecida del río.",
+        "El estrés es la causa de la depresión.",
+        "El tabaco es la causa de la enfermedad pulmonar.",
+        "El consumo excesivo de alcohol es la causa de la intoxicación.",
+        "La falta de ejercicio es la causa de la obesidad."
+      ],
+      [
+        "La contaminación es la causa de la salud pública.",
+        "El cambio climático es la causa de los desastres naturales.",
+        "La falta de educación es la causa del desempleo.",
+        "La pobreza es la causa de la violencia en las ciudades.",
+        "La corrupción es la causa de la inestabilidad política."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La causa de la sequía es la falta de lluvia.",
+        "El médico busca determinar la causa de la enfermedad.",
+        "La causa del incendio fue un cortocircuito eléctrico.",
+        "La causa del aumento de precios es la inflación.",
+        "La causa del accidente fue la falta de atención del conductor."
+      ]
+    ],
+    "Femenino"
+  ],
+  "spa-30-00007846-n_alguien": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "El hombre que camina por la calle es alguien.",
+        "Alguien está hablando en la habitación contigua.",
+        "Es alguien que me ha ayudado muchas veces.",
+        "Alguien ha dejado su cartera en el restaurante.",
+        "El hombre que se acerca es alguien que busca información sobre nuestros servicios."
+      ],
+      [
+        "La mujer que estaba caminando por la calle era alguien.",
+        "Alguien se acercó a ella y le dijo algo.",
+        "Espero encontrar a alguien en este lugar.",
+        "Alguien me llamó hoy por teléfono.",
+        "Alguien necesita ayuda, ¿no?"
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 5
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 5
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007846-n_humano": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "Un hombre es un ser humano.",
+        "El profesor es un ser humano.",
+        "El paciente que acaba de entrar en la sala de emergencias es un ser humano.",
+        "El hombre que camina por la calle es un ser humano.",
+        "El hombre que está leyendo el libro es un ser humano."
+      ],
+      [
+        "La mujer es un ser humano.",
+        "La persona que acaba de entrar es una humana.",
+        "La chica que está leyendo es una humana.",
+        "La enferma que está en la cama es una humana.",
+        "La mujer que está hablando conmigo es una humana."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 6
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 4
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007846-n_persona": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "Un hombre es una persona.",
+        "El profesor es una persona respetable.",
+        "El paciente necesita la atención de una persona calificada.",
+        "El hombre que salió del coche es una persona desconocida.",
+        "El hombre que escribió el libro es una persona muy talentosa."
+      ],
+      [
+        "La persona caminó hacia la puerta.",
+        "La persona habló con su amiga.",
+        "La persona leyó un libro interesante.",
+        "La persona se sintió enferma y tuvo que quedarse en casa.",
+        "La persona compró una nueva camisa roja."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La persona es un ser complejo y misterioso.",
+        "La persona tiene derechos humanos inalienables.",
+        "La persona puede ser buena o malvada.",
+        "La persona puede ser feliz o triste.",
+        "La persona puede ser inteligente o estúpida."
+      ]
+    ],
+    "Femenino"
+  ],
+  "spa-30-00020827-n_materia": [
+    "4",
+    "Lo que tiene masa y ocupa espacio.",
+    "n",
+    "spa",
+    [
+      [
+        "La materia es la sustancia que constituye todo lo visible y tangible en el universo.",
+        "El cuerpo humano está compuesto por una gran cantidad de materia, incluyendo huesos, tejidos, líquidos y aire.",
+        "La materia es la base de todas las formas de vida, sin ella no podríamos existir.",
+        "El agua es una forma de materia líquida que ocupa un gran volumen en nuestro planeta.",
+        "La materia oscura es una forma de materia que no emite luz y constituye la mayor parte de la materia en el universo, pero aún se desconoce su naturaleza exacta."
+      ],
+      [
+        "La materia es la sustancia que constituye todo lo visible e invisible del universo.",
+        "El agua es una materia líquida, incolorosa y transparente.",
+        "La roca es una materia sólida, compuesta de minerales.",
+        "La luz es una materia que viaja a velocidades extraordinariamente rápidas.",
+        "El aire es una materia invisible, que ocupa todo el espacio libre en la atmósfera."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La materia es la base de todo lo que existe",
+        "La materia se compone de átomos",
+        "La materia puede ser sólida, líquida o gaseosa",
+        "La materia es inmensamente variada",
+        "La materia es el resultado de la interacción de partículas subatómicas."
+      ]
+    ],
+    "Femenino"
+  ],
+  "spa-30-00022903-n_artículo": [
+    "3",
+    "Uno de una clase de objetos artísticos  explanation:  in this context, artifact refers to an object that has been created or modified by humans.",
+    "n",
+    "spa",
+    [
+      [
+        "Un artículo de arte es un objeto creado por un artista para ser admirado y apreciado",
+        "Un artículo de arte antiguo es una pieza que ha sobrevivido a través del tiempo y sigue siendo admirada y apreciada hoy en día",
+        "Un artículo de arte moderno es una creación contemporánea que refleja la cultura y las tendencias actuales",
+        "Un artículo de arte único es un objeto que no se puede encontrar en ninguna otra parte del mundo, ya sea porque fue creado por un artista famoso o porque es el resultado de una técnica única",
+        "Un artículo de arte valioso es una pieza que tiene un precio elevado debido a su rareza y la calidad de su ejecución."
+      ],
+      [
+        "La escultura es un ejemplo de artefacto cultural.",
+        "El grabado en piedra es un artículo arqueológico interesante.",
+        "La pintura de Van Gogh es una pieza maestra del arte moderno.",
+        "El collar de perlas es un objeto de lujo que se ha convertido en un artículo de moda.",
+        "El diseño de la catedral es un ejemplo arquitectónico impresionante."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El artículo más antiguo en la colección es un objeto precioso.",
+        "Los artículos de arte modernos son muy valiosos.",
+        "El artículo que me gusta más es una escultura antigua.",
+        "Hay muchos artículos interesantes en el museo.",
+        "El artículo que representa la cultura de un país es importante para su historia.  En estas frases, 'artículo' se refiere a objetos artísticos creados o modificados por humanos, y se utilizan en diferentes contextos y situaciones."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00023271-n_conocimiento": [
+    "1",
+    "El resultado psicológico de la percepción.",
+    "n",
+    "spa",
+    [
+      [
+        "El conocimiento del mundo es una construcción mental que permite a los seres humanos comprender y organizar su entorno.",
+        "La experiencia educativa es un proceso de aprendizaje que produce conocimientos en el alumno.",
+        "El conocimiento científico es la suma de las verdades descubiertas por los investigadores a través del método científico.",
+        "El conocimiento religioso es una creencia que se basa en la fe y la tradición.",
+        "La comprensión lingüística es el resultado psicológico de la percepción y procesamiento de las estructuras gramaticales de una lengua."
+      ],
+      [
+        "La comprensión del idioma es un conocimiento cognitivo.",
+        "El conocimiento de las leyes es una comprensión jurídica.",
+        "La conciencia de uno mismo es un conocimiento psicológico.",
+        "El conocimiento de la cultura es un resultado cultural.",
+        "El conocimiento del mundo es una percepción sensorial."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El conocimiento es un proceso mental que permite comprender y asimilar información.",
+        "La educación busca fomentar el conocimiento en todos los aspectos de la vida.",
+        "El conocimiento se adquiere a través de la experiencia, la observación y la reflexión.",
+        "El conocimiento es una habilidad que se desarrolla con el tiempo y la práctica.",
+        "La ciencia busca expandir el conocimiento humano en todos los campos del saber."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00023271-n_saber": [
+    "1",
+    "El resultado psicológico de la percepción.",
+    "n",
+    "spa",
+    [
+      [
+        "El conocimiento que se obtiene al observar y analizar algo es el saber.",
+        "La comprensión que surge al leer, escuchar o ver algo es el saber.",
+        "La capacidad mental para recordar, reconocer o identificar algo es el saber.",
+        "El conocimiento que se adquiere a través de la experiencia o la práctica es el saber.",
+        "La comprensión que se obtiene al resolver un problema o aplicar una regla es el saber."
+      ],
+      [
+        "La sabiduría es el conocimiento acumulado a lo largo del tiempo, pero el saber es el resultado psicológico de la percepción.",
+        "El saber es la capacidad mental para comprender y procesar información, pero también es el resultado psicológico de la percepción.",
+        "La percepción es la capacidad sensorial para recibir y interpretar información, y el saber es el resultado psicológico de esta percepción.",
+        "El conocimiento es la suma de todo lo que se sabe, pero el saber es el resultado psicológico de la percepción.",
+        "La comprensión es la capacidad mental para entender y procesar información, pero también es el resultado psicológico de la percepción."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El saber es un fenómeno complejo y a menudo inexplicable.",
+        "La educación es una forma poderosa de aumentar el saber en la sociedad.",
+        "El saber se puede adquirir a través de la experiencia, la lectura y la observación.",
+        "El saber es un bien que se transmite de generación en generación.",
+        "La ciencia busca ampliar nuestro conocimiento sobre el mundo que nos rodea."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00024720-n_estado": [
+    "1",
+    "La forma en que algo está con respecto a sus principales atributos.",
+    "n",
+    "spa",
+    [
+      [
+        "El estado del agua es líquido.",
+        "El estado de la luna es llena.",
+        "El estado de la tierra es sólida.",
+        "El estado de la leche es fría.",
+        "El estado de la piedra caliza es duro."
+      ],
+      [
+        "El estado de la salud de mi madre es bueno.",
+        "El estado de la economía mundial sigue siendo preocupante.",
+        "El estado de la tierra después del huracán fue devastador.",
+        "El estado de la educación en nuestro país ha mejorado considerablemente.",
+        "El estado de la tecnología en el siglo XXI es impresionante."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El estado de la economía es preocupante.",
+        "El estado de las relaciones entre los países es tenso.",
+        "El estado de la tecnología ha avanzado mucho en los últimos años.",
+        "El estado de la educación es deficiente.",
+        "El estado de la salud pública es grave."
+      ]
+    ],
+    "Masculino"
+  ]
+}

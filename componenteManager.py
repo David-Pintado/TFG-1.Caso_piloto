@@ -5,7 +5,6 @@ from configparser import ConfigParser
 import re
 import sys
 sys.path.append("./auxFunctionLibrary")
-
 from componenteImporter import ComponenteImporter
 import componenteQuestionMaker
 from componenteLLMCommunicator import ComponenteLLMCommunicator
@@ -26,7 +25,7 @@ def knowledge_exploitation():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Inicializamos el ComponenteImporter para importar los datos de las fuentes 
-    componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
+    componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['first_500_most_used_words_spa_file'])
     
     # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
     componenteLLMCommunicator_provisional = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
@@ -52,17 +51,7 @@ def knowledge_exploitation():
             eng_gloss = source_gloss_structure_eng[offset]
             llm_answer = componenteLLMCommunicator_provisional.run_the_model('Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: "' + eng_gloss +'".')
             spa_gloss = componenteExtractor.extract_llm_answers(llm_answer)
-            if type(spa_gloss) is list:
-                if len(spa_gloss) > 0:
-                    spa_gloss = spa_gloss[0]
-                elif len(spa_gloss) == 0:
-                    spa_gloss = ""
-            spa_gloss = spa_gloss.strip().split("\n")[0]
-            if ": " in spa_gloss and ": " not in eng_gloss:
-                spa_gloss = spa_gloss.split(': ')[1]
-            if not spa_gloss.endswith('.'):
-                spa_gloss += '.'
-            source_information[offset_word] = [element[0], spa_gloss.capitalize(), element[2], element[3]]
+            source_information[offset_word] = [element[0], spa_gloss, element[2], element[3]]
             
     
     # Explotar conocimiento (Al parecer da problemas si se cargan dos modelos a la vez, 
@@ -88,11 +77,16 @@ def knowledge_exploitation():
             llm_extracted_provisional_answers_list.append(llm_extracted_answer)
         # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
         provisional_answer = componenteExtractor.get_provisional_answer4((offset_word,attributes),llm_extracted_provisional_answers_list)
-            
+        print(provisional_answer)    
         # Añadirlo al source_information
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer]
-        exploited_information[offset_word] = item_list
-        source_information[offset_word] = item_list
+        if len(provisional_answer) == 1:  
+            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer[0]]
+            source_information[offset_word] = item_list
+            exploited_information[offset_word] = item_list   
+        elif len(provisional_answer) == 5:
+            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer[0], provisional_answer[1], provisional_answer[2], provisional_answer[3], provisional_answer[4]]
+            source_information[offset_word] = item_list
+            exploited_information[offset_word] = item_list  
         
     componenteLLMCommunicator_provisional.llm = None
         
@@ -121,18 +115,15 @@ def knowledge_exploitation():
             componenteValidator = ComponenteValidator(len(attributes[4][0]))
             # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
             final_answer = componenteValidator.get_final_answer((offset_word,attributes), llm_extracted_final_answers_list, attributes[5])
-
             
-        answer = ""
-        if final_answer == "":
-            answer = attributes[5]
-        else:
-            answer = final_answer
-        
-        # Añadirlo al exploited_information
-        item_list = [attributes[0], attributes[1], attributes[2], attributes[3], answer]
-        exploited_information[offset_word] = item_list
-        source_information[offset_word] = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], llm_extracted_final_answers_list, answer]
+            if len(final_answer) == 1:  
+                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_answers_list, final_answer[0]]
+                exploited_information[offset_word] = item_list
+                source_information[offset_word] = item_list
+            elif len(final_answer) == 5:
+                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_answers_list, final_answer[0], final_answer[1], final_answer[2], final_answer[3], final_answer[4]]
+                exploited_information[offset_word] = item_list
+                source_information[offset_word] = item_list
     
     # Generamos un JSON con la estructura de datos, para una mejor visualizacion
     json_exploited_information = json.dumps(source_information, indent=2, ensure_ascii=False)

@@ -650,6 +650,64 @@ def validar_linea(linea):
         return True
     else:
         return False
+    
+def prueba():
+    
+    b = [
+      [
+        "El error de lógica en su argumento fue evidente.",
+        "El error gramatical en el artículo de periodismo fue corregido por la revisión.",
+        "El error obvio en la contabilidad llevó a una investigación interna.",
+        "El error de pronunciación del actor fue criticado por los seguidores de la escuela de teatro clásica.",
+        "El error de programación en la computadora llevó al sistema al caos."
+      ],
+      [
+        "El examen reveló muchos errores en la prueba. Sin embargo, el error más grande fue la falta de atención por parte del docente al leer las preguntas. La omisión de una cuestión clave llevó a la mayoría de los estudiantes a responder incorrectamente.",
+        "El editor se enfureció cuando descubrió el error gramatical en el artículo. La falta de un punto después de la coma es inaceptable, dijo, y no debería haberse permitido.",
+        "La empresa ha sido criticada por muchos errores en su producto. El problema más recurrente es el defectuoso diseño del botón. Los clientes han sufrido molestias y la compañía ha perdido dinero como resultado de estas fallas.",
+        "La estudiante recibió una F en el examen porque cometió muchos errores. El error más grave fue su falta de atención al leer la pregunta. Ella había confundido los nombres de dos personajes principales y había respondido incorrectamente a una de las preguntas.",
+        "La jefa del proyecto se sentó para revisar el"
+      ]
+    ]
+    c = [
+      [
+        "El error mas importante del proyecto fue el no utilizar una base de datos centralizada.",
+        "Cuando se comete un error, es necesario corregirlo lo más pronto posible.",
+        "No puedes culpar al error por tu falta de atención.",
+        "El error humano puede ser muy peligroso en situaciones críticas.",
+        "Intentamos evitar los errores, pero a veces es imposible."
+      ]
+    ]
+    
+    a = [
+      [
+        "El hombre mantuvo un contactos prolongado con su amiga durante la fiesta.",
+        "El actor tuvo un contactos físico intenso con la actriz durante la escena.",
+        "El hombre tuvo un contactos telefónico con su madre para hablar sobre sus planes para el fin de semana.",
+        "El hombre tuvo un contactos visual con su hija mientras ella jugaba en el parque.",
+        "El hombre tuvo un contactos emocional profundo con su amiga después de que ella le contó sobre sus problemas."
+      ],
+      [
+        "El contacto entre los estudiantes y los profesores es esencial para un buen desarrollo académico.",
+        "El contacto entre los pacientes y los médicos es crucial para una buena salud.",
+        "El contacto entre los clientes y los empleados es fundamental para una buena experiencia de compra.",
+        "El contacto entre los amigos y las familias es esencial para una buena relación social.",
+        "EL contacto entre los trabajadores y los supervisores es fundamental para una buena productividad laboral."
+      ]
+    ]
+    
+    element_realización = ("spa-30-00039297-n_error",["5","Interacción cercana.","n","spa",])
+    
+    provisional_answer_intitución = componenteExtractor.get_provisional_answer4(element_realización, b)
+    
+    print(provisional_answer_intitución)
+    
+    componenteValidator = ComponenteValidator(5)
+    
+    final_answer_cosa = componenteValidator.get_final_answer(element_realización, c, "Masculino")
+    
+    print(final_answer_cosa)
+    
 
 # Método main
 if __name__ == "__main__":
@@ -664,7 +722,7 @@ if __name__ == "__main__":
     # component_llm_communicator_test() # Tested correctly
     print("Everything in LLM Communicator component passed")
     print("Testing over Extractor component...")
-    # component_extractor_test() # Tested correctly
+    component_extractor_test() # Tested correctly
     print("Everything in Extractor component passed")
     print("Testing over Validator component...")
     # component_validator_test() # Tested correctly

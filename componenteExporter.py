@@ -18,7 +18,11 @@ class ComponenteExporter:
                 gloss = attributes[1]
                 part_of_speech = attributes[2]
                 language = attributes[3]
-                knowledge = attributes[4]
+                knowledge = ""
+                if attributes[5] == "NULL":
+                    knowledge = "NULL"
+                else:
+                    knowledge = attributes[7]
                 final_element = "------"
                 
                 # Almacenar los valores entre comillas en una lista

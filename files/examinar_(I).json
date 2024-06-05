@@ -1,0 +1,341 @@
+{
+  "spa-30-00002684-n_cosa": [
+    "2",
+    "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+    "n",
+    "spa",
+    [
+      [
+        "La cosa que se proyecta en la pared es un objeto real, no solo una sombra.",
+        "El reflejo en el agua es una cosa tangible y visible, pero también es una sombra de algo más grande.",
+        "La imagen en la pantalla es una cosa que se puede tocar y ver, pero también es una sombra de lo que realmente está sucediendo.",
+        "El dibujo en el papel es una cosa tangible y visible, pero también es una sombra de la idea original del artista.",
+        "La estatua en el parque es una cosa tangible y visible, pero también es una sombra de lo que podría haber sido en otro tiempo o lugar."
+      ],
+      [
+        "La cosa que se proyecta en la pared es una sombra.",
+        "La cosa que flota en el aire es una sombra.",
+        "La cosa que se mueve en la oscuridad es una sombra.",
+        "La cosa que se ve en la noche es una sombra.",
+        "La cosa que se refleja en el agua es una sombra."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La cosa era tan hermosa que no podía creer lo que veía.",
+        "No sabía qué cosa estaba pasando, pero se sentía incómoda.",
+        "Aunque la cosa parecía simple, en realidad era muy compleja.",
+        "La cosa más difícil de hacer fue encontrar el equilibrio perfecto.",
+        "No tenía idea de qué cosa le habían puesto en la comida."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 0
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 2
+    }
+  ],
+  "spa-30-00002684-n_objeto": [
+    "1",
+    "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+    "n",
+    "spa",
+    [
+      [
+        "El objeto de la sombra es un reflejo de su forma.",
+        "La luna es un objeto luminoso en el cielo nocturno.",
+        "El espejo es un objeto que refleja nuestra imagen.",
+        "El árbol es un objeto natural que crece en la naturaleza.",
+        "El globo terráqueo es un objeto que gira alrededor del sol."
+      ],
+      [
+        "La escultura es un objeto que puede moldear una sombra.",
+        "El retrato de la reina es un objeto que puede moldear una sombra.",
+        "El busto de la madre es un objeto que puede moldear una sombra.",
+        "La estatua de la diosa es un objeto que puede moldear una sombra.",
+        "La figura de la bailarina es un objeto que puede moldear una sombra."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El objeto de mi deseo es viajar por Europa.",
+        "El objeto de mi investigación es comprender la historia de la humanidad.",
+        "El objeto de su interés es la ciencia ficción.",
+        "El objeto de nuestra discusión es el impacto social de las redes sociales.",
+        "El objeto de mi admiración es la belleza del paisaje natural."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00003553-n_conjunto": [
+    "2",
+    "Un conjunto de partes que se considera como una sola entidad.",
+    "n",
+    "spa",
+    [
+      [
+        "Un conjunto de piezas mecánicas es un motor completo.",
+        "El conjunto de huesos del pie forma la estructura del pie.",
+        "El conjunto de dientes es el aparato dental.",
+        "La unidad de transmisión es un conjunto de engranajes y ejes.",
+        "Un conjunto de cilindros es un motor de combustión interna."
+      ],
+      [
+        "El conjunto de piezas mecánicas funcionaba perfectamente.",
+        "La colección de libros antiguos es un tesoro cultural.",
+        "El grupo de amigos estaba reunido para celebrar su aniversario.",
+        "La serie de películas tiene una temática común.",
+        "La colección de joyas es una herencia familiar valiosa."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El conjunto de piezas se ensambló fácilmente.",
+        "El conjunto de datos proporciona información valiosa.",
+        "El conjunto de herramientas es muy completo.",
+        "El conjunto de reglas facilita la toma de decisiones.",
+        "El conjunto de materiales se utiliza para construir el prototipo."
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00004258-n_ser": [
+    "4",
+    "Una entidad viva.",
+    "n",
+    "spa",
+    [
+      [
+        "El león es un animal salvaje y poderoso.",
+        "El árbol es una entidad viva que crece y se desarrolla a lo largo del tiempo.",
+        "El hombre es una criatura compleja, con muchas facetas y emociones.",
+        "El río es un ser vivo que fluye y cambia constantemente.",
+        "El sol es una entidad viva que ilumina nuestro planeta y nos da calor y luz."
+      ],
+      [
+        "La madre es la fuente de vida para sus hijos.",
+        "La tierra es la madre de todos los seres vivientes.",
+        "La luna es una entidad misteriosa y poderosa en el cielo nocturno.",
+        "La naturaleza es la madre de todas las criaturas vivientes.",
+        "La vida es un proceso continuo de cambio y transformación."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 8
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00004475-n_ser": [
+    "2",
+    "Un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente.",
+    "n",
+    "spa",
+    [
+      [
+        "Un ser humano es un organismo biológico complejo que posee la habilidad de pensar, razonar y tomar decisiones.",
+        "El ser humano es una entidad social y cultural que puede actuar libremente en su entorno y interactuar con otros seres humanos.",
+        "Un ser animal es un organismo viviente que posee la capacidad de moverse, comer, respirar y defenderse.",
+        "El ser vegetal es una entidad biológica que puede desarrollarse a partir de semillas o brotes y poseer la habilidad de absorber nutrientes y crecer en un medio ambiente favorable.",
+        "Un ser inanimado es una entidad material que no posee la capacidad de actuar o funcionar de manera independiente, pero puede ser utilizada por otros seres vivos para fin"
+      ],
+      [
+        "La vida es un ser autónomo que puede crecer, desarrollarse y prosperar en condiciones favorables.",
+        "La inteligencia es un ser mental que permite a los humanos comprender y resolver problemas.",
+        "La conciencia es un ser psicológico que nos permite percibir nuestro entorno y nos hace conscientes de nuestras acciones.",
+        "La voluntad es un ser moral que nos permite elegir entre lo bueno y lo malo, y nos hace responsables de nuestras decisiones.",
+        "La emoción es un ser vital que nos permite experimentar una amplia gama de sentimientos y nos hace humanos."
+      ]
+    ],
+    "Masculino",
+    [
+      [
+        "El ser humano es un individuo capaz de tomar decisiones y actuar por su cuenta.",
+        "La inteligencia artificial es un ser que simula la capacidad de pensamiento y acción autónoma.",
+        "Un robot es un ser mecánico programado para realizar tareas específicas de manera independiente.",
+        "El embrión es un ser en desarrollo que comienza a funcionar de manera autónoma una vez se implanta en el útero.",
+        "Un holograma es un ser virtual que puede interactuar con su entorno y realizar acciones sin la necesidad de un soporte físico.  ¿Qué frases podrías dar usando 'ser' en género femenino?"
+      ]
+    ],
+    "Masculino"
+  ],
+  "spa-30-00006269-n_vida": [
+    "12",
+    "Cosas vivas en su conjunto.",
+    "n",
+    "spa",
+    [
+      [
+        "La vida animal es una variedad maravillosa y compleja que nos rodea.",
+        "El bosque es un mundo vivo, lleno de sonidos y olores.",
+        "La ciudad es una entidad viva, con su propio ritmo y energía.",
+        "El océano es una enorme masa viva, que respira y cambia constantemente.",
+        "La Tierra es un planeta vivo, con una red de ecosistemas interconectados y dependientes."
+      ],
+      [
+        "La vida marina es un mundo misterioso y atractivo.",
+        "La vida vegetal es la base de la cadena alimentaria.",
+        "La vida animal es una variedad infinita de formas y tamaños.",
+        "La vida en el desierto es difícil, pero algunos animales han adaptado con éxito.",
+        "La vida en la selva tropical es exuberante y vibrante."
+      ]
+    ],
+    "Femenino",
+    [
+      "La vi"
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 5
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007347-n_causa": [
+    "5",
+    "Una entidad que produce o causa algo.",
+    "n",
+    "spa",
+    [
+      [
+        "La contaminación es la causa de la enfermedad respiratoria.",
+        "El estrés es la causa del colapso mental.",
+        "La falta de educación es la causa del desempleo.",
+        "El consumo excesivo de alcohol es la causa de la violencia doméstica.",
+        "La pobreza es la causa de la falta de acceso a la salud."
+      ],
+      [
+        "La contaminación es la causa de la salud pública.",
+        "El cambio climático es la causa de la erosión costera.",
+        "La falta de educación es la causa del desempleo.",
+        "La pobreza es la causa de la enfermedad.",
+        "La corrupción es la causa de la inestabilidad política."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La causa de la sequía es la falta de lluvia.",
+        "El médico busca determinar la causa de la enfermedad.",
+        "La causa del incendio fue un cortocircuito eléctrico.",
+        "La causa del aumento de precios es la inflación.",
+        "La causa de la extinción de especies es la actividad humana."
+      ]
+    ],
+    "Femenino"
+  ],
+  "spa-30-00007846-n_alguien": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "El hombre que camina por la calle es alguien.",
+        "Alguien está hablando en la habitación.",
+        "Es alguien que me ha ayudado muchas veces.",
+        "Alguien necesita ayuda aquí.",
+        "Alguien ha robado mi bicicleta."
+      ],
+      [
+        "La mujer que estaba caminando por la calle era alguien.",
+        "Alguien se acercó a ella y le dijo algo.",
+        "Espero encontrar a alguien en este lugar.",
+        "Alguien me llamó hoy por teléfono.",
+        "La persona que estaba sentada en la esquina era alguien."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 5
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 5
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007846-n_humano": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "Un hombre es un ser humano.",
+        "El profesor es un hombre y por lo tanto, un ser humano.",
+        "El paciente que acaba de entrar al hospital es un ser humano.",
+        "El hombre que camina por la calle es un ser humano.",
+        "El hombre que está leyendo el libro es un ser humano."
+      ],
+      [
+        "La mujer es un ser humano.",
+        "La persona que está hablando es una humana.",
+        "Ella es una humana, como todos los demás.",
+        "Esas mujeres son humanas.",
+        "La mayoría de las personas son humanas."
+      ]
+    ],
+    "NULL",
+    {
+      "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 6
+    },
+    {
+      "Error 2: La palabra que buscamos no aparece en la frase.": 4
+    },
+    {
+      "Error 3:  La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+    }
+  ],
+  "spa-30-00007846-n_persona": [
+    "1",
+    "Un ser humano.",
+    "n",
+    "spa",
+    [
+      [
+        "Un hombre es una persona.",
+        "El profesor es una persona respetable.",
+        "La policía busca a la persona sospechosa.",
+        "El paciente necesita atención médica de una persona calificada.",
+        "El hombre que lee el libro es una persona interesante."
+      ],
+      [
+        "La persona caminaba por la calle.",
+        "La persona estaba leyendo un libro.",
+        "La persona habló con su amiga.",
+        "La persona se sintió enferma y tuvo que ir al médico.",
+        "La persona es muy inteligente y tiene muchas ideas creativas."
+      ]
+    ],
+    "Femenino",
+    [
+      [
+        "La persona es un ser complejo y misterioso.",
+        "La persona tiene derechos humanos inalienables.",
+        "La persona puede ser buena o malvada.",
+        "La persona puede ser feliz o triste.",
+        "La persona puede ser inteligente o estúpida."
+      ]
+    ],
+    "Femenino"
+  ]
+}
