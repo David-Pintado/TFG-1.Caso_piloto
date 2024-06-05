@@ -80,7 +80,7 @@ class ComponenteImporter:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         source_information[offset_word] = [sense, part_of_speech, language]
                         count += 1
-                    if count > 14:
+                    if count > 249:
                         break
                         
         except FileNotFoundError:

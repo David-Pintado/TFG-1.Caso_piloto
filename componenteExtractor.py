@@ -433,14 +433,12 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                 list_of_male_word_appearences.append(male_word_appearence)
         if len(list_of_male_word_appearences) != 0:
             nouns_with_positions = auxFunctions.extract_nouns_with_positions(phrase)
-            print(nouns_with_positions)
             word_position_list = list(position for (noun, position, _, _) in nouns_with_positions if noun in list_of_male_word_appearences)
             if len(word_position_list) >= 1:
                 word_position = word_position_list[0]
                 new_phrase = auxFunctions.destokenize(tokenize_phrase[:word_position])
                 search_article_phrase = new_phrase.strip().split(' ')
                 if len(search_article_phrase) == 1:
-                    print(search_article_phrase)
                     if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
                         count_male += 1
                     elif search_article_phrase[-1].lower() in array_female:
@@ -450,7 +448,6 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                         count_error_3 += 1                  
                 elif len(search_article_phrase) > 1:
                     reversed_search_article_phrase = search_article_phrase[::-1][:2]
-                    print(reversed_search_article_phrase)
                     if reversed_search_article_phrase[0].lower() in array_male:
                         count_male += 1
                     elif reversed_search_article_phrase[1].lower() in array_male:
@@ -475,7 +472,6 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
         if type(phrase) is list:
             phrase = phrase[0]
         phrase = phrase.lower()
-        print(phrase)
         tokenize_phrase = tokenizer.tokenize(phrase)
         female_word_appearence = ""
         list_of_female_word_appearences = []
@@ -488,7 +484,6 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                 list_of_female_word_appearences.append(female_word_appearence)
         if len(list_of_female_word_appearences) != 0:
             nouns_with_positions = auxFunctions.extract_nouns_with_positions(phrase)
-            print(nouns_with_positions)
             word_position_list = list(position for (noun, position, _, _) in nouns_with_positions if noun in list_of_female_word_appearences)
             if len(word_position_list) >= 1:
                 word_position = word_position_list[0]
@@ -524,17 +519,17 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
         # Vaciar la lista
         list_of_male_word_appearences = []
 
-    print(' ')
-    print('Puntos masculinos: ')
-    print(count_male) 
-    print(' ')
-    print('Puntos femeninos')
-    print(count_female)
-    print(' ')
-    print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
-    print(list_minimum_appearences)
-    print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
-    print(max_difference)
+    # print(' ')
+    # print('Puntos masculinos: ')
+    # print(count_male) 
+    # print(' ')
+    # print('Puntos femeninos')
+    # print(count_female)
+    # print(' ')
+    # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
+    # print(list_minimum_appearences)
+    # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
+    # print(max_difference)
     
     if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
