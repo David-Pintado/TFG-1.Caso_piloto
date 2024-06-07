@@ -15,20 +15,20 @@ def extract_llm_answers(llm_answer):
     # Eliminar los saltos de linea
     llm_extracted_answer = llm_extracted_answer.replace('\n',' ').replace('\n\n',' ').strip()
     # Comprabar si tiene separadores de frases. Si no tiene es que es una traduccion
-    if(re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != []):    
+    if(re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != [] and (len(re.split(r'\d+\)|\d+\.', llm_extracted_answer)) >= 4)):    
         # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
         llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:]
         # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
         return llm_extracted_answer
-    # Comprobar si tiene más de una frase (. ). En ese caso puede que no tenga separadores pero que sean un conjunto de frases
+    # Comprobar si tiene más de una frase. En ese caso puede que no tenga separadores pero que sean un conjunto de frases
     elif(len(llm_extracted_answer.split('. ')) >= 4):
         # Compilar la expresión regular directamente sin escapar
         llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('. ')]
         # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
         return llm_extracted_answer
@@ -37,7 +37,7 @@ def extract_llm_answers(llm_answer):
         # Compilar la expresión regular directamente sin escapar
         llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('; ')]
         # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() for answer in llm_extracted_answer]
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
         return llm_extracted_answer
