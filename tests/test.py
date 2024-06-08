@@ -12,7 +12,7 @@ from componenteImporter import ComponenteImporter
 import componenteQuestionMaker
 from componenteLLMCommunicator import ComponenteLLMCommunicator
 import componenteExtractor
-from componenteValidator import ComponenteValidator
+import componenteValidator
 from componenteExporter import ComponenteExporter
 
 
@@ -86,7 +86,7 @@ def component_importer_test():
     assert (element_piloto[0], element_piloto[1]) in source_information.items(), "Should appear"
     
     # Elemento que debe contener el source_information
-    element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
+    element_tierra = ("spa-30-09334396-n_tierra", ["2", "La parte sólida de la superficie de la tierra.", "n","spa"])
     assert (element_tierra[0], element_tierra[1]) in source_information.items(), "Should appear"
     
     # Creamos la estructura de datos donde guardar las glosas
@@ -109,27 +109,16 @@ def component_question_maker_test():
     
     provisional_prompts_piloto = componenteQuestionMaker.generate_provisional_prompts(element_piloto)
     provisional_prompts_tierra = componenteQuestionMaker.generate_provisional_prompts(element_tierra)
-    assert provisional_prompts_piloto == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'piloto' se utilice " +
-                                        "en género masculino en todo momento, con el sentido de 'NULL'. Cada frase debe contener la palabra 'piloto' en género masculino, " +
-                                        "asegurándote de mantener este género en todas las instancias dentro de la frase.", "Como experto en lingüística, por favor, " +
-                                        "proporciona cinco frases donde la palabra 'piloto' se utilice en género femenino en todo momento, con el sentido de " +
-                                        "'NULL'. Cada frase debe contener la palabra 'piloto' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase."], "Shold be true"
-    assert provisional_prompts_tierra == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'tierra' se utilice " +
-                                        "en género masculino en todo momento, con el sentido de 'la parte sólida de la superficie de la Tierra'. Cada frase debe contener la palabra 'tierra' en género masculino, " +
-                                        "asegurándote de mantener este género en todas las instancias dentro de la frase.", "Como experto en lingüística, por favor, " +
-                                        "proporciona cinco frases donde la palabra 'tierra' se utilice en género femenino en todo momento, con el sentido de " +
-                                        "'la parte sólida de la superficie de la Tierra'. Cada frase debe contener la palabra 'tierra' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase."], "Shold be true"
-        
+    assert provisional_prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'.", 
+                                          f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género femenino con el sentido de 'NULL'."], "Shold be true"
+    assert provisional_prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género masculino con el sentido de 'la parte sólida de la superficie de la Tierra'.", 
+                                          f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'."], "Shold be true"  
     
     validation_prompts_piloto = componenteQuestionMaker.generate_validation_prompts(element_piloto, "masculino")
     validation_prompts_tierra = componenteQuestionMaker.generate_validation_prompts(element_tierra, "femenino")
     
-    assert validation_prompts_piloto == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'piloto' se utilice " +
-                                        "en género masculino en todo momento, con el sentido de 'NULL'. Cada frase debe contener la palabra 'piloto' en género masculino, " +
-                                        "asegurándote de mantener este género en todas las instancias dentro de la frase."], "Shold be true"
-    assert validation_prompts_tierra == ["Como experto en lingüística, por favor, proporciona cinco frases donde la palabra 'tierra' "+
-                                         "se utilice en género femenino en todo momento, con el sentido de 'la parte sólida de la superficie de la Tierra'. " +
-                                         "Cada frase debe contener la palabra 'tierra' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase."], "Shold be true"
+    assert validation_prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'."], "Shold be true"
+    assert validation_prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'."], "Shold be true"
         
     
 def component_llm_communicator_test():
@@ -164,7 +153,7 @@ def component_llm_communicator_test():
         # Itera sobre cada línea
         for line in lines:
             # Verifica si la línea contiene el mensaje que estás buscando
-            if "LLM \"../models/zephyr-7b-alpha.Q5_K_M.gguf\" no encontrado. Vuelve a introducir una nueva ruta" in line:
+            if "LLM \"../../models/zephyr-7b-alpha.Q5_K_M.gguf\" no encontrado. Vuelve a introducir una nueva ruta" in line:
                 assert True, "Should be there"
                 break
         else:
@@ -347,7 +336,7 @@ def component_extractor_test():
     
     provisional_answer = componenteExtractor.get_provisional_answer4(element_tierra, llm_extracted_answer_list)
     
-    assert provisional_answer == "Femenino", "Should be Femenino"
+    assert provisional_answer == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
@@ -382,7 +371,7 @@ def component_extractor_test():
     
     provisional_answer_intitución = componenteExtractor.get_provisional_answer4(element_institución, llm_extracted_answer_list_2)
     
-    assert provisional_answer_intitución == "Femenino", "Should be Femenino"
+    assert provisional_answer_intitución == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
@@ -417,7 +406,7 @@ def component_extractor_test():
     
     provisional_answer_intitución_plural = componenteExtractor.get_provisional_answer4(element_institución_plural, llm_extracted_answer_list_3)
     
-    assert provisional_answer_intitución_plural == "Femenino", "Should be Femenino"
+    assert provisional_answer_intitución_plural == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
@@ -452,7 +441,7 @@ def component_extractor_test():
     
     provisional_answer_universal = componenteExtractor.get_provisional_answer4(element_universal, llm_extracted_answer_list_4)
     
-    assert provisional_answer_universal == "NULL", "Should be NULL"
+    assert provisional_answer_universal == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 9}, {'Error 2: La palabra que buscamos no aparece en la frase.': 10}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 0}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la extracción de la respuesta provisional.'}], "Should be True"
     
     # --------------------------------------   Prueba 5   -------------------------------------------
     
@@ -487,7 +476,7 @@ def component_extractor_test():
     
     provisional_answer_científico = componenteExtractor.get_provisional_answer4(element_científico, llm_extracted_answer_list_5)
     
-    assert provisional_answer_científico == "Masculino", "Should be Masculino"
+    assert provisional_answer_científico == ["Masculino"], "Should be ['Masculino']"
     
 def component_validator_test():
         
@@ -510,17 +499,15 @@ def component_validator_test():
       ]
     ]
     
-    componenteValidator = ComponenteValidator(10)
-    
     final_answer_cosa = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Femenino")
     
-    assert final_answer_cosa == "Femenino", "Should be Femenino"
+    assert final_answer_cosa == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
     final_answer_cosa_2 = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Masculino")
     
-    assert final_answer_cosa_2 == "NULL", "Should be NULL"
+    assert final_answer_cosa_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación de la respuesta provisional.'}], "Should be True"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
@@ -543,83 +530,285 @@ def component_validator_test():
     
     final_answer_error = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Masculino")
     
-    assert final_answer_error == "Masculino", "Should be Masculino"
+    assert final_answer_error == ["Masculino"], "Should be ['Masculino']"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
     final_answer_error_2 = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Femenino")
     
-    assert final_answer_error_2 == "NULL", "Should be NULL"
+    assert final_answer_error_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación de la respuesta provisional.'}], "Should be True"
     
 def component_exporter_test():
     
     exploited_information = {
-    "spa-30-00001740-n_entidad": [
-        "1",
-        "aquello que se percibe o se sabe o se infiere que tiene su existencia propia distinta (viva o no viva)",
-        "n",
-        "spa",
-        "NULL"],
-    "spa-30-00004258-n_organismo": [
-        "2",
-        "una entidad viva",
-        "n",
-        "spa",
-        "Masculino"],
-    "spa-30-00004475-n_organismo": [
-        "1",
-        "un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente",
-        "n",
-        "spa",
-        "Masculino"],
-    "spa-30-00007846-n_alguno": [
-        "1",
-        "un ser humano",
-        "n",
-        "spa",
-        "NULL"],
-    "spa-30-00007846-n_alma": [
-        "1",
-        "un ser humano",
-        "n",
-        "spa",
-        "Femenino"],
-    "spa-30-00007846-n_individuo": [
-        "1",
-        "un ser humano",
-        "n",
-        "spa",
-        "Masculino"],
-    "spa-30-00015388-n_animal": [
-        "1",
-        "un organismo vivo dotado de movimiento voluntario",
-        "n",
-        "spa",
-        "Masculino"],
-    "spa-30-00017222-n_planta": [
-        "1",
-        "(Botánica) un organismo vivo que carece del poder de la locomoción",
-        "n",
-        "spa",
-        "Femenino"],
-    "spa-30-00021265-n_comida": [
-        "7",
-        "cualquier sustancia que puede ser metabolizado por un animal para dar energía y construir tejido",
-        "n",
-        "spa",
-        "Femenino"],
-    "spa-30-00023773-n_motivo": [
-        "1",
-        "Could you also provide examples of situations where the concept of 'motive' is most commonly applied?",
-        "n",
-        "spa",
-        "Masculino"],
-    "spa-30-00026192-n_sensación": [
-        "2",
-        "experimentación de estados emocionales y afectivos",
-        "n",
-        "spa",
-        "Femenino"]
+        "spa-30-00002684-n_cosa": [
+            "2",
+            "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+            "n",
+            "spa",
+            [
+            [
+                "La cosa que se proyecta en la pared es un objeto real, no una ilusión.",
+                "El reflejo en el agua es solo una cosa, pero parece ser más que eso.",
+                "La sombra que sigue al hombre es una cosa tangible y visible, pero no tiene vida propia.",
+                "La imagen en la pantalla es una cosa real, pero no es lo mismo que el objeto en sí mismo.",
+                "El eco que se escucha en la habitación es solo una cosa, pero puede ser muy molesto."
+            ],
+            [
+                "La cosa más oscura en la habitación era una sombra larga que se extendía a lo largo del piso.",
+                "La cosa más frágil que ella había visto nunca antes era una hoja de papel que flotaba en el aire, sin ningún soplo.",
+                "La cosa más difícil para ella era creer que la sombra que le seguía fuera real.",
+                "La cosa más hermosa que ella había visto nunca antes era una hoja de oro que brillaba en el sol.",
+                "La cosa más misteriosa que ella había visto nunca antes era una sombra oscura que se movía por la habitación sin ninguna explicación aparente."
+            ]
+            ],
+            "Femenino",
+            [
+            [
+                "La cosa era tan hermosa que parecía sacada de un cuento de hadas.",
+                "La cosa estaba hecha de madera, pero parecía ser de cristal.",
+                "La cosa era tan grande que se podían ver las sombras de las personas que la rodeaban.",
+                "La cosa tenía una forma extraña y parecía haber sido moldeada por un artista.",
+                "La cosa estaba llena de detalles y parecía haber sido creada por un maestro escultor.  ¿Qué significado tiene la frase moldear una sombra? ¿Cómo se relaciona con el sustantivo 'cosa'?  La frase moldear una sombra hace referencia a crear o dar forma a algo que no es tangible, como una som"
+            ]
+            ],
+            "Femenino"
+        ],
+        "spa-30-00002684-n_objeto": [
+            "1",
+            "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+            "n",
+            "spa",
+            [
+            [
+                "El objeto reflejaba la luna brillante en su superficie.",
+                "La sombra del objeto se proyectó sobre el piso oscuro.",
+                "El objeto tenía un contorno definido, lo que le daba una apariencia más realista.",
+                "El objeto moldeó una sombra perfectamente redondeada en la pared.",
+                "La sombra del objeto se deslizó lentamente sobre el suelo, como si estuviera viviente."
+            ],
+            [
+                "La piedra es un objeto tangible y visible, que puede moldear una sombra en la superficie de otra piedra.",
+                "El cuadro es un objeto tangible y visible, que puede moldear una sombra en el muro.",
+                "El árbol es un objeto tangible y visible, que puede moldear una sombra en el suelo.",
+                "La lámpara es un objeto tangible y visible, que puede moldear una sombra en la pared.",
+                "El libro es un objeto tangible y visible, que puede moldear una sombra en la mesa."
+            ]
+            ],
+            "Masculino",
+            [
+            [
+                "El objeto de mi deseo es viajar por Europa.",
+                "El objeto de mi investigación es comprender la historia de la humanidad.",
+                "El objeto de mi admiración es el talento y habilidades de Beethoven.",
+                "El objeto de mi ambición es alcanzar la cima del monte Everest.",
+                "El objeto de mi curiosidad es descubrir los secretos de la Antártida."
+            ]
+            ],
+            "Masculino"
+        ],
+        "spa-30-00003553-n_conjunto": [
+            "2",
+            "Un conjunto de partes que se considera como una sola entidad.",
+            "n",
+            "spa",
+            [
+            [
+                "Un conjunto de piezas mecánicas es un motor completo.",
+                "El conjunto de huesos del pie forma la estructura de apoyo para el cuerpo.",
+                "El conjunto de dientes es una parte importante del sistema digestivo.",
+                "Un conjunto de lentes es necesario para corregir la visión.",
+                "El conjunto de órganos reproductores masculinos se conoce como genitales masculinos."
+            ],
+            [
+                "El conjunto de piezas del reloj es un mecanismo complejo.",
+                "La colección de libros antiguos forma parte de la biblioteca histórica.",
+                "El grupo de amigos es una unión fuerte y duradera.",
+                "La serie de películas constituye una obra maestra del cine.",
+                "La colección de joyas es un tesoro inestimable."
+            ]
+            ],
+            "Masculino",
+            [
+            [
+                "El conjunto de estrellas es un sistema celeste bien definido.",
+                "El conjunto de datos proporciona información valiosa para la investigación.",
+                "El conjunto de herramientas es suficiente para realizar el trabajo.",
+                "El conjunto de leyes establece los límites de lo que es legal y lo que no lo es.",
+                "El conjunto de ideas proporciona una visión completa del problema."
+            ]
+            ],
+            "Masculino"
+        ],
+        "spa-30-00004258-n_ser": [
+            "4",
+            "Una entidad viva.",
+            "n",
+            "spa",
+            [
+            [
+                "El león es la reina del bosque.",
+                "El elefante es el gigante de la savana.",
+                "El tigre es el rey de la selva.",
+                "El rinoceronte es el guardián de la pradera.",
+                "El gorila es el rey de los simios."
+            ],
+            [
+                "La madre es la fuente de vida para su hijo.",
+                "La planta es la encarnación de vitalidad y crecimiento.",
+                "La nación es una entidad viva, con un corazón y una mente propia.",
+                "La cultura es el alma de una sociedad, que la hace única e inmortal.",
+                "La belleza es la expresión más pura del ser humano, que nos une a nuestra naturaleza."
+            ]
+            ],
+            "NULL",
+            {
+            "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+            },
+            {
+            "Error 2: La palabra que buscamos no aparece en la frase.": 9
+            },
+            {
+            "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            },
+            {
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción de la respuesta provisional."
+            }
+        ],
+        "spa-30-00004475-n_ser": [
+            "2",
+            "Un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente.",
+            "n",
+            "spa",
+            [
+            [
+                "Un ser humano adulto es un individuo capaz de tomar decisiones y actuar de manera autónoma.",
+                "El niño pequeño es un ser que aún no ha desarrollado la capacidad de hablar o caminar sin ayuda.",
+                "La conciencia es un ser intangible que permite al ser humano tener una percepción de su entorno y sus propias emociones.",
+                "El virus es un ser microscópico que puede causar enfermedades graves en los seres vivos.",
+                "La inteligencia artificial es un ser creado por la tecnología que tiene la capacidad de aprender y responder a las instrucciones dadas por el usuario."
+            ],
+            [
+                "La planta es un ser vivo capaz de absorber nutrientes y crecer.",
+                "La bacteria es un ser vivo microscópico que puede causar enfermedades.",
+                "La hormona es un ser químico biológicamente activo que regula procesos fisiológicos.",
+                "La computadora es un ser electrónico programable que puede realizar cálculos y operaciones.",
+                "La luna es un ser celestial que ilumina la noche y afecta el mar y la tierra."
+            ]
+            ],
+            "Masculino",
+            [
+            [
+                "El ser humano es un individuo capaz de tomar decisiones y actuar de forma autónoma.",
+                "La inteligencia artificial es un ser que simula la capacidad de pensamiento y acción humana.",
+                "Un robot es un ser mecánico programado para realizar tareas específicas de manera independiente.",
+                "El embrión es un ser en desarrollo que comienza a funcionar de forma autónoma una vez implantado en el útero.",
+                "Un holograma es un ser virtual que puede interactuar con su entorno y realizar tareas sin la necesidad de una presencia física.  ¿Qué frases podrías dar usando 'ser' en género femenino?"
+            ]
+            ],
+            "Masculino"
+        ],
+        "spa-30-00006269-n_vida": [
+            "12",
+            "Cosas vivas en su conjunto.",
+            "n",
+            "spa",
+            [
+            [
+                "La vida animal es una diversidad maravillosa y compleja.",
+                "El mundo vegetal es un vasto reino de seres vivientes.",
+                "Los microorganismos son la base de la cadena alimentaria y la mayoría de los procesos biológicos en la Tierra.",
+                "La vida marina es una comunidad compleja e interdependiente que abarca todo el planeta.",
+                "El bosque tropical es un mosaico de vida exuberante y variada, donde se encuentran especies únicas y raras."
+            ],
+            [
+                "La vida marina es un mundo misterioso y atractivo.",
+                "La vida vegetal es la base de la cadena alimentaria.",
+                "La vida animal es una variedad infinita de formas y tamaños.",
+                "La vida rural es una experiencia única que se puede disfrutar en el campo.",
+                "La vida urbana es un entorno complejo y dinámico."
+            ]
+            ],
+            "Femenino",
+            [
+            [
+                "La vida se mantiene en equilibrio a través de la biodiversidad.",
+                "La vida es un regalo inestimable que debemos cuidar y proteger.",
+                "La vida en su diversidad es el resultado de millones de años de evolución.",
+                "La vida en todos sus aspectos es algo hermoso y maravilloso.",
+                "La vida en su conjunto es un misterio que aún no ha sido completamente descifrado."
+            ]
+            ],
+            "Femenino"
+        ],
+        "spa-30-00007347-n_causa": [
+            "5",
+            "Una entidad que produce o causa algo.",
+            "n",
+            "spa",
+            [
+            [
+                "La contaminación es la causa de la enfermedad respiratoria.",
+                "El estrés es la causa de la depresión.",
+                "El tabaco es la causa del cáncer pulmonar.",
+                "El consumo excesivo de alcohol es la causa de la cirrosis.",
+                "La falta de ejercicio es la causa de la obesidad."
+            ],
+            [
+                "La contaminación es la causa de la salud pública.",
+                "El cambio climático es la causa de los desastres naturales.",
+                "La falta de educación es la causa del desempleo.",
+                "La pobreza es la causa de la violencia en las ciudades.",
+                "La corrupción es la causa de la inestabilidad política."
+            ]
+            ],
+            "Femenino",
+            [
+            [
+                "La causa de la sequía es la falta de lluvia.",
+                "El médico busca determinar la causa de la enfermedad.",
+                "La causa del incendio fue un cortocircuito eléctrico.",
+                "La causa del aumento de precios es la inflación.",
+                "La causa del accidente fue la falta de atención del conductor."
+            ]
+            ],
+            "Femenino"
+        ],
+        "spa-30-00007846-n_alguien": [
+            "1",
+            "Un ser humano.",
+            "n",
+            "spa",
+            [
+            [
+                "El hombre que camina por la calle es alguien.",
+                "Alguien está hablando en la habitación.",
+                "Es alguien que me ha ayudado muchas veces.",
+                "Alguien debe haber dejado la puerta abierta.",
+                "El hombre que se acerca es alguien que conoce a mi madre."
+            ],
+            [
+                "La mujer que estaba caminando por la calle.",
+                "La persona que estaba leyendo el libro.",
+                "La chica que estaba bailando en la fiesta.",
+                "La estudiante que estaba escribiendo su tarea.",
+                "La mujer que estaba hablando con su amiga."
+            ]
+            ],
+            "NULL",
+            {
+            "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 3
+            },
+            {
+            "Error 2: La palabra que buscamos no aparece en la frase.": 7
+            },
+            {
+            "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            },
+            {
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción de la respuesta provisional."
+            }
+        ],
     }
     
     config = ConfigParser()
@@ -702,7 +891,7 @@ def prueba():
     
     print(provisional_answer_intitución)
     
-    componenteValidator = ComponenteValidator(5)
+    
     
     final_answer_cosa = componenteValidator.get_final_answer(element_realización, c, "Masculino")
     
@@ -725,9 +914,9 @@ if __name__ == "__main__":
     component_extractor_test() # Tested correctly
     print("Everything in Extractor component passed")
     print("Testing over Validator component...")
-    # component_validator_test() # Tested correctly
+    component_validator_test() # Tested correctly
     print("Everything in Validator component passed")
     print("Testing over Exporter component...")
-    # component_exporter_test() # Tested correctly
+    component_exporter_test() # Tested correctly
     print("Everything in Exporter component passed")
     print("Everything passed")

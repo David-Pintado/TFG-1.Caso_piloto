@@ -1,6 +1,6 @@
 
 import componenteExtractor
-from componenteValidator import ComponenteValidator
+import componenteValidator
 import re
 
 

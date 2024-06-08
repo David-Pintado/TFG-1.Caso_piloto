@@ -1,0 +1,15 @@
+
+
+INFORMACIÓN DE LOS RESULTADOS DE LA EXPERIMENTACIÓN
+
+Entradas totales: 500 (100.00%)
+Cantidad 'Masculino' obtenidos: 123 (24.60%)
+Cantidad 'Femenino' obtenidos: 268 (53.60%)
+Cantidad de conocimiento obtenido: 391 (78.20%)
+Cantidad 'NULL' obtenidos: 109 (21.80%)
+'NULL' obtenidos en la fase de extracción de la respuesta provisional: 79 (15.80%)
+'NULL' obtenidos en la fase de validación de la respuesta provisional: 30 (6.00%)
+Total de frases sobre los que se han analizado los errores de 'NULL': 922
+Error 1 (Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.): 87 (9.44%)
+Error 2 (La palabra que buscamos no aparece en la frase.): 251 (27.22%)
+Error 3 (La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.): 227 (24.62%)
