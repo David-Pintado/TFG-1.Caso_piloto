@@ -76,11 +76,11 @@ class ComponenteImporter:
                     # Clave compuesta (offset_word)
                     offset_word = offset + '_' + word
                     # Si es un synset en español y el tipo de palabra es sustantivo (noun=n)
-                    if language == "spa" and part_of_speech == "n" and word in words_set:
+                    if language == "spa" and part_of_speech == "n" and word in words_set and offset == "spa-30-00007347-n":
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         source_information[offset_word] = [sense, part_of_speech, language]
                         count += 1
-                    if count > 249:
+                    if count > 149:
                         break
                         
         except FileNotFoundError:
@@ -111,7 +111,7 @@ class ComponenteImporter:
                     # Añadimos a la lista una tupla (offset, gloss)
                     eng_data_structure[synset[0].replace('eng','spa')] = synset[6]
         except FileNotFoundError:
-            print(f'Archivo "{self.spa_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
+            print(f'Archivo "{self.eng_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
         return eng_data_structure   
 

@@ -9,7 +9,7 @@ from componenteImporter import ComponenteImporter
 import componenteQuestionMaker
 from componenteLLMCommunicator import ComponenteLLMCommunicator
 import componenteExtractor
-from componenteValidator import ComponenteValidator
+import componenteValidator
 from componenteExporter import ComponenteExporter
 
 
@@ -28,17 +28,13 @@ def knowledge_exploitation():
     componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['first_500_most_used_words_spa_file'])
     
     # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
-    componenteLLMCommunicator_provisional = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
+    componenteLLMCommunicator_provisional = ComponenteLLMCommunicator(config['file_path']['provisional_results_language_model_path'])
     
     # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
     componenteLLMCommunicator_provisional.load_model()
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
     source_information = componenteImporter.generate_data_structure()
-    
-    # Creamos la estructura de datos que guardará el conocimiento que se haya explotado en los modelos de lenguaje, 
-    # junto con la información extraída de la(s) fuente(s).
-    exploited_information = {}
     
     # Generar la estructura de datos en ingles para poder conseguir sus glosses 
     source_gloss_structure_eng = componenteImporter.generate_eng_data_structure()
@@ -61,10 +57,10 @@ def knowledge_exploitation():
     #     La segunda para validar las que tienen el valor del resultado provisional 'Femenino' o 'Masculino'
     
     for (offset_word,attributes) in source_information.items():
-        llm_extracted_provisional_answers_list = []  
-        llm_extracted_final_answers_list = []
-        provisional_answer = ""
-        final_answer = ""
+        llm_extracted_provisional_results_list = []  
+        llm_extracted_final_results_list = []
+        provisional_result = ""
+        final_result = ""
         
         # (respuesta provisional)
         provisional_prompt_list = componenteQuestionMaker.generate_provisional_prompts((offset_word,attributes))
@@ -74,31 +70,29 @@ def knowledge_exploitation():
             # Extraer la parte de la respuesta para su posterior tratado
             llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
             # Añadir la lista de las respuestas al data structure
-            llm_extracted_provisional_answers_list.append(llm_extracted_answer)
-        # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-        provisional_answer = componenteExtractor.get_provisional_answer4((offset_word,attributes),llm_extracted_provisional_answers_list)   
+            llm_extracted_provisional_results_list.append(llm_extracted_answer)
+        # Conseguir el resultado provisional en base a lo devuelto por el modelo de lenguaje
+        provisional_result = componenteExtractor.get_provisional_result4((offset_word,attributes),llm_extracted_provisional_results_list)   
         # Añadirlo al source_information
-        if len(provisional_answer) == 1:  
-            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer[0]]
+        if len(provisional_result) == 1:  
+            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_results_list, provisional_result[0]]
+            source_information[offset_word] = item_list 
+        elif len(provisional_result) == 6:
+            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_results_list, provisional_result[0], provisional_result[1], provisional_result[2], provisional_result[3], provisional_result[4], provisional_result[5]]
             source_information[offset_word] = item_list
-            exploited_information[offset_word] = item_list   
-        elif len(provisional_answer) == 5:
-            item_list = [attributes[0], attributes[1], attributes[2], attributes[3], llm_extracted_provisional_answers_list, provisional_answer[0], provisional_answer[1], provisional_answer[2], provisional_answer[3], provisional_answer[4]]
-            source_information[offset_word] = item_list
-            exploited_information[offset_word] = item_list  
         
     componenteLLMCommunicator_provisional.llm = None
         
     # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para validar las respuestas provisionales
-    componenteLLMCommunicator_final = ComponenteLLMCommunicator(config['file_path']['final_answers_language_model_path'])
+    componenteLLMCommunicator_final = ComponenteLLMCommunicator(config['file_path']['final_results_language_model_path'])
     
     # Cargamos el modelo de lenguaje que vamos a utilizar para validar las respuestas provisionales
     componenteLLMCommunicator_final.load_model()    
     
-    for (offset_word,attributes) in exploited_information.items():    
+    for (offset_word,attributes) in source_information.items():    
         # (validacion de 'Femenino' o 'Masculino')
-        final_answer = ""
-        llm_extracted_final_answers_list = []
+        final_result = ""
+        llm_extracted_final_results_list = []
         if attributes[5] == "Femenino" or attributes[5] == "Masculino":
             final_prompt_list = componenteQuestionMaker.generate_validation_prompts((offset_word,attributes), attributes[5])
             
@@ -108,35 +102,31 @@ def knowledge_exploitation():
                 # Extraer la parte de la respuesta para su posterior tratado
                 llm_extracted_answer = componenteExtractor.extract_llm_answers(llm_answer)
                 # Añadir la lista de las respuestas al data structure
-                llm_extracted_final_answers_list.append(llm_extracted_answer)
+                llm_extracted_final_results_list.append(llm_extracted_answer)
             
-            # Inicializamos la clase 5 con los datos necesarios
-            componenteValidator = ComponenteValidator(len(attributes[4][0]))
-            # Conseguir la respuesta provisional en base a lo devuelto por el modelo de lenguaje
-            final_answer = componenteValidator.get_final_answer((offset_word,attributes), llm_extracted_final_answers_list, attributes[5])
+            # Conseguir el resultado provisional en base a lo devuelto por el modelo de lenguaje
+            final_result = componenteValidator.get_final_result((offset_word,attributes), llm_extracted_final_results_list, attributes[5])
             
-            if len(final_answer) == 1:  
-                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_answers_list, final_answer[0]]
-                exploited_information[offset_word] = item_list
+            if len(final_result) == 1:  
+                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_results_list, final_result[0]]
                 source_information[offset_word] = item_list
-            elif len(final_answer) == 5:
-                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_answers_list, final_answer[0], final_answer[1], final_answer[2], final_answer[3], final_answer[4]]
-                exploited_information[offset_word] = item_list
+            elif len(final_result) == 6:
+                item_list = [attributes[0], attributes[1], attributes[2], attributes[3], attributes[4], attributes[5], llm_extracted_final_results_list, final_result[0], final_result[1], final_result[2], final_result[3], final_result[4], final_result[5]]
                 source_information[offset_word] = item_list
     
     # Generamos un JSON con la estructura de datos, para una mejor visualizacion
-    json_exploited_information = json.dumps(source_information, indent=2, ensure_ascii=False)
+    json_source_information = json.dumps(source_information, indent=2, ensure_ascii=False)
     
     # Generamos un JSON con la estructura de datos en ingles, para una mejor visualizacion
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
     
     # Guardar el 'source_information' en formato json en un archivo    
-    componenteImporter.save_json(file_path_source_information_json,json_exploited_information)
+    componenteImporter.save_json(file_path_source_information_json,json_source_information)
     
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
     componenteImporter.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
     
-    return exploited_information
+    return source_information
 
 def knowledge_exploitation_process():
     
@@ -144,14 +134,14 @@ def knowledge_exploitation_process():
     config.read('./config.ini')
     
     print('Knowledge exploitation process STARTED')
-    exploited_information = knowledge_exploitation() 
+    source_information = knowledge_exploitation() 
     print('Knowledge exploitation process FINISHED')
     
     # Inicializamos la clase para con la ruta del archivo a exportar
     componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])
     
     print('Knowledge export process STARTED')
-    componenteExporter.export_knowledge(exploited_information)
+    componenteExporter.export_knowledge(source_information)
     print('Knowledge export process FINISHED')
 
 

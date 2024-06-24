@@ -31,6 +31,6 @@ class ComponenteLLMCommunicator:
             echo=True # Echo the prompt back in the output
         )
         
-        #print(json.dumps(output, indent=2, ensure_ascii=False))
+        print(json.dumps(output, indent=2, ensure_ascii=False))
         
         return output

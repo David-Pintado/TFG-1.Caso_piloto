@@ -10,8 +10,8 @@ def extract_values(file_path):
         'femenino': int(re.search(r'Cantidad \'Femenino\' obtenidos: (\d+)', content).group(1)),
         'conocimiento': int(re.search(r'Cantidad de conocimiento obtenido: (\d+)', content).group(1)),
         'null': int(re.search(r'Cantidad \'NULL\' obtenidos: (\d+)', content).group(1)),
-        'null_extraccion': int(re.search(r'\'NULL\' obtenidos en la fase de extracción de la respuesta provisional: (\d+)', content).group(1)),
-        'null_validacion': int(re.search(r'\'NULL\' obtenidos en la fase de validación de la respuesta provisional: (\d+)', content).group(1)),
+        'null_extraccion': int(re.search(r'\'NULL\' obtenidos en la fase de extracción del resultado provisional: (\d+)', content).group(1)),
+        'null_validacion': int(re.search(r'\'NULL\' obtenidos en la fase de validación del resultado provisional: (\d+)', content).group(1)),
         'total_frases': int(re.search(r'Total de frases sobre los que se han analizado los errores de \'NULL\': (\d+)', content).group(1)),
         'error_1': int(re.search(r'Error 1.*?: (\d+)', content).group(1)),
         'error_2': int(re.search(r'Error 2.*?: (\d+)', content).group(1)),
@@ -23,8 +23,8 @@ def calculate_percentage(part, whole):
     return (part / whole) * 100 if whole > 0 else 0
 
 # Paths to the input files
-file1_path = './resultados_experimentaciones/experimentacion_1/resultados.txt'
-file2_path = './resultados_experimentaciones/experimentacion_2/resultados.txt'
+file1_path = './resultados_experimentaciones_finales_(I)/experimentacion_1/resultados.txt'
+file2_path = './resultados_experimentaciones_finales_(I)/experimentacion_2/resultados.txt'
 
 # Extract values from the files
 values1 = extract_values(file1_path)
@@ -56,8 +56,8 @@ with open(output_path, 'w', encoding='utf-8') as result_file:
     result_file.write(f"Cantidad 'Femenino' obtenidos: {combined_values['femenino']} ({combined_percentages['femenino']:.2f}%)\n")
     result_file.write(f"Cantidad de conocimiento obtenido: {combined_values['conocimiento']} ({combined_percentages['conocimiento']:.2f}%)\n")
     result_file.write(f"Cantidad 'NULL' obtenidos: {combined_values['null']} ({combined_percentages['null']:.2f}%)\n")
-    result_file.write(f"'NULL' obtenidos en la fase de extracción de la respuesta provisional: {combined_values['null_extraccion']} ({combined_percentages['null_extraccion']:.2f}%)\n")
-    result_file.write(f"'NULL' obtenidos en la fase de validación de la respuesta provisional: {combined_values['null_validacion']} ({combined_percentages['null_validacion']:.2f}%)\n")
+    result_file.write(f"'NULL' obtenidos en la fase de extracción del resultado provisional: {combined_values['null_extraccion']} ({combined_percentages['null_extraccion']:.2f}%)\n")
+    result_file.write(f"'NULL' obtenidos en la fase de validación del resultado provisional: {combined_values['null_validacion']} ({combined_percentages['null_validacion']:.2f}%)\n")
     result_file.write(f"Total de frases sobre los que se han analizado los errores de 'NULL': {combined_values['total_frases']}\n")
     result_file.write(f"Error 1 (Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.): {combined_values['error_1']} ({combined_percentages['error_1']:.2f}%)\n")
     result_file.write(f"Error 2 (La palabra que buscamos no aparece en la frase.): {combined_values['error_2']} ({combined_percentages['error_2']:.2f}%)\n")

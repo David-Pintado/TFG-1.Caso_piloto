@@ -136,7 +136,7 @@ def component_llm_communicator_test():
     sys.stdout = archivo_salida
 
     # Si el path del modelo no es correcto no debe dar error, si no indicar el motivo por consola
-    componenteLLMCommunicator_test = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path_test']) 
+    componenteLLMCommunicator_test = ComponenteLLMCommunicator(config['file_path']['provisional_results_language_model_path_test']) 
     componenteLLMCommunicator_test.load_model()
 
     # Cierra el archivo
@@ -179,7 +179,7 @@ def component_llm_communicator_test():
         sys.stderr = archivo_salida
         
         # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
-        componenteLLMCommunicator = ComponenteLLMCommunicator(config['file_path']['provisional_answers_language_model_path'])
+        componenteLLMCommunicator = ComponenteLLMCommunicator(config['file_path']['provisional_results_language_model_path'])
         
         # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
         componenteLLMCommunicator.load_model()
@@ -334,9 +334,9 @@ def component_extractor_test():
     
     llm_extracted_answer_list = [expected_output_piloto_masculino, expected_output_piloto_femenino]
     
-    provisional_answer = componenteExtractor.get_provisional_answer4(element_tierra, llm_extracted_answer_list)
+    provisional_result = componenteExtractor.get_provisional_result4(element_tierra, llm_extracted_answer_list)
     
-    assert provisional_answer == ["Femenino"], "Should be ['Femenino']"
+    assert provisional_result == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
@@ -369,9 +369,9 @@ def component_extractor_test():
                                         ]
                                     ]
     
-    provisional_answer_intitución = componenteExtractor.get_provisional_answer4(element_institución, llm_extracted_answer_list_2)
+    provisional_result_intitución = componenteExtractor.get_provisional_result4(element_institución, llm_extracted_answer_list_2)
     
-    assert provisional_answer_intitución == ["Femenino"], "Should be ['Femenino']"
+    assert provisional_result_intitución == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
@@ -404,9 +404,9 @@ def component_extractor_test():
                                         ]
                                     ]
     
-    provisional_answer_intitución_plural = componenteExtractor.get_provisional_answer4(element_institución_plural, llm_extracted_answer_list_3)
+    provisional_result_intitución_plural = componenteExtractor.get_provisional_result4(element_institución_plural, llm_extracted_answer_list_3)
     
-    assert provisional_answer_intitución_plural == ["Femenino"], "Should be ['Femenino']"
+    assert provisional_result_intitución_plural == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
@@ -439,9 +439,9 @@ def component_extractor_test():
       ]
     ]
     
-    provisional_answer_universal = componenteExtractor.get_provisional_answer4(element_universal, llm_extracted_answer_list_4)
+    provisional_result_universal = componenteExtractor.get_provisional_result4(element_universal, llm_extracted_answer_list_4)
     
-    assert provisional_answer_universal == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 9}, {'Error 2: La palabra que buscamos no aparece en la frase.': 10}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 0}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la extracción de la respuesta provisional.'}], "Should be True"
+    assert provisional_result_universal == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 9}, {'Error 2: La palabra que buscamos no aparece en la frase.': 10}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 0}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la extracción del resultado provisional.'}], "Should be True"
     
     # --------------------------------------   Prueba 5   -------------------------------------------
     
@@ -474,9 +474,9 @@ def component_extractor_test():
       ]
     ]
     
-    provisional_answer_científico = componenteExtractor.get_provisional_answer4(element_científico, llm_extracted_answer_list_5)
+    provisional_result_científico = componenteExtractor.get_provisional_result4(element_científico, llm_extracted_answer_list_5)
     
-    assert provisional_answer_científico == ["Masculino"], "Should be ['Masculino']"
+    assert provisional_result_científico == ["Masculino"], "Should be ['Masculino']"
     
 def component_validator_test():
         
@@ -499,15 +499,15 @@ def component_validator_test():
       ]
     ]
     
-    final_answer_cosa = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Femenino")
+    final_result_cosa = componenteValidator.get_final_result(element_realización, llm_extracted_answer_list_1, "Femenino")
     
-    assert final_answer_cosa == ["Femenino"], "Should be ['Femenino']"
+    assert final_result_cosa == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
-    final_answer_cosa_2 = componenteValidator.get_final_answer(element_realización, llm_extracted_answer_list_1, "Masculino")
+    final_result_cosa_2 = componenteValidator.get_final_result(element_realización, llm_extracted_answer_list_1, "Masculino")
     
-    assert final_answer_cosa_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación de la respuesta provisional.'}], "Should be True"
+    assert final_result_cosa_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación del resultado provisional.'}], "Should be True"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
@@ -528,15 +528,15 @@ def component_validator_test():
       ]
     ]
     
-    final_answer_error = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Masculino")
+    final_result_error = componenteValidator.get_final_result(element_error, llm_extracted_answer_list_2, "Masculino")
     
-    assert final_answer_error == ["Masculino"], "Should be ['Masculino']"
+    assert final_result_error == ["Masculino"], "Should be ['Masculino']"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
-    final_answer_error_2 = componenteValidator.get_final_answer(element_error, llm_extracted_answer_list_2, "Femenino")
+    final_result_error_2 = componenteValidator.get_final_result(element_error, llm_extracted_answer_list_2, "Femenino")
     
-    assert final_answer_error_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación de la respuesta provisional.'}], "Should be True"
+    assert final_result_error_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación del resultado provisional.'}], "Should be True"
     
 def component_exporter_test():
     
@@ -672,7 +672,7 @@ def component_exporter_test():
             "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
             },
             {
-            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción de la respuesta provisional."
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
             }
         ],
         "spa-30-00004475-n_ser": [
@@ -806,7 +806,7 @@ def component_exporter_test():
             "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
             },
             {
-            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción de la respuesta provisional."
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
             }
         ],
     }
@@ -887,15 +887,15 @@ def prueba():
     
     element_realización = ("spa-30-00039297-n_error",["5","Interacción cercana.","n","spa",])
     
-    provisional_answer_intitución = componenteExtractor.get_provisional_answer4(element_realización, b)
+    provisional_result_intitución = componenteExtractor.get_provisional_result4(element_realización, b)
     
-    print(provisional_answer_intitución)
+    print(provisional_result_intitución)
     
     
     
-    final_answer_cosa = componenteValidator.get_final_answer(element_realización, c, "Masculino")
+    final_result_cosa = componenteValidator.get_final_result(element_realización, c, "Masculino")
     
-    print(final_answer_cosa)
+    print(final_result_cosa)
     
 
 # Método main

@@ -24,14 +24,14 @@ def generate_provisional_prompts(element):
     
     return prompt_list
 
-def generate_validation_prompts(element, provisional_answer):
+def generate_validation_prompts(element, provisional_result):
     
     offset_word = element[0]
     word = offset_word.split('_')[1]
     gloss = element[1][1]
-    if provisional_answer.lower() == "masculino":
+    if provisional_result.lower() == "masculino":
         question = f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo '{word}' en género masculino con el sentido de '{gloss}'."
-    elif provisional_answer.lower() == "femenino":
+    elif provisional_result.lower() == "femenino":
         question = f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo '{word}' en género femenino con el sentido de '{gloss}'."
     prompt_list = [question]
     

@@ -37,7 +37,7 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 
 
 # Devolver el resultado provisional
-# print(componenteExtractor.get_provisional_answer('entidad',[llm_extracted_answer_list1, llm_extracted_answer_list2]))
+# print(componenteExtractor.get_provisional_result('entidad',[llm_extracted_answer_list1, llm_extracted_answer_list2]))
 
 # a = [
 #       [
@@ -66,20 +66,20 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 #       ]
 #     ]
 
-# print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
+# print('--------- Pruebas diferentes "get_provisional_results" ----------------')
 # print('')
-# print('Get_provisional_answer 1')
-# print(componenteExtractor.get_provisional_answer('conjunto',a))
+# print('Get_provisional_result 1')
+# print(componenteExtractor.get_provisional_result('conjunto',a))
 # print('')
-# print('Get_provisional_answer 2')
-# print(componenteExtractor.get_provisional_answer2('conjunto',a))
+# print('Get_provisional_result 2')
+# print(componenteExtractor.get_provisional_result2('conjunto',a))
 # print('')
-# print('Get_provisional_answer 3')
-# print(componenteExtractor.get_provisional_answer3('conjunto',a))
+# print('Get_provisional_result 3')
+# print(componenteExtractor.get_provisional_result3('conjunto',a))
 # print(' ')
 # print(' ')
 # print('Validación')
-# print(componenteValidator.get_final_answer('conjunto', b, 'Masculino'))
+# print(componenteValidator.get_final_result('conjunto', b, 'Masculino'))
 
 
 # b = [
@@ -109,22 +109,22 @@ array2 = {'id': 'cmpl-dca4e623-1772-490c-97f9-55e442c5e7ae', 'object': 'text_com
 #       ]
 #     ]
 
-# print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
+# print('--------- Pruebas diferentes "get_provisional_results" ----------------')
 # print('')
-# print('Get_provisional_answer 1')
-# print(componenteExtractor.get_provisional_answer('causa',c))
+# print('Get_provisional_result 1')
+# print(componenteExtractor.get_provisional_result('causa',c))
 # print('')
-# print('Get_provisional_answer 2')
-# print(componenteExtractor.get_provisional_answer2('causa',c))
+# print('Get_provisional_result 2')
+# print(componenteExtractor.get_provisional_result2('causa',c))
 # print('')
-# print('Get_provisional_answer 3')
-# print(componenteExtractor.get_provisional_answer3('causa',c))
+# print('Get_provisional_result 3')
+# print(componenteExtractor.get_provisional_result3('causa',c))
 
 # conponente5 = ComponenteValidator(5)
 # print(' ')
 # print(' ')
 # print('Validación')
-# print(conponente5.get_final_answer('ser', b, 'Masculino'))
+# print(conponente5.get_final_result('ser', b, 'Masculino'))
 
 
 a = [
@@ -153,22 +153,22 @@ element = ["spa-30-00002137-n_abstracción", [
 
 
 
-# print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
+# print('--------- Pruebas diferentes "get_provisional_results" ----------------')
 # print('')
-# print('Get_provisional_answer 1')
+# print('Get_provisional_result 1')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componenteExtractor.get_provisional_answer(element,a))
+# print(componenteExtractor.get_provisional_result(element,a))
 # print('')
-# print('Get_provisional_answer 2')
+# print('Get_provisional_result 2')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componenteExtractor.get_provisional_answer2(element,a))
+# print(componenteExtractor.get_provisional_result2(element,a))
 # print('')
-# print('Get_provisional_answer 3')
+# print('Get_provisional_result 3')
 # print(' ')
 # print('Respuesta que se obtiene: ')
-# print(componenteExtractor.get_provisional_answer3(element,a))
+# print(componenteExtractor.get_provisional_result3(element,a))
 
 # /////////////////
 
@@ -198,23 +198,23 @@ p = [
     ]
 
 
-print('--------- Pruebas diferentes "get_provisional_answers" ----------------')
+print('--------- Pruebas diferentes "get_provisional_results" ----------------')
 print('')
-print('Get_provisional_answer 1')
+print('Get_provisional_result 1')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componenteExtractor.get_provisional_answer(element,a))
+print(componenteExtractor.get_provisional_result(element,a))
 print('')
-print('Get_provisional_answer 2')
+print('Get_provisional_result 2')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componenteExtractor.get_provisional_answer2(element,a))
+print(componenteExtractor.get_provisional_result2(element,a))
 print('')
-print('Get_provisional_answer 3')
+print('Get_provisional_result 3')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componenteExtractor.get_provisional_answer3(element,a))
-print('Get_provisional_answer 4')
+print(componenteExtractor.get_provisional_result3(element,a))
+print('Get_provisional_result 4')
 print(' ')
 print('Respuesta que se obtiene: ')
-print(componenteExtractor.get_provisional_answer4(element,a))
+print(componenteExtractor.get_provisional_result4(element,a))

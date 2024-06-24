@@ -5,10 +5,10 @@ class ComponenteExporter:
     def __init__(self, exploited_information_file_path):
         self.exploited_information_file_path = exploited_information_file_path
 
-    def export_knowledge(self, exploited_information):
+    def export_knowledge(self, source_information):
         
         with open(self.exploited_information_file_path, 'w', encoding='utf-8') as f:
-            for (offset_word,attributes) in exploited_information.items():
+            for (offset_word,attributes) in source_information.items():
                 
                 # Extraccion de los elementos que van a formar parte de la exportacion
                 offset_word_splitted = offset_word.split('_')

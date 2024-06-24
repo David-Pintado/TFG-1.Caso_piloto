@@ -55,9 +55,9 @@ def extract_llm_answers(llm_answer):
     return llm_extracted_answer
 
 
-def get_provisional_answer(element, llm_extracted_answer_list):
+def get_provisional_result(element, llm_extracted_answer_list):
     
-    """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
+    """Función para el resultado provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
@@ -66,7 +66,7 @@ def get_provisional_answer(element, llm_extracted_answer_list):
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
-        - provisional_answer (string)
+        - provisional_result (string)
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
                 - "NULL": No se ha conseguido encontrar el género de la palabra
@@ -78,7 +78,7 @@ def get_provisional_answer(element, llm_extracted_answer_list):
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    provisional_answer = ""
+    provisional_result = ""
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
     array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
@@ -154,16 +154,16 @@ def get_provisional_answer(element, llm_extracted_answer_list):
     
     # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
     if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
-        provisional_answer = "Masculino"
+        provisional_result = "Masculino"
     elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
-        provisional_answer = "Femenino"
+        provisional_result = "Femenino"
     else:
-        provisional_answer = "NULL"
-    return provisional_answer
+        provisional_result = "NULL"
+    return provisional_result
     
 # ///////////////////////////////////////////////////////////////////////////////////
 
-def get_provisional_answer2(element, llm_extracted_answer_list):
+def get_provisional_result2(element, llm_extracted_answer_list):
     
     # Inicializamos las variables necesarias
     count_male = 0
@@ -172,7 +172,7 @@ def get_provisional_answer2(element, llm_extracted_answer_list):
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    provisional_answer = ""
+    provisional_result = ""
     list_minimum_appearences = len(llm_extracted_answer_list[0])/2
     max_difference = list_minimum_appearences/2
     array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
@@ -237,16 +237,16 @@ def get_provisional_answer2(element, llm_extracted_answer_list):
     # print(max_difference)
 
     if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
-        provisional_answer = "Masculino"
+        provisional_result = "Masculino"
     elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
-        provisional_answer = "Femenino"
+        provisional_result = "Femenino"
     else:
-        provisional_answer = "NULL"
-    return provisional_answer
+        provisional_result = "NULL"
+    return provisional_result
 
-def get_provisional_answer3(element, llm_extracted_answer_list):
+def get_provisional_result3(element, llm_extracted_answer_list):
     
-    """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
+    """Función para el resultado provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
@@ -255,7 +255,7 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
-        - provisional_answer (string)
+        - provisional_result (string)
                 - "Neutro": La palabra es de género neutro
                 - "Masculino": La palabra es de género masculino
                 - "Femenino": La palabra es de género femenino
@@ -269,7 +269,7 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     plural_word = auxFunctions.pluralize_word(word)
     male_word_appearence = ""
     female_word_appearence = ""
-    provisional_answer = ""
+    provisional_result = ""
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = len(llm_extracted_answer_list[0]) * 0.8
     array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
@@ -354,19 +354,19 @@ def get_provisional_answer3(element, llm_extracted_answer_list):
     if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
         # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
         if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
-            provisional_answer = "Masculino"
+            provisional_result = "Masculino"
         elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
-            provisional_answer = "Femenino"
+            provisional_result = "Femenino"
         else: 
-            provisional_answer = "NULL"
+            provisional_result = "NULL"
     else:
-        provisional_answer = "NULL"
-    return provisional_answer
+        provisional_result = "NULL"
+    return provisional_result
 
 
-def get_provisional_answer4(element, llm_extracted_answer_list):
+def get_provisional_result4(element, llm_extracted_answer_list):
     
-    """Función para la respuesta provisional al conocimiento a obtener en base a una palabra y una lista de frases
+    """Función para el resultado provisional al conocimiento a obtener en base a una palabra y una lista de frases
        con la palabra en varios géneros
     
        Parámetros:
@@ -375,26 +375,28 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
        Retorna:
-        - provisional_answer (Lista)
+        - provisional_result (Lista)
                 - ["Masculino"]: La palabra es de género masculino
                 - ["Femenino"]: La palabra es de género femenino
-                - ["NULL", errores, mensajes]: No se ha conseguido encontrar el género de la palabra
+                - ["NULL", correctas, tipos_incorrectas, mensajes]: No se ha conseguido encontrar el género de la palabra
     """
     
     # Inicializamos las variables necesarias
-    # Crear la lista del contenido completo del provisional_answer
-    provisional_answer = []
+    # Crear la lista del contenido completo del provisional_result
+    provisional_result = []
     # Crear el mensaje de información del estado de la entrada: 
     #   - Si es NULL, no se ha podido obtner un resultado a partir de la entrada, y la ejecución queda en provisional
-    #       message: "La entrada ha terminado su ejecución en la extracción de la respuesta provisional"
+    #       message: "La entrada ha terminado su ejecución en la extracción del resultado provisional"
     #   - Si no es NULL, no se añade ningún mensaje
-    message = "La entrada ha terminado su ejecución en la extracción de la respuesta provisional."
-    # Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.
-    count_error_1 = 0
-    # Error 2: La palabra que buscamos no aparece en la frase.
-    count_error_2 = 0
-    # Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
-    count_error_3 = 0
+    message = "La entrada ha terminado su ejecución en la extracción del resultado provisional."
+    # Correctas: Frases correctas en las que se suman puntos.
+    count_correct = 0
+    # Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.
+    count_incorrect_1 = 0
+    # Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+    count_incorrect_2 = 0
+    # Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+    count_incorrect_3 = 0
     count_male = 0
     count_female = 0
     word = element[0].split('_')[1]
@@ -402,25 +404,32 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
     male_word_appearence = ""
     female_word_appearence = ""
     answer = ""
-    provisional_answer = []
+    provisional_result = []
     max_difference = len(llm_extracted_answer_list[0])-round((len(llm_extracted_answer_list[0])*2)/3) + 1
     list_minimum_appearences = 3
-    array_female = ['la', 'las', 'una', 'unas','esa', 'esta', 'esas', 'estas', 'otra', 'otras']
-    array_male = ['el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 'estos', 'otro', 'otros']
+    array_female = [
+        'la', 'las', 'una', 'unas', 'esa', 'esta', 'esas', 'estas', 
+        'otra', 'otras', 'muchas', 'varias', 'nuevas', 'toda', 'todas', 
+        'alguna', 'algunas', 'aquella', 'aquellas', 'ninguna', 'ningunas', 
+        'cierta', 'ciertas', 'nuestra', 'nuestras', 'vuestra', 'vuestras', 
+        'suya', 'suyas'
+    ]
+    array_male = [
+        'el', 'del', 'los', 'un', 'unos', 'al', 'ese', 'este', 'esos', 
+        'estos', 'otro', 'otros', 'muchos', 'varios', 'nuevos', 'todo', 
+        'todos', 'algún', 'algunos', 'aquel', 'aquellos', 'ningún', 
+        'ningunos', 'cierto', 'ciertos', 'nuestro', 'nuestros', 'vuestro', 
+        'vuestros', 'suyo', 'suyos'
+    ]
     # Crear un tokenizador personalizado con una expresión regular
     tokenizer = RegexpTokenizer(r'\w+|[^\w\s]')
-    
-    # Si una lista tiene más frases en un género que en otro, se acorta la lista a la cantidad mínima de frases
-    minimun_number_of_sentences = min(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
-    maximun_number_of_sentences = max(len(llm_extracted_answer_list[0]), len(llm_extracted_answer_list[1]))
-    llm_extracted_answer_list[0] = llm_extracted_answer_list[0][:minimun_number_of_sentences]
-    llm_extracted_answer_list[1] = llm_extracted_answer_list[1][:minimun_number_of_sentences]
     
     # Contamos las apariciones de las palabras y articulos para saber su genero
     for phrase in llm_extracted_answer_list[0]:
         # Si tenemos una lista en vez de frases las tratamos quedandonos con el primero elemento / frase de las listas
         if type(phrase) is list:
             phrase = phrase[0]
+        phrase = phrase.lower()
         tokenize_phrase = tokenizer.tokenize(phrase)
         male_word_appearence = ""
         list_of_male_word_appearences = []
@@ -436,35 +445,41 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
             word_position_list = list(position for (noun, position, _, _) in nouns_with_positions if noun in list_of_male_word_appearences)
             if len(word_position_list) >= 1:
                 word_position = word_position_list[0]
-                new_phrase = auxFunctions.destokenize(tokenize_phrase[:word_position])
+                new_phrase = auxFunctions.destokenize(tokenize_phrase, tokenize_phrase[:word_position])
                 search_article_phrase = new_phrase.strip().split(' ')
                 if len(search_article_phrase) == 1:
                     if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
                         count_male += 1
+                        count_correct += 1
                     elif search_article_phrase[-1].lower() in array_female:
                         count_male += -1
+                        count_correct += 1
                     else:
-                        # Sumar Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
-                        count_error_3 += 1                  
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        count_incorrect_3 += 1                  
                 elif len(search_article_phrase) > 1:
                     reversed_search_article_phrase = search_article_phrase[::-1][:2]
                     if reversed_search_article_phrase[0].lower() in array_male:
+                        count_correct += 1
                         count_male += 1
                     elif reversed_search_article_phrase[1].lower() in array_male:
+                        count_correct += 1
                         count_male += 0.5
                     elif reversed_search_article_phrase[0].lower() in array_female:
+                        count_correct += 1
                         count_male += -1
                     elif reversed_search_article_phrase[1].lower() in array_female:
+                        count_correct += 1
                         count_male += -0.5
                     else:
-                        # Sumar Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
-                        count_error_3 += 1
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        count_incorrect_3 += 1
             else:
-                # Sumar Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
-                count_error_1 += 1
+                # Sumar Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
+                count_incorrect_1 += 1
         else:
-            # Sumamos a Error 2: La palabra que buscamos no aparece en la frase.
-            count_error_2 += 1
+            # Sumamos a Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+            count_incorrect_2 += 1
         # Vaciar la lista
         list_of_male_word_appearences = []
     for phrase in llm_extracted_answer_list[1]:
@@ -487,79 +502,74 @@ def get_provisional_answer4(element, llm_extracted_answer_list):
             word_position_list = list(position for (noun, position, _, _) in nouns_with_positions if noun in list_of_female_word_appearences)
             if len(word_position_list) >= 1:
                 word_position = word_position_list[0]
-                new_phrase = auxFunctions.destokenize(tokenize_phrase[:word_position])
+                new_phrase = auxFunctions.destokenize(tokenize_phrase, tokenize_phrase[:word_position])
                 search_article_phrase = new_phrase.strip().split(' ')
                 if len(search_article_phrase) == 1:
                     if search_article_phrase[-1].lower() in array_male:  # Comparar en minúsculas para hacerlo insensible a mayúsculas/minúsculas
                         count_female += -1
+                        count_correct += 1
                     elif search_article_phrase[-1].lower() in array_female:
+                        count_correct += 1
                         count_female += 1
                     else:
-                        # Sumar Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
-                        count_error_3 += 1
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        count_incorrect_3 += 1
                 elif len(search_article_phrase) > 1:
                     reversed_search_article_phrase = search_article_phrase[::-1][:2]
                     if reversed_search_article_phrase[0].lower() in array_male:
+                        count_correct += 1
                         count_female += -1
                     elif reversed_search_article_phrase[1].lower() in array_male:
+                        count_correct += 1
                         count_female += -0.5
                     elif reversed_search_article_phrase[0].lower() in array_female:
+                        count_correct += 1
                         count_female += 1
                     elif reversed_search_article_phrase[1].lower() in array_female:
+                        count_correct += 1
                         count_female += 0.5
                     else:
-                        # Sumar Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
-                        count_error_3 += 1
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        count_incorrect_3 += 1
             else:
-                # Sumar Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
-                count_error_1 += 1
+                # Sumar Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
+                count_incorrect_1 += 1
         else:
-            # Sumamos a Error 2: La palabra que buscamos no aparece en la frase.
-            count_error_2 += 1
+            # Sumamos a Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+            count_incorrect_2 += 1
         # Vaciar la lista
-        list_of_male_word_appearences = []
-
-    # print(' ')
-    # print('Puntos masculinos: ')
-    # print(count_male) 
-    # print(' ')
-    # print('Puntos femeninos')
-    # print(count_female)
-    # print(' ')
-    # print('Umbral para categoría (Femenino o masculino han de superar el umbral para obtener la respuesta): ')
-    # print(list_minimum_appearences)
-    # print('Umbra general (La diferencia entre las categorías tiene que superar este umbral para obtener un género): ')
-    # print(max_difference)
+        list_of_female_word_appearences = []
     
-    if len(llm_extracted_answer_list[0]) > 0 and len(llm_extracted_answer_list[0]) >= maximun_number_of_sentences/2:
-        # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
-        if count_male >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_male > count_female:
-            answer = "Masculino"
-        elif count_female >=  list_minimum_appearences and 0 <= max_difference < abs(count_male-count_female) and count_female > count_male:
-            answer = "Femenino"
-        else: 
-            answer = "NULL"
-    else:
+    # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
+    if count_male >=  list_minimum_appearences and 0 <= max_difference <= abs(count_male-count_female) and count_male > count_female:
+        answer = "Masculino"
+    elif count_female >=  list_minimum_appearences and 0 <= max_difference <= abs(count_male-count_female) and count_female > count_male:
+        answer = "Femenino"
+    else: 
         answer = "NULL"
-    # Devolver el contenido completo de la respuesta provisional
+    # Devolver el contenido completo del resultado provisional
     if answer == "NULL":
+        # Crea el primer elemento como un diccionario
+        correct_message = {
+            "Correctas.": count_correct
+        }
         # Crea el segundo elemento como un diccionario
-        error_message_1 = {
-            "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": count_error_1
+        incorrect_message_1 = {
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": count_incorrect_1
         }
         # Crea el tercer elemento como un diccionario
-        error_message_2 = {
-            "Error 2: La palabra que buscamos no aparece en la frase.": count_error_2
+        incorrect_message_2 = {
+            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": count_incorrect_2
         }
         # Crea el cuarto elemento como un diccionario
-        error_message_3 = {
-            "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": count_error_3
+        incorrect_message_3 = {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": count_incorrect_3
         }
         # Crea el quinto elemento como un diccionario
         information_message = {
             "Mensaje de información" : message
         }
-        provisional_answer = [answer, error_message_1, error_message_2, error_message_3, information_message]
+        provisional_result = [answer, correct_message, incorrect_message_1, incorrect_message_2, incorrect_message_3, information_message]
     else:
-        provisional_answer = [answer]
-    return provisional_answer
+        provisional_result = [answer]
+    return provisional_result

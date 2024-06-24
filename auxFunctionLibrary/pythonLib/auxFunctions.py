@@ -2,6 +2,10 @@
 from itertools import product
 import spacy
 import re
+import nltk
+
+# Descargar el recurso necesario
+nltk.download('averaged_perceptron_tagger')
 
 # Cargar el modelo de lenguaje en español
 nlp = spacy.load("es_core_news_sm")
@@ -82,23 +86,50 @@ def extract_nouns_with_positions(sentence):
     
     return nouns_with_positions
 
-def split_by_position_char(string, position):
-    if position < 0 or position >= len(string):
-        raise ValueError("La posición está fuera de los límites de la cadena.")
-    
-    # Obtener el carácter en la posición dada
-    char = string[position]
-    
-    # Dividir la cadena por el carácter encontrado en la posición
-    partes = string.split(char)
-    
-    return partes
-
-def destokenize(tokens):
-    # Reconstruir la oración a partir de los tokens
+def destokenize(original_tokens, new_tokens):
+    """Reconstruye una oración a partir de una lista de tokens, manejando contracciones y posesivos."""
     sentence = ''
-    for i, token in enumerate(tokens):
-        if i > 0 and re.match(r'\w', token) and re.match(r'\w', tokens[i - 1]):
-            sentence += ' '
-        sentence += token
-    return sentence
+    for i, token in enumerate(new_tokens):
+        # Check if the current token is a possessive
+        is_current_possessive = is_possessive(original_tokens, i)
+        
+        # Check for word-word junction (excluding punctuation and special cases)
+        if re.match(r'\w', token) and re.match(r'\w', new_tokens[i - 1]) and token not in ['.', ',', '!', '?', ':', ';'] and new_tokens[i - 1] not in ['¿', '¡']:
+            # Handle contractions (ends with "'s")
+            if re.match(r'\w', token) and i <= len(new_tokens) - 3 and new_tokens[i + 1] == "'" and not new_tokens[i + 2] == "s":
+                # If the current token is a possessive, don't add extra space
+                if is_current_possessive:
+                    sentence += ' ' + token
+                else:
+                    sentence += ' ' + token + ' '
+            elif token == "'" and not (i <= len(new_tokens) - 2 and new_tokens[i + 1] == 's'): 
+                sentence += token
+            else:
+                sentence += ' ' + token
+        else:
+            # Handle spaces after sentence-ending punctuations
+            if token in [')',';',':',',','.', '!','¡','¿','?'] and i < len(new_tokens) - 1:
+                sentence += token + ' '
+            elif token == "(":
+                sentence += ' ' + token
+            else:
+                if is_possessive(original_tokens, i-2):
+                    sentence += ' ' + token
+                else:
+                    sentence += token
+    return sentence.strip()  # Remove leading/trailing spaces
+
+def is_possessive(tokens, index):
+    """Determina si la palabra en el índice dado es un posesivo."""
+    # Etiquetar las partes de la oración
+    pos_tags = nltk.pos_tag(tokens)
+    
+    # Verificar si la palabra en el índice dado es un posesivo
+    if index >= 0 and index < len(tokens) - 1:
+        # Comprobar si la palabra siguiente es un apóstrofe
+        if tokens[index + 1] == "'":
+            # Comprobar si la palabra actual es un sustantivo propio (NNP) o plural (NNS)
+            if pos_tags[index][1] in ["NNP", "NNS"]:
+                return True
+    
+    return False
