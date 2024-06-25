@@ -61,7 +61,7 @@ def get_provisional_result(element, llm_extracted_answer_list):
        con la palabra en varios géneros
     
        Parámetros:
-        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
+        - element = Elemento de la estructura de datos knowledge_table, compuesto por key + attributes
         - llm_extracted_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
@@ -250,7 +250,7 @@ def get_provisional_result3(element, llm_extracted_answer_list):
        con la palabra en varios géneros
     
        Parámetros:
-        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
+        - element = Elemento de la estructura de datos knowledge_table, compuesto por key + attributes
         - llm_extracted_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino
@@ -370,7 +370,7 @@ def get_provisional_result4(element, llm_extracted_answer_list):
        con la palabra en varios géneros
     
        Parámetros:
-        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
+        - element = Elemento de la estructura de datos knowledge_table, compuesto por key + attributes
         - llm_extracted_answer_list (list) = Lista que se compone de dos listas de misma longud
                         - La primera contiene frases con la palabra en género maculino
                         - La segunda contiene frases con la palabra en género femenino

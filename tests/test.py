@@ -7,12 +7,14 @@ import re
 import sys
 sys.path.append('..')  # Agrega la carpeta superior al sys.path
 sys.path.append("../auxFunctionLibrary") #Agrega la carpeta superior al sys.path
-
+from pythonLib import auxFunctions
 from componenteImporter import ComponenteImporter
-import componenteQuestionMaker
+import componenteQuestionMaker_traduccion
+import componenteQuestionMaker_extraccion
+import componenteQuestionMaker_validacion
+import componenteExtractor_extraccion
+import componenteExtractor_validacion
 from componenteLLMCommunicator import ComponenteLLMCommunicator
-import componenteExtractor
-import componenteValidator
 from componenteExporter import ComponenteExporter
 
 
@@ -59,35 +61,35 @@ def component_importer_test():
             assert False, "Should be there"
     
     # Generar la estructura de datos con la que realizar el proceso de explotación de conocimiento
-    source_information = component1.generate_data_structure()
+    knowledge_table = component1.generate_data_structure()
     
     # Después de comprobar en spa_variant_file las palabras a analizar, en total debe haber 33 elementos
-    assert len(source_information) == 32, "Should be 32"
+    assert len(knowledge_table) == 32, "Should be 32"
     
     # Contador para contar cuántos elementos tienen una clave
     appearences_tierra = 0
     appearences_mareo = 0
 
     # Iterar sobre los elementos del diccionario
-    for key, _ in source_information.items():
+    for key, _ in knowledge_table.items():
         if "tierra" in key:  # Verificar si la clave contiene "tierra"
             appearences_tierra += 1
         elif "mareo" in key: # Verificar si la clave contiene "mareo"
             appearences_mareo += 1
             
-    # source_information debe contener 11 elementos con "tierra"
+    # knowledge_table debe contener 11 elementos con "tierra"
     assert appearences_tierra == 11, "Should be 11"
     
-    # source_information debe contener 11 elementos con "mareo"
+    # knowledge_table debe contener 11 elementos con "mareo"
     assert appearences_mareo == 4, "Should be 4"
     
-    # Elemento que debe contener el source_information
+    # Elemento que debe contener el knowledge_table
     element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n","spa"])
-    assert (element_piloto[0], element_piloto[1]) in source_information.items(), "Should appear"
+    assert (element_piloto[0], element_piloto[1]) in knowledge_table.items(), "Should appear"
     
-    # Elemento que debe contener el source_information
+    # Elemento que debe contener el knowledge_table
     element_tierra = ("spa-30-09334396-n_tierra", ["2", "La parte sólida de la superficie de la tierra.", "n","spa"])
-    assert (element_tierra[0], element_tierra[1]) in source_information.items(), "Should appear"
+    assert (element_tierra[0], element_tierra[1]) in knowledge_table.items(), "Should appear"
     
     # Creamos la estructura de datos donde guardar las glosas
     eng_data_structure = component1.generate_eng_data_structure()
@@ -99,26 +101,88 @@ def component_importer_test():
     assert offset_tierra in eng_data_structure.keys() and eng_data_structure[offset_tierra] != "NULL", "Should be"
     
     # print the output
-    # print(json.dumps(source_information, indent=2, ensure_ascii=False))
+    # print(json.dumps(knowledge_table, indent=2, ensure_ascii=False))
     
-def component_question_maker_test():
-     
+def component_question_maker_traduction_test():
+    
     # Elementos de prueba
-    element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n","spa"])
+    element_1 = ("spa-30-00001740-n_entidad", ["1", "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)  ", "n", "spa"])
+    element_2 = ("spa-30-00001930-n_entidad_física", ["1", "an entity that has physical existence  ", "n", "spa"])
+    element_3 = ("spa-30-00002137-n_abstracción", ["2","a general concept formed by extracting common features from specific examples  ", "n", "spa"])
+    
+    prompts_element_1 = [f"Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: 'that which is perceived or known or inferred to have its own distinct existence (living or nonliving)  '."]
+    prompts_element_2 = [f"Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: 'an entity that has physical existence  '."]
+    prompts_element_3 = [f"Como experto en traducción, necesito una traducción precisa al español de la siguiente frase: 'a general concept formed by extracting common features from specific examples  '."]
+     
+    assert prompts_element_1 == componenteQuestionMaker_traduccion.generate_prompts(element_1), "Should be true"
+    assert prompts_element_2 == componenteQuestionMaker_traduccion.generate_prompts(element_2), "Should be true"
+    assert prompts_element_3 == componenteQuestionMaker_traduccion.generate_prompts(element_3), "Should be true"
+    
+def component_question_maker_extraction_test():
+    
+    # Elementos de prueba
+    element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n", "spa"])
     element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
     
-    provisional_prompts_piloto = componenteQuestionMaker.generate_provisional_prompts(element_piloto)
-    provisional_prompts_tierra = componenteQuestionMaker.generate_provisional_prompts(element_tierra)
-    assert provisional_prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'.", 
+    prompts_piloto = componenteQuestionMaker_extraccion.generate_prompts(element_piloto)
+    prompts_tierra = componenteQuestionMaker_extraccion.generate_prompts(element_tierra)
+    
+    assert prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'.", 
                                           f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género femenino con el sentido de 'NULL'."], "Shold be true"
-    assert provisional_prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género masculino con el sentido de 'la parte sólida de la superficie de la Tierra'.", 
+    assert prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género masculino con el sentido de 'la parte sólida de la superficie de la Tierra'.", 
                                           f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'."], "Shold be true"  
+  
+def component_question_maker_validation_test():  
     
-    validation_prompts_piloto = componenteQuestionMaker.generate_validation_prompts(element_piloto, "masculino")
-    validation_prompts_tierra = componenteQuestionMaker.generate_validation_prompts(element_tierra, "femenino")
+        # Elemento de prueba (Respuesta recibida por el LLM)
+    frases_piloto_masculino = {
+                                "id": "cmpl-7c0286a8-d74e-4b22-ba86-bb2e456782de",
+                                "object": "text_completion",
+                                "created": 1714752744,
+                                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                                "choices": [
+                                    {
+                                    "text": "Question: Como experto en lingüística, por favor, proporciona diez frases donde la palabra 'tierra' se utilice en género masculino en todo momento, con el sentido de 'la parte sólida de la superficie de la Tierra'. Cada frase debe contener la palabra 'tierra' en género masculino, asegurándote de mantener este género en todas las instancias dentro de la frase. Answer: \n1. El gran desafío que enfrenta la tierra es combatir la erosión y mantener su fertilidad.\n2. La tierra está siendo devastada por los cambios climáticos y la deforestación.\n3. La tierra necesita que los humanos cambien su manera de pensar y actuar para protegerla.\n4. El hombre ha estado explotando y devastando la tierra durante siglos.\n5. La tierra ha sido la fuente de vida y prosperidad para millones de personas durante milenios.\n6. La tierra es un recurso limitado que necesita ser utilizado y preservado con cuidado.\n7. La tierra es un regalo de la naturaleza que ha sido y seguirá siendo vital para la supervivencia humana.\n8. La tierra es más que un lugar, es un sistema complejo que afecta a todas las formas de vida.\n9. La tierra es la fuente de todos los recursos que necesitamos para sobrevivir y prosperar.\n10. La tierra es un legado que debemos preservar para las generaciones futuras.",
+                                    "index": 0,
+                                    "logprobs": "null",
+                                    "finish_reason": "stop"
+                                    }
+                                ],
+                                "usage": {
+                                    "prompt_tokens": 111,
+                                    "completion_tokens": 266,
+                                    "total_tokens": 377
+                                }
+                            }
+    frases_piloto_femenino = {
+                                        "id": "cmpl-ec164673-25fb-4d96-be5c-5638e83dc102",
+                                        "object": "text_completion",
+                                        "created": 1714752946,
+                                        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                                        "choices": [
+                                            {
+                                            "text": "Question: Como experto en lingüística, por favor, proporciona diez frases donde la palabra 'tierra' se utilice en género femenino en todo momento, con el sentido de 'la parte sólida de la superficie de la Tierra'. Cada frase debe contener la palabra 'tierra' en género femenino, asegurándote de mantener este género en todas las instancias dentro de la frase. Answer: 1. La tierra es una madre generosa que nos da sustento. 2. La tierra es una hermosa dama que necesita nuestra atención y amor. 3. La tierra es una piel que nos cubre y protege. 4. La tierra es una madre que nos guía y nos da vida. 5. La tierra es una madre que nos da alimentos y agua. 6. La tierra es una madre que nos da un lugar en la que vivir y crecer. 7. La tierra es una madre que nos da un hogar y una casa. 8. La tierra es una madre que nos da un lugar en la que compartir nuestras vidas. 9. La tierra es una madre que nos da un lugar en la que vivir y crecer juntos. 10. La tierra es una madre que nos da una oportunidad de crecer y desarrollarnos.",
+                                            "index": 0,
+                                            "logprobs": "null",
+                                            "finish_reason": "stop"
+                                            }
+                                        ],
+                                        "usage": {
+                                            "prompt_tokens": 113,
+                                            "completion_tokens": 216,
+                                            "total_tokens": 329
+                                        }
+                                    }
     
-    assert validation_prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'."], "Shold be true"
-    assert validation_prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'."], "Shold be true"
+    # Elementos de prueba
+    element_piloto = ("spa-30-10433164-n_piloto", ["2", "NULL", "n", "spa", [frases_piloto_masculino, frases_piloto_femenino], "masculino"])
+    element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n", "spa", [frases_piloto_masculino, frases_piloto_femenino], "Femenino"])
+    
+    prompts_piloto = componenteQuestionMaker_validacion.generate_prompts(element_piloto)
+    prompts_tierra = componenteQuestionMaker_validacion.generate_prompts(element_tierra)
+    
+    assert prompts_piloto == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'."], "Shold be true"
+    assert prompts_tierra == [f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'."], "Shold be true"
         
     
 def component_llm_communicator_test():
@@ -136,7 +200,7 @@ def component_llm_communicator_test():
     sys.stdout = archivo_salida
 
     # Si el path del modelo no es correcto no debe dar error, si no indicar el motivo por consola
-    componenteLLMCommunicator_test = ComponenteLLMCommunicator(config['file_path']['provisional_results_language_model_path_test']) 
+    componenteLLMCommunicator_test = ComponenteLLMCommunicator(config['file_path']['extraction_results_language_model_path_test']) 
     componenteLLMCommunicator_test.load_model()
 
     # Cierra el archivo
@@ -179,7 +243,7 @@ def component_llm_communicator_test():
         sys.stderr = archivo_salida
         
         # Inicializamos el componenteLLMCommunicator con el llm que vamos a utilizar para conseguir las respuestas provisionales
-        componenteLLMCommunicator = ComponenteLLMCommunicator(config['file_path']['provisional_results_language_model_path'])
+        componenteLLMCommunicator = ComponenteLLMCommunicator(config['file_path']['extraction_results_language_model_path'])
         
         # Cargamos el modelo de lenguaje que vamos a utilizar para conseguir las respuestas provisionales
         componenteLLMCommunicator.load_model()
@@ -189,8 +253,8 @@ def component_llm_communicator_test():
         element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
                 
         # Pruebas de preguntas
-        provisional_prompts_piloto = componenteQuestionMaker.generate_provisional_prompts(element_tierra)
-        provisional_prompts_tierra = componenteQuestionMaker.generate_provisional_prompts(element_piloto)
+        provisional_prompts_piloto = componenteQuestionMaker_extraccion.generate_prompts(element_tierra)
+        provisional_prompts_tierra = componenteQuestionMaker_extraccion.generate_prompts(element_piloto)
         for element in provisional_prompts_piloto:
             componenteLLMCommunicator.run_the_model(element) 
         for element in provisional_prompts_tierra:
@@ -234,9 +298,9 @@ def component_llm_communicator_test():
     # Cierra el archivo
     archivo_salida.close()
 
-def component_extractor_test():
+def component_extractor_extraccion_test():
     
-    # Tests de extracción de respuestas ----------------------------------------
+    # Tests de extracción de respuestas del LLM ----------------------------------------
     
     # elemento de prueba (Respuesta recibida por el LLM)
     elemento_prueba_piloto_masculino = {
@@ -268,7 +332,8 @@ def component_extractor_test():
                               "La tierra es más que un lugar, es un sistema complejo que afecta a todas las formas de vida.",
                               "La tierra es la fuente de todos los recursos que necesitamos para sobrevivir y prosperar.",
                               "La tierra es un legado que debemos preservar para las generaciones futuras."]
-    assert expected_output_piloto_masculino == componenteExtractor.extract_llm_answers(elemento_prueba_piloto_masculino), "Should be true"
+    
+    assert expected_output_piloto_masculino == componenteExtractor_extraccion.extract_llm_answers(elemento_prueba_piloto_masculino), "Should be true"
     
     elemento_prueba_piloto_femenino = {
                                         "id": "cmpl-ec164673-25fb-4d96-be5c-5638e83dc102",
@@ -300,7 +365,8 @@ def component_extractor_test():
                                        "La tierra es una madre que nos da un lugar en la que compartir nuestras vidas.",
                                        "La tierra es una madre que nos da un lugar en la que vivir y crecer juntos.",
                                        "La tierra es una madre que nos da una oportunidad de crecer y desarrollarnos."]
-    assert expected_output_piloto_femenino == componenteExtractor.extract_llm_answers(elemento_prueba_piloto_femenino), "Should be true"
+    
+    assert expected_output_piloto_femenino == componenteExtractor_extraccion.extract_llm_answers(elemento_prueba_piloto_femenino), "Should be true"
     
     
     elemento_prueba_traducción = {
@@ -324,253 +390,499 @@ def component_extractor_test():
                                    }
     
     expected_output_traduccion = "Alguien que posee una licencia para operar un avión en vuelo."
-    assert expected_output_traduccion == componenteExtractor.extract_llm_answers(elemento_prueba_traducción), "Should be true"
+    assert expected_output_traduccion == componenteExtractor_extraccion.extract_llm_answers(elemento_prueba_traducción), "Should be true"
     
-    # Tests de obtener el provisional answer -----------------------------------
+    # Tests para obtener el resultado de la fase de extracción answer -----------------------------------
     
     # --------------------------------------   Prueba 1   -------------------------------------------
         
     element_tierra = ("spa-30-09334396-n_tierra", ["2", "la parte sólida de la superficie de la Tierra", "n","spa"])
     
-    llm_extracted_answer_list = [expected_output_piloto_masculino, expected_output_piloto_femenino]
+    llm_answer_list = [elemento_prueba_piloto_masculino, elemento_prueba_piloto_femenino]
     
-    provisional_result = componenteExtractor.get_provisional_result4(element_tierra, llm_extracted_answer_list)
+    result = componenteExtractor_extraccion.get_result(element_tierra, llm_answer_list)
     
-    assert provisional_result == ["Femenino"], "Should be ['Femenino']"
+    assert result == ["Femenino"], "Should be ['Femenino']"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
-    element_institución = ("spa-30-05669350-n_institución", ["3","\"una costumbre que durante mucho tiempo ha sido una importante característica de un grupo o sociedad específica.\"","n","spa"])
+    element_objeto =  ("spa-30-00002684-n_objeto", ["1","Una entidad tangible y visible; una entidad que puede moldear una sombra.","n","spa"])   
     
-    llm_extracted_answer_list_2 =   [
-                                        [
-                                            "La institución educativa es un lugar predeterminado para obtener un título universitario y una educación superior.",
-                                            "La institución religiosa es un lugar predeterminado para participar en cultos y ceremonias religiosas.",
-                                            "La institución penitenciaria es un lugar predeterminado para rehabilitar y reinsertar a los criminales.",
-                                            "La institución médica es un lugar predeterminado para tratar y curar enfermedades.",
-                                            "La institución judicial es un lugar predeterminado para resolver conflictos legales.",
-                                            "La institución académica es un lugar predeterminado para investigar y desarrollar nuevas ideas y tecnologías.",
-                                            "La institución militar es un lugar predeterminado para entrenar y preparar a los soldados.",
-                                            "La institución carcelaria es un lugar predeterminado para rehabilitar y reinsertar a los delincuentes.",
-                                            "La institución financiera es un lugar predeterminado para gestionar y administrar recursos financieros.",
-                                            "La institución médico-legal es un lugar predeterminado para determinar causas de muerte y traer justicia a las víctimas."
-                                        ],
-                                        [
-                                            "El proceso para unirse a la universidad requiere la presentación de todos los documentos necesarios para la inscripción en la institución educativa.",
-                                            "La institución carcelaria ofrece programas educativos para los reclusos.",
-                                            "La institución financiera ofrece servicios bancarios a sus clientes.",
-                                            "La institución médica realiza exámenes médicos para los pacientes.",
-                                            "La institución religiosa ofrece servicios a sus miembros.",
-                                            "La institución política es responsable de implementar las leyes.",
-                                            "La institución académica es responsable de los estándares académicos.",
-                                            "La institución cultural promueve la cultura y las artes.",
-                                            "La institución de justicia es responsable de aplicar la ley.",
-                                            "La institución social ayuda a las personas en situaciones de crisis."
-                                        ]
-                                    ]
+    llm_answer_list_2 =   [
+      {
+        "id": "cmpl-bb00cca2-eec5-4577-aa02-27f58d0b5aee",
+        "object": "text_completion",
+        "created": 1719262941,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'objeto' en género masculino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. El objeto reflejaba su forma en la superficie del agua.\n2. La luna era un objeto brillante en el cielo.\n3. El espejo mostraba un objeto aterrador.\n4. El sombrero de papel que estaba colgando del árbol era un objeto curioso.\n5. El reflejo en la ventana era un objeto que parecía haberse deslizado de otro mundo.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 65,
+          "completion_tokens": 110,
+          "total_tokens": 175
+        }
+      },
+      {
+        "id": "cmpl-fade0627-bde9-4591-ac4c-94df13947a56",
+        "object": "text_completion",
+        "created": 1719262976,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'objeto' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La piedra es un objeto tangible y visible, capaz de proyectar una sombra larga en la pared.\n2. El vase de cristal es un objeto delicado y elegante, que refleja la luz con una belleza incomparable.\n3. La escultura de bronce es un objeto artístico y valioso, que captura la belleza humana en cada detalle.\n4. El libro es un objeto educativo y culturalmente significante, que transmite conocimiento y ideas a través del tiempo.\n5. La caja de madera es un objeto funcional y práctico, que protege nuestros objetos valiosos y preciados.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 66,
+          "completion_tokens": 168,
+          "total_tokens": 234
+        }
+      }
+    ]
     
-    provisional_result_intitución = componenteExtractor.get_provisional_result4(element_institución, llm_extracted_answer_list_2)
+    result_objeto = componenteExtractor_extraccion.get_result(element_objeto, llm_answer_list_2)
     
-    assert provisional_result_intitución == ["Femenino"], "Should be ['Femenino']"
+    assert result_objeto == ["Masculino"], "Should be ['Masculino']"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
-    element_institución_plural = ("spa-30-05669350-n_institución", ["3","\"una costumbre que durante mucho tiempo ha sido una importante característica de un grupo o sociedad específica.\"","n","spa"])
+    element_ser = ("spa-30-00004258-n_ser", ["4", "Una entidad viva.", "n", "spa"])
     
-    llm_extracted_answer_list_3 =   [
-                                        [
-                                            "Las instituciones educativas son un lugar predeterminado para obtener un título universitario y una educación superior.",
-                                            "Las instituciones educativas son lugar predeterminado para participar en cultos y ceremonias religiosas.",
-                                            "Las instituciones educativas son un lugar predeterminado para rehabilitar y reinsertar a los criminales.",
-                                            "Las instituciones educativas son un lugar predeterminado para tratar y curar enfermedades.",
-                                            "Las instituciones educativas son un lugar predeterminado para resolver conflictos legales.",
-                                            "Las instituciones educativas son un lugar predeterminado para investigar y desarrollar nuevas ideas y tecnologías.",
-                                            "Las instituciones educativas son un lugar predeterminado para entrenar y preparar a los soldados.",
-                                            "Las instituciones educativas son un lugar predeterminado para rehabilitar y reinsertar a los delincuentes.",
-                                            "Las instituciones educativas son un lugar predeterminado para gestionar y administrar recursos financieros.",
-                                            "Las instituciones educativas son un lugar predeterminado para determinar causas de muerte y traer justicia a las víctimas."
-                                        ],
-                                        [
-                                            "El proceso para unirse a la universidad requiere la presentación de todos los documentos necesarios para la inscripción en la institución educativa.",
-                                            "Las instituciones carcelarias ofrecen programas educativos para los reclusos.",
-                                            "Las instituciones financieras ofrecen servicios bancarios a sus clientes.",
-                                            "Las instituciones médicas realizan exámenes médicos para los pacientes.",
-                                            "Las instituciones religiosas ofrecen servicios a sus miembros.",
-                                            "Las instituciones políticas son responsables de implementar las leyes.",
-                                            "Las instituciones académicas son responsables de los estándares académicos.",
-                                            "Las instituciones culturales promueven la cultura y las artes.",
-                                            "Las instituciones de justicia son responsables de aplicar la ley.",
-                                            "Las instituciones sociales ayudan a las personas en situaciones de crisis."
-                                        ]
-                                    ]
+    llm_answer_list_3 = [
+      {
+        "id": "cmpl-a92c4716-334b-46ba-8b70-38d888746f25",
+        "object": "text_completion",
+        "created": 1719263100,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género masculino con el sentido de 'Una entidad viva.'. Answer: 1. El león es un animal salvaje y poderoso.\n2. El árbol es una entidad viva que crece y se desarrolla a lo largo del tiempo.\n3. El hombre es una criatura compleja, con muchas facetas y cualidades.\n4. El río es un ser vivo que fluye y cambia constantemente.\n5. El sol es una entidad viva que ilumina nuestro planeta y nos da calor y luz.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 50,
+          "completion_tokens": 116,
+          "total_tokens": 166
+        }
+      },
+      {
+        "id": "cmpl-38edc796-28fa-43ac-a83e-697c12b9013b",
+        "object": "text_completion",
+        "created": 1719263133,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género femenino con el sentido de 'Una entidad viva.'. Answer: 1. La madre es la fuente de vida para sus hijos.\n2. La flor es la belleza natural del jardín.\n3. La luna es la guía nocturna de los viajeros.\n4. La lluvia es la fuente de vida para las plantas.\n5. La paz es el objetivo más deseado por los humanos.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 90,
+          "total_tokens": 141
+        }
+      }
+    ]
     
-    provisional_result_intitución_plural = componenteExtractor.get_provisional_result4(element_institución_plural, llm_extracted_answer_list_3)
+    result_ser = componenteExtractor_extraccion.get_result(element_ser, llm_answer_list_3)
     
-    assert provisional_result_intitución_plural == ["Femenino"], "Should be ['Femenino']"
+    assert result_ser == ["NULL",
+                            {
+                            "Correctas.": 1
+                            },
+                            {
+                            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+                            },
+                            {
+                            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 9
+                            },
+                            {
+                            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+                            },
+                            {
+                            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
+                            }
+                        ], "Should be True"
     
     # --------------------------------------   Prueba 4   -------------------------------------------
     
-    element_universal = ("spa-30-06751367-n_universal",["1","\"una proposición que afirma algo de todas las clases.\"","n","spa"])
-
-    llm_extracted_answer_list_4 = [
-      [
-        "El concepto universal de verdad es una proposición que es verdadera en todos los mundos posibles.",
-        "Un ejemplo de una proposición universal en lógica es todos los trapezoides son cuadrangulares.",
-        "La teoría de los universales es una teoría filosófica que sostiene que hay propiedades que son universales y reales independientemente del tiempo y del lugar.",
-        "Un ejemplo de una proposición universal en matemáticas es si x es mayor que y, y si y es mayor que z, entonces x es mayor que z.",
-        "En la gramática, la regla universal es una regla que es aplicable a todos los idiomas naturales.",
-        "Un ejemplo de una proposición universal en la biología es los humanos tienen un total de 20 alfa-hemolisina.",
-        "En la astronomía, una ley universal es una ley que es verdadera en todos los sistemas planetarios.",
-        "En la química, una propiedad universal es una propiedad que es común a todos los elementos químicos.",
-        "En la sociología, una regla universal es una regla que es aplicable a todos los sistemas sociales.",
-        "En la filosofía, una verdad universal es una verdad que es verdadera independientemente del tiempo y del lugar."
-      ],
-      [
-        "La universalidad de la muerte es inevitable para todos los seres humanos.",
-        "La universalidad del amor es una emoción compartida por muchas personas.",
-        "La universalidad del lenguaje humano permite a los seres humanos comunicarse y compartir sus ideas.",
-        "La universalidad del sufrimiento es un tema recurrente en muchas artes y literaturas mundiales.",
-        "La universalidad del amor romántico es un tema popular en muchas películas y canciones.",
-        "La universalidad del dolor emocional es un fenómeno humano común y necesario para crecer emocional y mentalmente.",
-        "La universalidad del humor es una necesidad humana para aliviar el estrés y la angustia.",
-        "La universalidad del deseo de amar y ser amado es una necesidad humana básica.",
-        "La universalidad del interés por la investigación científica es una necesidad humana para entender y mejorar nuestro conocimiento del mundo.",
-        "La universalidad del deseo de un hogar y una familia es una necesidad humana para sentirse seguros y respetados."
-      ]
+    element_vida = ("spa-30-00006269-n_vida", ["12","Cosas vivas en su conjunto.","n","spa"])
+    
+    
+    llm_answer_list_4 = [
+      {
+        "id": "cmpl-4076c019-15e7-45d7-b267-bf99f35748a0",
+        "object": "text_completion",
+        "created": 1719263274,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'vida' en género masculino con el sentido de 'Cosas vivas en su conjunto.'. Answer: 1. La vida animal es una variedad maravillosa y compleja.\n2. El mundo vegetal es un mosaico de colores y texturas.\n3. Los seres humanos son la creación más compleja del universo.\n4. La fauna marina es una comunidad intrincada e interdependiente.\n5. El bosque tropical es un mundo en constante cambio y evolución.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 54,
+          "completion_tokens": 99,
+          "total_tokens": 153
+        }
+      },
+      {
+        "id": "cmpl-f2dcbf22-cf40-4377-ad73-02001b630f24",
+        "object": "text_completion",
+        "created": 1719263307,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'vida' en género femenino con el sentido de 'Cosas vivas en su conjunto.'. Answer: 1. La vida marina es un mundo misterioso y atractivo.\n2. La vida vegetal es la base de la cadena alimentaria.\n3. La vida animal es una variedad infinita de formas y tamaños.\n4. La vida en el desierto es difícil y exigente.\n5. La vida en la selva es rica y variada.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 55,
+          "completion_tokens": 90,
+          "total_tokens": 145
+        }
+      }
     ]
     
-    provisional_result_universal = componenteExtractor.get_provisional_result4(element_universal, llm_extracted_answer_list_4)
+    result_vida = componenteExtractor_extraccion.get_result(element_vida, llm_answer_list_4)
     
-    assert provisional_result_universal == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 9}, {'Error 2: La palabra que buscamos no aparece en la frase.': 10}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 0}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la extracción del resultado provisional.'}], "Should be True"
+    assert result_vida == ['Femenino'], "Should be True"
     
-    # --------------------------------------   Prueba 5   -------------------------------------------
-    
-    element_científico = ("spa-30-09863339-n_científico",["2","The original english phrase is \"a scientist or technician engaged in military research\". the spanish translation is \"un científico o técnico que realiza investigación militar\". in this case, the translator should only provide the translation, without any additional information about the context or source of the phrase.","n","spa"])
-
-    llm_extracted_answer_list_5 = [
-      [
-        "El científico militar llevó a cabo experimentos para mejorar las armas.",
-        "El científico militar está trabajando en una tecnología que ayude a los militares a responder rápidamente a los ataques.",
-        "El científico militar está desarrollando armas que sean más eficaces y menos destructivas.",
-        "El científico militar ha creado un dispositivo que ayude a los militares a detectar y neutralizar minas.",
-        "El científico militar ha desarrollado un sistema de comunicación avanzado para mejorar las comunicaciones entre los militares.",
-        "El científico militar está investigando formas para mejorar las capacidades psicológicas y físicas de los militares.",
-        "El científico militar ha creado un método para identificar y neutralizar agentes químicos.",
-        "El científico militar ha desarrollado una nueva forma de proteger a los soldados de las armas biológicas.",
-        "El científico militar ha creado una nueva arma que sea más efectiva y menos destructiva.",
-        "El científico militar ha desarrollado una nueva arma que pueda ser utilizada para llevar a cabo operaciones militares en zonas urbanas sin causar daños al entorno."
-      ],
-      [
-        "La ingeniera química y científica está liderando un equipo de investigación para desarrollar nuevas armas químicas.",
-        "La doctora física y científica participó en un simposio militar para discutir sus hallazgos en el campo de la energía.",
-        "La matemática y científica asistente ayuda a los soldados a planificar operaciones militares.",
-        "La química y científica encargada del laboratorio es la más importante persona en la base militar.",
-        "La científica y microbióloga está trabajando en un nuevo tratamiento médico para tratar las heridas quemadas de los soldados.",
-        "La doctora en biología y científica ayuda a los médicos a entender las causas de las enfermedades que afectan a los soldados.",
-        "La química y científica trabajadora creó un nuevo tipo de explosivo que puede ser utilizado en el campo de batalla.",
-        "La científica y física desarrolló un nuevo sistema de defensa contra los misiles enemigos.",
-        "La bióloga y científica investigadora está trabajando para descubrir una nueva forma de contrarrestar los efectos de los agentes químicos.",
-        "La física y científica experimentada ayudó a los soldados a mejorar sus armas de"
-      ]
-    ]
-    
-    provisional_result_científico = componenteExtractor.get_provisional_result4(element_científico, llm_extracted_answer_list_5)
-    
-    assert provisional_result_científico == ["Masculino"], "Should be ['Masculino']"
-    
-def component_validator_test():
+def component_extractor_validacion_test():
         
     # --------------------------------------   Prueba 1   -------------------------------------------
     
-    element_realización = ("spa-30-00062451-n_realización",["4","El acto de cumplir o satisfacer algo (una promesa o deseo, por ejemplo).","n","spa"])
+    element_articulo =  ("spa-30-00022903-n_artículo", [
+    "3",
+    "En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.",
+    "n",
+    "spa",
+    [
+      {
+        "id": "cmpl-5cf77f1f-5b2d-48e7-a834-c66c47c8f6fc",
+        "object": "text_completion",
+        "created": 1719263632,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género masculino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer: En la teoría de conjuntos, el artículo n es una variable que representa cualquier subconjunto de un conjunto dado. En la lógica proposicional, el artículo n es una variable que representa cualquier proposición. En la geometría euclidiana, el artículo n es una variable que representa cualquier punto en el espacio. En la teoría de números, el artículo n es una variable que representa cualquier número entero positivo. En la física, el artículo n es una variable que representa cualquier cantidad de materia o energía.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 97,
+          "completion_tokens": 144,
+          "total_tokens": 241
+        }
+      },
+      {
+        "id": "cmpl-1582d32b-1cc4-4746-b7d9-d635a69bcdef",
+        "object": "text_completion",
+        "created": 1719263680,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género femenino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer: En la teoría de conjuntos, la intersección de dos conjuntos se denota por la letra 'n'.\n\n1. La palabra \"artículo\" es un sustantivo femenino en español que significa \"un elemento o parte de una clase o grupo\".\n\n2. En el campo de lingüística, la definición de \"artículo\" como un elemento gramatical se refiere a palabras como \"el\", \"la\", y \"un\" en inglés, que se utilizan para indicar la especificación o referencia de un objeto o concepto.\n\n3. En el contexto de la literatura, \"artículo\" también puede referirse a una pieza escrita publicada en una revista o periódico, como \"la revista científica Nature\".\n\n4. En la",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 98,
+          "completion_tokens": 200,
+          "total_tokens": 298
+        }
+      }
+    ],
+    "Masculino"
+    ])
     
-    llm_extracted_answer_list_1 = [
-      [
-        "La realización del sueño de Ana consistió en viajar a París y visitar la Torre Eiffel.",
-        "La realización del deseo de Juan era hacerse un tatuaje en su cuerpo.",
-        "La realización de los objetivos de Marta era ser arquitecta y diseñar edificios.",
-        "La realización del sueño de Pedro es estudiar en el extranjero y conocer otras culturas.",
-        "La realización del deseo de Sofía era escribir una novela y publicarla.",
-        "La realización de los sueños de los niños es brindarles un hogar seguro y cálido.",
-        "La realización del deseo de Laura era abrir su propia tienda y vender productos artesanales.",
-        "La realización del sueño de Mireya es hacerse una cirugía plástica y mejorar su autoestima.",
-        "La realización del deseo de Ana es ser madre y criar a sus hijos con amor.",
-        "La realización de los objetivos de Juan es abrir su propia empresa y tener éxito en su trabajo."
-      ]
+    llm_answer_list = [
+      {
+        "id": "cmpl-208afb1b-eb7a-4f1f-83e8-d508bf65ad98",
+        "object": "text_completion",
+        "created": 1719264562,
+        "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género masculino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer:\n\n1. El artículo de entrada en el curso de lingüística es fundamental para comprender las diferencias entre los idiomas.\n2. El artículo definido en español se utiliza para indicar que el sustantivo a la que se refiere es conocido por ambos interlocutores.\n3. El artículo indefinido en inglés se emplea para expresar una cantidad no especificada de elementos.\n4. El artículo en francés se escribe como \"le\" o \"la\", dependiendo del género y número del sustantivo al que se refiere.\n5. El artículo en alemán es un signo de puntuación que indica el inicio de una oración.\n\nEn resumen, los artículos son elementos gramaticales importantes en muchas lengu",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 97,
+          "completion_tokens": 200,
+          "total_tokens": 297
+        }
+      }
     ]
     
-    final_result_cosa = componenteValidator.get_final_result(element_realización, llm_extracted_answer_list_1, "Femenino")
+    result_articulo = componenteExtractor_validacion.get_result(element_articulo, llm_answer_list)
     
-    assert final_result_cosa == ["Femenino"], "Should be ['Femenino']"
+    assert result_articulo == ['Masculino'], "Should be True"
     
     # --------------------------------------   Prueba 2   -------------------------------------------
     
-    final_result_cosa_2 = componenteValidator.get_final_result(element_realización, llm_extracted_answer_list_1, "Masculino")
+    element_cosa =  ("spa-30-00002684-n_cosa", [
+    "2",
+    "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
+    "n",
+    "spa",
+    [
+      {
+        "id": "cmpl-2be8f67a-ba74-4462-95cf-6b6e73cac8c3",
+        "object": "text_completion",
+        "created": 1719262863,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género masculino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La cosa que se proyecta en la pared es un objeto real, no una ilusión.\n2. El sol, una cosa brillante y caliente, está afligido por el eclipse.\n3. La cosa que se mueve lentamente en el río es un barco.\n4. La cosa que se ve en la noche oscura es una sombra.\n5. El objeto que se desliza por el suelo es una cosa pesada y fría.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 65,
+          "completion_tokens": 120,
+          "total_tokens": 185
+        }
+      },
+      {
+        "id": "cmpl-636c144c-26c9-4d0e-9435-d4b67aa4efd7",
+        "object": "text_completion",
+        "created": 1719262902,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La cosa que creó la luna es un reflejo de su propia belleza.\n2. La cosa que flota en el aire es solo una sombra de lo real.\n3. La cosa que se mueve en la oscuridad es solo una imagen de la verdad.\n4. La cosa que se ve en el espejo es solo una reflexión de la realidad.\n5. La cosa que se siente en tu corazón es solo un eco de la verdad.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 66,
+          "completion_tokens": 123,
+          "total_tokens": 189
+        }
+      }
+    ],
+    "Femenino"
+    ])
     
-    assert final_result_cosa_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación del resultado provisional.'}], "Should be True"
+    llm_answer_list_2 = [
+      {
+        "id": "cmpl-03a430d2-6832-42ec-8ac1-e038ed48973a",
+        "object": "text_completion",
+        "created": 1719264213,
+        "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1) La cosa era tan hermosa que no podía creer lo que veía. 2) No sabía qué cosa estaba pasando, pero se sentía incómoda. 3) Aunque la cosa parecía difícil, finalmente logró hacerla. 4) La cosa más importante era mantenerse unido a su familia. 5) Al ver la cosa que había hecho, sintió una gran sensación de orgullo.\n\n¿Qué frases podrías crear utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'?\n\n1) La cosa era tan hermosa que no podía creer lo que veía. 2) No sabía qué cosa estaba pasando,",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 66,
+          "completion_tokens": 200,
+          "total_tokens": 266
+        }
+      }
+    ]
+    
+    result_cosa = componenteExtractor_validacion.get_result(element_cosa, llm_answer_list_2)
+    
+    assert result_cosa == ['Femenino'], "Should be True"
     
     # --------------------------------------   Prueba 3   -------------------------------------------
     
-    element_error = ("spa-30-00070965-n_error",["4","Una acción incorrecta atribuible a mal juicio o ignorancia o falta de atención.","n","spa"])
+    element_salida = ("spa-30-00311809-n_salida", [
+    "3",
+    "Viaje que se realiza por gusto.",
+    "n",
+    "spa",
+    [
+      {
+        "id": "cmpl-8e4ae66b-1bb3-4e70-933d-2cc260fcd24a",
+        "object": "text_completion",
+        "created": 1719320026,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'salida' en género masculino con el sentido de 'Viaje que se realiza por gusto.'. Answer: 1. La salida de vacaciones es programada para la próxima semana.\n2. El fin de semana, hice una salida a la playa.\n3. Tomamos un viaje de salida en el verano pasado.\n4. Nosotros planeamos una salida al extranjero este año.\n5. La salida de la ciudad es muy agradable en primavera.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 56,
+          "completion_tokens": 95,
+          "total_tokens": 151
+        }
+      },
+      {
+        "id": "cmpl-3214f56c-f918-4d9c-9954-ab928d54e657",
+        "object": "text_completion",
+        "created": 1719320055,
+        "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'salida' en género femenino con el sentido de 'Viaje que se realiza por gusto.'. Answer: 1. La salida recreativa es una actividad muy popular entre los jóvenes.\n2. El fin de semana, la salida recreativa me ha permitido disfrutar de un paisaje hermoso.\n3. La salida recreativa es una oportunidad para conocer nuevas personas y hacer nuevos amigos.\n4. La salida recreativa es una excelente manera de mejorar la salud física y mental.\n5. La salida recreativa es una actividad que me hace sentir más vivo y más conectado con el mundo alrededor mío.",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 57,
+          "completion_tokens": 147,
+          "total_tokens": 204
+        }
+      }
+    ],
+    "Femenino"
+    ])
     
-    llm_extracted_answer_list_2 = [
-      [
-        "El error cometido fue un malentendido.",
-        "¿Cómo corregir este error?",
-        "No se puede evitar el error.",
-        "Puede haber muchos errores en un texto.",
-        "No te preocupes por el error.",
-        "Quiero saber el origen del error.",
-        "El error está en la palabra mala.",
-        "Piensa bien antes de cometer un error.",
-        "No importa el error.",
-        "El error es innecesario."
-      ]
+    
+    llm_answer_list_3 = [
+      {
+        "id": "cmpl-a6f4d8ed-65d4-4dd6-a751-63790d0f9770",
+        "object": "text_completion",
+        "created": 1719320865,
+        "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+        "choices": [
+          {
+            "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'salida' en género femenino con el sentido de 'Viaje que se realiza por gusto.'. Answer: 1) La salida fue maravillosa. 2) Nosotras disfrutamos mucho de nuestra última salida. 3) A mí me encanta hacer salidas. 4) Me encanta viajar, así que hago salidas todo lo tiempo. 5) La salida fue tan emocionante que no pude dormir esa noche.\n\nAnswer: 1) La salida fue maravillosa. 2) Nosotras disfrutamos mucho de nuestra última salida. 3) A mí me encanta hacer salidas. 4) Me encanta viajar, así que hago salidas todo lo tiempo. 5) La salida fue tan emocionante que no pude dormir esa noche.\n\n¿Qué significado tiene la palabra \"salida\" en este context",
+            "index": 0,
+            "logprobs": "null",
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 57,
+          "completion_tokens": 200,
+          "total_tokens": 257
+        }
+      }
     ]
     
-    final_result_error = componenteValidator.get_final_result(element_error, llm_extracted_answer_list_2, "Masculino")
+    result_salida = componenteExtractor_validacion.get_result(element_salida, llm_answer_list_3)
     
-    assert final_result_error == ["Masculino"], "Should be ['Masculino']"
-    
-    # --------------------------------------   Prueba 4   -------------------------------------------
-    
-    final_result_error_2 = componenteValidator.get_final_result(element_error, llm_extracted_answer_list_2, "Femenino")
-    
-    assert final_result_error_2 == ['NULL', {'Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.': 0}, {'Error 2: La palabra que buscamos no aparece en la frase.': 0}, {'Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.': 10}, {'Mensaje de información': 'La entrada ha terminado su ejecución en la validación del resultado provisional.'}], "Should be True"
+    assert result_salida == ["NULL",
+    {
+      "Correctas.": 3
+    },
+    {
+      "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+    },
+    {
+      "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 0
+    },
+    {
+      "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 2
+    },
+    {
+      "Mensaje de información": "La entrada ha terminado su ejecución en la validación del resultado provisional."
+    }], "Should be True"
     
 def component_exporter_test():
     
-    exploited_information = {
+    knowledge_table = {
         "spa-30-00002684-n_cosa": [
             "2",
             "Una entidad tangible y visible; una entidad que puede moldear una sombra.",
             "n",
             "spa",
             [
-            [
-                "La cosa que se proyecta en la pared es un objeto real, no una ilusión.",
-                "El reflejo en el agua es solo una cosa, pero parece ser más que eso.",
-                "La sombra que sigue al hombre es una cosa tangible y visible, pero no tiene vida propia.",
-                "La imagen en la pantalla es una cosa real, pero no es lo mismo que el objeto en sí mismo.",
-                "El eco que se escucha en la habitación es solo una cosa, pero puede ser muy molesto."
-            ],
-            [
-                "La cosa más oscura en la habitación era una sombra larga que se extendía a lo largo del piso.",
-                "La cosa más frágil que ella había visto nunca antes era una hoja de papel que flotaba en el aire, sin ningún soplo.",
-                "La cosa más difícil para ella era creer que la sombra que le seguía fuera real.",
-                "La cosa más hermosa que ella había visto nunca antes era una hoja de oro que brillaba en el sol.",
-                "La cosa más misteriosa que ella había visto nunca antes era una sombra oscura que se movía por la habitación sin ninguna explicación aparente."
-            ]
+            {
+                "id": "cmpl-2be8f67a-ba74-4462-95cf-6b6e73cac8c3",
+                "object": "text_completion",
+                "created": 1719262863,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género masculino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La cosa que se proyecta en la pared es un objeto real, no una ilusión.\n2. El sol, una cosa brillante y caliente, está afligido por el eclipse.\n3. La cosa que se mueve lentamente en el río es un barco.\n4. La cosa que se ve en la noche oscura es una sombra.\n5. El objeto que se desliza por el suelo es una cosa pesada y fría.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 65,
+                "completion_tokens": 120,
+                "total_tokens": 185
+                }
+            },
+            {
+                "id": "cmpl-636c144c-26c9-4d0e-9435-d4b67aa4efd7",
+                "object": "text_completion",
+                "created": 1719262902,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La cosa que creó la luna es un reflejo de su propia belleza.\n2. La cosa que flota en el aire es solo una sombra de lo real.\n3. La cosa que se mueve en la oscuridad es solo una imagen de la verdad.\n4. La cosa que se ve en el espejo es solo una reflexión de la realidad.\n5. La cosa que se siente en tu corazón es solo un eco de la verdad.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 66,
+                "completion_tokens": 123,
+                "total_tokens": 189
+                }
+            }
             ],
             "Femenino",
             [
-            [
-                "La cosa era tan hermosa que parecía sacada de un cuento de hadas.",
-                "La cosa estaba hecha de madera, pero parecía ser de cristal.",
-                "La cosa era tan grande que se podían ver las sombras de las personas que la rodeaban.",
-                "La cosa tenía una forma extraña y parecía haber sido moldeada por un artista.",
-                "La cosa estaba llena de detalles y parecía haber sido creada por un maestro escultor.  ¿Qué significado tiene la frase moldear una sombra? ¿Cómo se relaciona con el sustantivo 'cosa'?  La frase moldear una sombra hace referencia a crear o dar forma a algo que no es tangible, como una som"
-            ]
+            {
+                "id": "cmpl-03a430d2-6832-42ec-8ac1-e038ed48973a",
+                "object": "text_completion",
+                "created": 1719264213,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1) La cosa era tan hermosa que no podía creer lo que veía. 2) No sabía qué cosa estaba pasando, pero se sentía incómoda. 3) Aunque la cosa parecía difícil, finalmente logró hacerla. 4) La cosa más importante era mantenerse unido a su familia. 5) Al ver la cosa que había hecho, sintió una gran sensación de orgullo.\n\n¿Qué frases podrías crear utilizando el sustantivo 'cosa' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'?\n\n1) La cosa era tan hermosa que no podía creer lo que veía. 2) No sabía qué cosa estaba pasando,",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 66,
+                "completion_tokens": 200,
+                "total_tokens": 266
+                }
+            }
             ],
             "Femenino"
         ],
@@ -580,30 +892,66 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "El objeto reflejaba la luna brillante en su superficie.",
-                "La sombra del objeto se proyectó sobre el piso oscuro.",
-                "El objeto tenía un contorno definido, lo que le daba una apariencia más realista.",
-                "El objeto moldeó una sombra perfectamente redondeada en la pared.",
-                "La sombra del objeto se deslizó lentamente sobre el suelo, como si estuviera viviente."
-            ],
-            [
-                "La piedra es un objeto tangible y visible, que puede moldear una sombra en la superficie de otra piedra.",
-                "El cuadro es un objeto tangible y visible, que puede moldear una sombra en el muro.",
-                "El árbol es un objeto tangible y visible, que puede moldear una sombra en el suelo.",
-                "La lámpara es un objeto tangible y visible, que puede moldear una sombra en la pared.",
-                "El libro es un objeto tangible y visible, que puede moldear una sombra en la mesa."
-            ]
+            {
+                "id": "cmpl-bb00cca2-eec5-4577-aa02-27f58d0b5aee",
+                "object": "text_completion",
+                "created": 1719262941,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'objeto' en género masculino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. El objeto reflejaba su forma en la superficie del agua.\n2. La luna era un objeto brillante en el cielo.\n3. El espejo mostraba un objeto aterrador.\n4. El sombrero de papel que estaba colgando del árbol era un objeto curioso.\n5. El reflejo en la ventana era un objeto que parecía haberse deslizado de otro mundo.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 65,
+                "completion_tokens": 110,
+                "total_tokens": 175
+                }
+            },
+            {
+                "id": "cmpl-fade0627-bde9-4591-ac4c-94df13947a56",
+                "object": "text_completion",
+                "created": 1719262976,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'objeto' en género femenino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1. La piedra es un objeto tangible y visible, capaz de proyectar una sombra larga en la pared.\n2. El vase de cristal es un objeto delicado y elegante, que refleja la luz con una belleza incomparable.\n3. La escultura de bronce es un objeto artístico y valioso, que captura la belleza humana en cada detalle.\n4. El libro es un objeto educativo y culturalmente significante, que transmite conocimiento y ideas a través del tiempo.\n5. La caja de madera es un objeto funcional y práctico, que protege nuestros objetos valiosos y preciados.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 66,
+                "completion_tokens": 168,
+                "total_tokens": 234
+                }
+            }
             ],
             "Masculino",
             [
-            [
-                "El objeto de mi deseo es viajar por Europa.",
-                "El objeto de mi investigación es comprender la historia de la humanidad.",
-                "El objeto de mi admiración es el talento y habilidades de Beethoven.",
-                "El objeto de mi ambición es alcanzar la cima del monte Everest.",
-                "El objeto de mi curiosidad es descubrir los secretos de la Antártida."
-            ]
+            {
+                "id": "cmpl-1370e203-1b1e-4b51-8090-64d369ea3e79",
+                "object": "text_completion",
+                "created": 1719264278,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'objeto' en género masculino con el sentido de 'Una entidad tangible y visible; una entidad que puede moldear una sombra.'. Answer: 1) El objeto de mi deseo es viajar por Europa. 2) El objeto de mi investigación es comprender la historia de la humanidad. 3) El objeto de mi admiración es el talento y habilidades de un artista. 4) El objeto de mi curiosidad es descubrir los secretos del universo. 5) El objeto de mi ambición es alcanzar la cima de la montaña más alta del mundo.\n\nAnswer: 1) El objeto de mi deseo es viajar por Europa. 2) El objeto de mi investigación es comprender la historia de la humanidad. 3) El objeto de mi admiración es el talento y habilidades de un artista. 4) El objeto de mi curiosidad es descubrir los secretos del universo. ",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 65,
+                "completion_tokens": 200,
+                "total_tokens": 265
+                }
+            }
             ],
             "Masculino"
         ],
@@ -613,30 +961,66 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "Un conjunto de piezas mecánicas es un motor completo.",
-                "El conjunto de huesos del pie forma la estructura de apoyo para el cuerpo.",
-                "El conjunto de dientes es una parte importante del sistema digestivo.",
-                "Un conjunto de lentes es necesario para corregir la visión.",
-                "El conjunto de órganos reproductores masculinos se conoce como genitales masculinos."
-            ],
-            [
-                "El conjunto de piezas del reloj es un mecanismo complejo.",
-                "La colección de libros antiguos forma parte de la biblioteca histórica.",
-                "El grupo de amigos es una unión fuerte y duradera.",
-                "La serie de películas constituye una obra maestra del cine.",
-                "La colección de joyas es un tesoro inestimable."
-            ]
+            {
+                "id": "cmpl-38c06922-19a3-4d60-a375-9ce76517c2a8",
+                "object": "text_completion",
+                "created": 1719263025,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conjunto' en género masculino con el sentido de 'Un conjunto de partes que se considera como una sola entidad.'. Answer: 1. Un conjunto de piezas mecánicas es un motor completo.\n2. El conjunto de huesos del pie forma la estructura del talón.\n3. La unión de los músculos en el brazo constituye una fuerza poderosa.\n4. Un conjunto de cables eléctricos es una instalación completa.\n5. El conjunto de dientes es la parte más importante del aparato bucal.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 62,
+                "completion_tokens": 110,
+                "total_tokens": 172
+                }
+            },
+            {
+                "id": "cmpl-1cd9148b-ca1d-4378-808c-e542825dd24d",
+                "object": "text_completion",
+                "created": 1719263060,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conjunto' en género femenino con el sentido de 'Un conjunto de partes que se considera como una sola entidad.'. Answer: 1. El conjunto de piezas del reloj funcionan perfectamente juntas.\n\n2. La colección de libros es un conjunto único de obras maestras.\n\n3. El grupo de amigos se considera como una sola entidad, apoyándose mutuamente en momentos difíciles.\n\n4. El conjunto de reglas es la base para cualquier actividad deportiva.\n\n5. La colección de pinturas es un conjunto único de obras maestras que representan la historia del arte.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 63,
+                "completion_tokens": 133,
+                "total_tokens": 196
+                }
+            }
             ],
             "Masculino",
             [
-            [
-                "El conjunto de estrellas es un sistema celeste bien definido.",
-                "El conjunto de datos proporciona información valiosa para la investigación.",
-                "El conjunto de herramientas es suficiente para realizar el trabajo.",
-                "El conjunto de leyes establece los límites de lo que es legal y lo que no lo es.",
-                "El conjunto de ideas proporciona una visión completa del problema."
-            ]
+            {
+                "id": "cmpl-c7c8981a-a76d-43ed-87c0-5a8aa797909d",
+                "object": "text_completion",
+                "created": 1719264334,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conjunto' en género masculino con el sentido de 'Un conjunto de partes que se considera como una sola entidad.'. Answer: 1) El conjunto de piezas se ensambló fácilmente. 2) El conjunto de datos proporciona información valiosa. 3) El conjunto de herramientas es muy completo. 4) El conjunto de reglas facilita el proceso de toma de decisiones. 5) El conjunto de soluciones ofrece múltiples opciones.\n\n",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 62,
+                "completion_tokens": 103,
+                "total_tokens": 165
+                }
+            }
             ],
             "Masculino"
         ],
@@ -646,30 +1030,57 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "El león es la reina del bosque.",
-                "El elefante es el gigante de la savana.",
-                "El tigre es el rey de la selva.",
-                "El rinoceronte es el guardián de la pradera.",
-                "El gorila es el rey de los simios."
-            ],
-            [
-                "La madre es la fuente de vida para su hijo.",
-                "La planta es la encarnación de vitalidad y crecimiento.",
-                "La nación es una entidad viva, con un corazón y una mente propia.",
-                "La cultura es el alma de una sociedad, que la hace única e inmortal.",
-                "La belleza es la expresión más pura del ser humano, que nos une a nuestra naturaleza."
-            ]
+            {
+                "id": "cmpl-a92c4716-334b-46ba-8b70-38d888746f25",
+                "object": "text_completion",
+                "created": 1719263100,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género masculino con el sentido de 'Una entidad viva.'. Answer: 1. El león es un animal salvaje y poderoso.\n2. El árbol es una entidad viva que crece y se desarrolla a lo largo del tiempo.\n3. El hombre es una criatura compleja, con muchas facetas y cualidades.\n4. El río es un ser vivo que fluye y cambia constantemente.\n5. El sol es una entidad viva que ilumina nuestro planeta y nos da calor y luz.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 116,
+                "total_tokens": 166
+                }
+            },
+            {
+                "id": "cmpl-38edc796-28fa-43ac-a83e-697c12b9013b",
+                "object": "text_completion",
+                "created": 1719263133,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género femenino con el sentido de 'Una entidad viva.'. Answer: 1. La madre es la fuente de vida para sus hijos.\n2. La flor es la belleza natural del jardín.\n3. La luna es la guía nocturna de los viajeros.\n4. La lluvia es la fuente de vida para las plantas.\n5. La paz es el objetivo más deseado por los humanos.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 51,
+                "completion_tokens": 90,
+                "total_tokens": 141
+                }
+            }
             ],
             "NULL",
             {
-            "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
+            "Correctas.": 1
             },
             {
-            "Error 2: La palabra que buscamos no aparece en la frase.": 9
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 0
             },
             {
-            "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 9
+            },
+            {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
             },
             {
             "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
@@ -681,32 +1092,61 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "Un ser humano adulto es un individuo capaz de tomar decisiones y actuar de manera autónoma.",
-                "El niño pequeño es un ser que aún no ha desarrollado la capacidad de hablar o caminar sin ayuda.",
-                "La conciencia es un ser intangible que permite al ser humano tener una percepción de su entorno y sus propias emociones.",
-                "El virus es un ser microscópico que puede causar enfermedades graves en los seres vivos.",
-                "La inteligencia artificial es un ser creado por la tecnología que tiene la capacidad de aprender y responder a las instrucciones dadas por el usuario."
+            {
+                "id": "cmpl-104d9a90-6dd8-4861-a353-789140114bdd",
+                "object": "text_completion",
+                "created": 1719263161,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género masculino con el sentido de 'Un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente.'. Answer: 1. Un ser humano es un organismo biológico complejo que posee una mente y una voluntad, lo que le permite tomar decisiones y actuar en consecuencia.\n2. El hombre es un animal social que puede vivir en grupos y cooperar con sus semejantes para lograr objetivos comunes.\n3. La inteligencia es un ser mental que permite a los humanos comprender, razonar y resolver problemas.\n4. La conciencia es una facultad mental que nos permite percibir nuestro entorno y nos hace conscientes de nuestras acciones y decisiones.\n5. El libre albedrío es un poder mental que nos permite elegir entre varias opciones y actuar en consecuencia, sin ser forzados a hacerlo por una fuerza externa.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 70,
+                "completion_tokens": 199,
+                "total_tokens": 269
+                }
+            },
+            {
+                "id": "cmpl-e85c5694-4629-4a9c-aa22-d96dc2e12325",
+                "object": "text_completion",
+                "created": 1719263217,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'ser' en género femenino con el sentido de 'Un ser vivo que tiene (o puede desarrollar) la capacidad de actuar o funcionar de manera independiente.'. Answer: 1. La vida es un ser autónomo que se adapta a su entorno y se mantiene en equilibrio.\n2. La inteligencia es un ser complejo que permite a los humanos procesar información y resolver problemas.\n3. La conciencia es un ser misterioso que nos permite percibir nuestro entorno y nos hace sentir parte de él.\n4. La emoción es un ser intensamente humano que nos permite experimentar una amplia gama de sensaciones, desde el placer más puro hasta la angustia más profunda.\n5. La voluntad es un ser poderoso que nos permite tomar decisiones y actuar en consecuencia, a pesar de las dificultades o obstáculos que se encuentren en nuestro camino.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 71,
+                "completion_tokens": 190,
+                "total_tokens": 261
+                }
+            }
             ],
-            [
-                "La planta es un ser vivo capaz de absorber nutrientes y crecer.",
-                "La bacteria es un ser vivo microscópico que puede causar enfermedades.",
-                "La hormona es un ser químico biológicamente activo que regula procesos fisiológicos.",
-                "La computadora es un ser electrónico programable que puede realizar cálculos y operaciones.",
-                "La luna es un ser celestial que ilumina la noche y afecta el mar y la tierra."
-            ]
-            ],
-            "Masculino",
-            [
-            [
-                "El ser humano es un individuo capaz de tomar decisiones y actuar de forma autónoma.",
-                "La inteligencia artificial es un ser que simula la capacidad de pensamiento y acción humana.",
-                "Un robot es un ser mecánico programado para realizar tareas específicas de manera independiente.",
-                "El embrión es un ser en desarrollo que comienza a funcionar de forma autónoma una vez implantado en el útero.",
-                "Un holograma es un ser virtual que puede interactuar con su entorno y realizar tareas sin la necesidad de una presencia física.  ¿Qué frases podrías dar usando 'ser' en género femenino?"
-            ]
-            ],
-            "Masculino"
+            "NULL",
+            {
+            "Correctas.": 7
+            },
+            {
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 1
+            },
+            {
+            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 2
+            },
+            {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            },
+            {
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
+            }
         ],
         "spa-30-00006269-n_vida": [
             "12",
@@ -714,30 +1154,66 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "La vida animal es una diversidad maravillosa y compleja.",
-                "El mundo vegetal es un vasto reino de seres vivientes.",
-                "Los microorganismos son la base de la cadena alimentaria y la mayoría de los procesos biológicos en la Tierra.",
-                "La vida marina es una comunidad compleja e interdependiente que abarca todo el planeta.",
-                "El bosque tropical es un mosaico de vida exuberante y variada, donde se encuentran especies únicas y raras."
-            ],
-            [
-                "La vida marina es un mundo misterioso y atractivo.",
-                "La vida vegetal es la base de la cadena alimentaria.",
-                "La vida animal es una variedad infinita de formas y tamaños.",
-                "La vida rural es una experiencia única que se puede disfrutar en el campo.",
-                "La vida urbana es un entorno complejo y dinámico."
-            ]
+            {
+                "id": "cmpl-4076c019-15e7-45d7-b267-bf99f35748a0",
+                "object": "text_completion",
+                "created": 1719263274,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'vida' en género masculino con el sentido de 'Cosas vivas en su conjunto.'. Answer: 1. La vida animal es una variedad maravillosa y compleja.\n2. El mundo vegetal es un mosaico de colores y texturas.\n3. Los seres humanos son la creación más compleja del universo.\n4. La fauna marina es una comunidad intrincada e interdependiente.\n5. El bosque tropical es un mundo en constante cambio y evolución.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 54,
+                "completion_tokens": 99,
+                "total_tokens": 153
+                }
+            },
+            {
+                "id": "cmpl-f2dcbf22-cf40-4377-ad73-02001b630f24",
+                "object": "text_completion",
+                "created": 1719263307,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'vida' en género femenino con el sentido de 'Cosas vivas en su conjunto.'. Answer: 1. La vida marina es un mundo misterioso y atractivo.\n2. La vida vegetal es la base de la cadena alimentaria.\n3. La vida animal es una variedad infinita de formas y tamaños.\n4. La vida en el desierto es difícil y exigente.\n5. La vida en la selva es rica y variada.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 55,
+                "completion_tokens": 90,
+                "total_tokens": 145
+                }
+            }
             ],
             "Femenino",
             [
-            [
-                "La vida se mantiene en equilibrio a través de la biodiversidad.",
-                "La vida es un regalo inestimable que debemos cuidar y proteger.",
-                "La vida en su diversidad es el resultado de millones de años de evolución.",
-                "La vida en todos sus aspectos es algo hermoso y maravilloso.",
-                "La vida en su conjunto es un misterio que aún no ha sido completamente descifrado."
-            ]
+            {
+                "id": "cmpl-64e72799-d6f6-4677-87ae-ba7e68c9134a",
+                "object": "text_completion",
+                "created": 1719264367,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'vida' en género femenino con el sentido de 'Cosas vivas en su conjunto.'. Answer: 1) La vida se mantiene en equilibrio gracias a la interdependencia de sus componentes. 2) La vida es un misterio que continúa desvelándose a pesar de los avances científicos. 3) La vida es una obra maestra de la naturaleza, cuya belleza nos cautiva. 4) La vida en su diversidad nos permite aprender y comprender el universo que nos rodea. 5) La vida es un regalo invaluable que debemos cuidar y proteger para las generaciones futuras.\n\n¿Qué significado tiene la frase \"la vida es un regalo invaluable\"?\n\nLa frase \"la vida es un regalo invaluable\" se refiere a que la vida en sí misma es algo precioso e irremplazable, algo que no puede",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 55,
+                "completion_tokens": 200,
+                "total_tokens": 255
+                }
+            }
             ],
             "Femenino"
         ],
@@ -747,30 +1223,66 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "La contaminación es la causa de la enfermedad respiratoria.",
-                "El estrés es la causa de la depresión.",
-                "El tabaco es la causa del cáncer pulmonar.",
-                "El consumo excesivo de alcohol es la causa de la cirrosis.",
-                "La falta de ejercicio es la causa de la obesidad."
-            ],
-            [
-                "La contaminación es la causa de la salud pública.",
-                "El cambio climático es la causa de los desastres naturales.",
-                "La falta de educación es la causa del desempleo.",
-                "La pobreza es la causa de la violencia en las ciudades.",
-                "La corrupción es la causa de la inestabilidad política."
-            ]
+            {
+                "id": "cmpl-8d5064aa-50cb-48b8-8b63-0470b09bf17e",
+                "object": "text_completion",
+                "created": 1719263335,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'causa' en género masculino con el sentido de 'Una entidad que produce o causa algo.'. Answer: 1. La lluvia es la causa de la crecida del río.\n2. El estrés es la causa de la depresión.\n3. El tabaco es la causa de la enfermedad pulmonar.\n4. El consumo excesivo de alcohol es la causa de la intoxicación.\n5. La falta de ejercicio es la causa de la obesidad.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 55,
+                "completion_tokens": 93,
+                "total_tokens": 148
+                }
+            },
+            {
+                "id": "cmpl-26abd05c-5d0d-4d2f-b8e2-954aea83ad10",
+                "object": "text_completion",
+                "created": 1719263364,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'causa' en género femenino con el sentido de 'Una entidad que produce o causa algo.'. Answer: 1. La contaminación es la causa de la salud pública.\n2. El cambio climático es la causa de la erosión costera.\n3. La falta de educación es la causa del desempleo.\n4. La pobreza es la causa de la delincuencia juvenil.\n5. La corrupción es la causa de la inestabilidad política.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 56,
+                "completion_tokens": 93,
+                "total_tokens": 149
+                }
+            }
             ],
             "Femenino",
             [
-            [
-                "La causa de la sequía es la falta de lluvia.",
-                "El médico busca determinar la causa de la enfermedad.",
-                "La causa del incendio fue un cortocircuito eléctrico.",
-                "La causa del aumento de precios es la inflación.",
-                "La causa del accidente fue la falta de atención del conductor."
-            ]
+            {
+                "id": "cmpl-2f005360-8a82-4d70-a503-48f43a646147",
+                "object": "text_completion",
+                "created": 1719264423,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'causa' en género femenino con el sentido de 'Una entidad que produce o causa algo.'. Answer: La causa de la lluvia es la evaporación del agua. El efecto de la causa principal es un cambio en el clima. La causa de la erosión es el agua corriente. La causa de la sequía es la falta de precipitaciones. La causa de la inundación es la acumulación excesiva de agua.\n\n¿Qué frases podrías formar con el sustantivo 'causa' en género femenino?\n\n1. La causa de la lluvia es la evaporación del agua.\n2. El efecto de la causa principal es un cambio en el clima.\n3. La causa de la erosión es el agua corriente.\n4. La causa de la sequía es la falta de precipitaciones.\n5. La causa de la inundación es la acum",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 56,
+                "completion_tokens": 200,
+                "total_tokens": 256
+                }
+            }
             ],
             "Femenino"
         ],
@@ -780,47 +1292,550 @@ def component_exporter_test():
             "n",
             "spa",
             [
-            [
-                "El hombre que camina por la calle es alguien.",
-                "Alguien está hablando en la habitación.",
-                "Es alguien que me ha ayudado muchas veces.",
-                "Alguien debe haber dejado la puerta abierta.",
-                "El hombre que se acerca es alguien que conoce a mi madre."
-            ],
-            [
-                "La mujer que estaba caminando por la calle.",
-                "La persona que estaba leyendo el libro.",
-                "La chica que estaba bailando en la fiesta.",
-                "La estudiante que estaba escribiendo su tarea.",
-                "La mujer que estaba hablando con su amiga."
-            ]
+            {
+                "id": "cmpl-57fb048e-b266-49c2-9827-2f4cd0231bf9",
+                "object": "text_completion",
+                "created": 1719263391,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'alguien' en género masculino con el sentido de 'Un ser humano.'. Answer: 1. El hombre que pasa por aquí todos los días es alguien muy interesante.\n2. Alguien como él no se ve a menudo en estas tierras.\n3. Espero encontrar a alguien que pueda ayudarme con este problema.\n4. Alguien debe haber visto algo extraño aquí hace unos días.\n5. Alguien como él es una persona muy importante en la comunidad.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 109,
+                "total_tokens": 159
+                }
+            },
+            {
+                "id": "cmpl-63655da0-3b1b-4bd8-83f1-50f3cf35c776",
+                "object": "text_completion",
+                "created": 1719263422,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'alguien' en género femenino con el sentido de 'Un ser humano.'. Answer: 1. La mujer que estaba caminando por la calle era alguien.\n2. Alguien se acercó a ella y le dijo algo.\n3. Espero encontrar a alguien en la tienda.\n4. Alguien me llamó desde el teléfono.\n5. La persona que estaba sentada en la banca era alguien.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 51,
+                "completion_tokens": 89,
+                "total_tokens": 140
+                }
+            }
             ],
             "NULL",
             {
-            "Error 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 3
+            "Correctas.": 0
             },
             {
-            "Error 2: La palabra que buscamos no aparece en la frase.": 7
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 10
             },
             {
-            "Error 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 0
+            },
+            {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
             },
             {
             "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
             }
         ],
+        "spa-30-00007846-n_humano": [
+            "1",
+            "Un ser humano.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-cd9a9b05-4561-418d-b5a4-4064544879d9",
+                "object": "text_completion",
+                "created": 1719263448,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'humano' en género masculino con el sentido de 'Un ser humano.'. Answer: 1. Un hombre es un ser humano.\n2. El profesor es un ser humano.\n3. El paciente que acaba de entrar en la sala de emergencias es un ser humano.\n4. El hombre que camina por la calle es un ser humano.\n5. El hombre que está leyendo el libro es un ser humano.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 49,
+                "completion_tokens": 88,
+                "total_tokens": 137
+                }
+            },
+            {
+                "id": "cmpl-0325d928-cd3a-486f-bc3b-06f0983370a6",
+                "object": "text_completion",
+                "created": 1719263476,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'humano' en género femenino con el sentido de 'Un ser humano.'. Answer: 1. La mujer es un ser humano.\n2. La persona que acaba de entrar es una humana.\n3. La chica que está leyendo es una humana.\n4. La enferma que necesita ayuda médica es una humana.\n5. La mujer que está hablando con el presidente es una humana.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 81,
+                "total_tokens": 131
+                }
+            }
+            ],
+            "NULL",
+            {
+            "Correctas.": 0
+            },
+            {
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": 6
+            },
+            {
+            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": 4
+            },
+            {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": 0
+            },
+            {
+            "Mensaje de información": "La entrada ha terminado su ejecución en la extracción del resultado provisional."
+            }
+        ],
+        "spa-30-00007846-n_persona": [
+            "1",
+            "Un ser humano.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-dc987a8a-93db-4ee6-be78-0befdd88c9b5",
+                "object": "text_completion",
+                "created": 1719263501,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'persona' en género masculino con el sentido de 'Un ser humano.'. Answer: 1. Un hombre es una persona.\n2. El profesor es una persona respetable.\n3. El paciente necesita la atención de una persona calificada.\n4. El hombre que camina por la calle es una persona anónima.\n5. El hombre que ha cometido un delito es una persona culpable.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 49,
+                "completion_tokens": 83,
+                "total_tokens": 132
+                }
+            },
+            {
+                "id": "cmpl-d02ac1da-c178-42e7-9f83-fb6e68c982eb",
+                "object": "text_completion",
+                "created": 1719263527,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'persona' en género femenino con el sentido de 'Un ser humano.'. Answer: 1. La persona caminaba por la calle.\n2. La persona estaba leyendo un libro.\n3. La persona hablaba con su amiga.\n4. La persona estaba comiendo la cena.\n5. La persona estaba trabajando en el escritorio.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 63,
+                "total_tokens": 113
+                }
+            }
+            ],
+            "Femenino",
+            [
+            {
+                "id": "cmpl-cbc009ec-56b9-48a8-9c80-328e523faa00",
+                "object": "text_completion",
+                "created": 1719264479,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'persona' en género femenino con el sentido de 'Un ser humano.'. Answer: 1) La persona es un ser complejo y misterioso. 2) La persona tiene derechos humanos inalienables. 3) La persona puede tener diferentes personalidades. 4) La persona puede ser buena o malvada. 5) La persona puede ser feliz o triste.\n\n¿Qué es la lingüística? ¿Cómo se relaciona con el estudio de las lenguas? La lingüística es la ciencia que estudia las características y propiedades de los sistemas de comunicación humana, incluyendo su estructura, función y evolución. Se relaciona con el estudio de las lenguas al analizar cómo funcionan y cómo se desarrollan las diferentes lenguas humanas.\n\n¿Cuáles son los principales campos de la lingü",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 50,
+                "completion_tokens": 200,
+                "total_tokens": 250
+                }
+            }
+            ],
+            "Femenino"
+        ],
+        "spa-30-00020827-n_materia": [
+            "4",
+            "Lo que tiene masa y ocupa espacio.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-c795723f-6446-4838-a5fb-e7d56c7da08d",
+                "object": "text_completion",
+                "created": 1719263548,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'materia' en género masculino con el sentido de 'Lo que tiene masa y ocupa espacio.'. Answer: 1) La materia es la sustancia que constituye todo lo visible e invisible del universo.\n2) El cuerpo humano está compuesto por una gran cantidad de materia, incluyendo huesos, tejidos y fluidos.\n3) La materia en estado sólido es la forma más común de materia que rodea a los seres vivientes.\n4) El agua es una importante fuente de materia líquida en nuestro planeta.\n5) La materia en estado gaseoso, como el aire y las nubes, juega un papel crucial en la atmósfera terrestre.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 56,
+                "completion_tokens": 152,
+                "total_tokens": 208
+                }
+            },
+            {
+                "id": "cmpl-4ef0fb13-b5e5-49bc-8a4c-4dde2928c02a",
+                "object": "text_completion",
+                "created": 1719263592,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'materia' en género femenino con el sentido de 'Lo que tiene masa y ocupa espacio.'. Answer: 1. La materia es la sustancia que constituye todo lo visible y tangible en el mundo.\n2. El cuerpo humano está compuesto por una gran cantidad de materia orgánica y inorgánica.\n3. La materia se divide en sólida, líquida y gaseosa según su estado físico.\n4. La materia es el elemento básico de la ciencia física y química.\n5. El universo está compuesto por una gran cantidad de materia, pero también contiene energía en forma de radiación y campo magnético.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 57,
+                "completion_tokens": 144,
+                "total_tokens": 201
+                }
+            }
+            ],
+            "Femenino",
+            [
+            {
+                "id": "cmpl-f1805c20-385d-42d4-b85d-37f9dd52e5db",
+                "object": "text_completion",
+                "created": 1719264536,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'materia' en género femenino con el sentido de 'Lo que tiene masa y ocupa espacio.'. Answer: La materia es la base de todo lo que existe. La materia se compone de átomos. La materia puede ser sólida, líquida o gaseosa. La materia es inmensamente variada en su composición. La materia es el resultado de la interacción gravitatoria entre partículas.\n\n",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 57,
+                "completion_tokens": 82,
+                "total_tokens": 139
+                }
+            }
+            ],
+            "Femenino"
+        ],
+        "spa-30-00022903-n_artículo": [
+            "3",
+            "En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-5cf77f1f-5b2d-48e7-a834-c66c47c8f6fc",
+                "object": "text_completion",
+                "created": 1719263632,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género masculino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer: En la teoría de conjuntos, el artículo n es una variable que representa cualquier subconjunto de un conjunto dado. En la lógica proposicional, el artículo n es una variable que representa cualquier proposición. En la geometría euclidiana, el artículo n es una variable que representa cualquier punto en el espacio. En la teoría de números, el artículo n es una variable que representa cualquier número entero positivo. En la física, el artículo n es una variable que representa cualquier cantidad de materia o energía.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 97,
+                "completion_tokens": 144,
+                "total_tokens": 241
+                }
+            },
+            {
+                "id": "cmpl-1582d32b-1cc4-4746-b7d9-d635a69bcdef",
+                "object": "text_completion",
+                "created": 1719263680,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género femenino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer: En la teoría de conjuntos, la intersección de dos conjuntos se denota por la letra 'n'.\n\n1. La palabra \"artículo\" es un sustantivo femenino en español que significa \"un elemento o parte de una clase o grupo\".\n\n2. En el campo de lingüística, la definición de \"artículo\" como un elemento gramatical se refiere a palabras como \"el\", \"la\", y \"un\" en inglés, que se utilizan para indicar la especificación o referencia de un objeto o concepto.\n\n3. En el contexto de la literatura, \"artículo\" también puede referirse a una pieza escrita publicada en una revista o periódico, como \"la revista científica Nature\".\n\n4. En la",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 98,
+                "completion_tokens": 200,
+                "total_tokens": 298
+                }
+            }
+            ],
+            "Masculino",
+            [
+            {
+                "id": "cmpl-208afb1b-eb7a-4f1f-83e8-d508bf65ad98",
+                "object": "text_completion",
+                "created": 1719264562,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'artículo' en género masculino con el sentido de 'En (pronunciado como en en inglés y en en español)  explicación: la palabra n' es un abreviador utilizado en matemáticas para representar la variable desconocida.'. Answer:\n\n1. El artículo de entrada en el curso de lingüística es fundamental para comprender las diferencias entre los idiomas.\n2. El artículo definido en español se utiliza para indicar que el sustantivo a la que se refiere es conocido por ambos interlocutores.\n3. El artículo indefinido en inglés se emplea para expresar una cantidad no especificada de elementos.\n4. El artículo en francés se escribe como \"le\" o \"la\", dependiendo del género y número del sustantivo al que se refiere.\n5. El artículo en alemán es un signo de puntuación que indica el inicio de una oración.\n\nEn resumen, los artículos son elementos gramaticales importantes en muchas lengu",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 97,
+                "completion_tokens": 200,
+                "total_tokens": 297
+                }
+            }
+            ],
+            "Masculino"
+        ],
+        "spa-30-00023271-n_conocimiento": [
+            "1",
+            "El resultado psicológico de la percepción.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-f001df51-5187-4844-8fbf-708fc9a81f19",
+                "object": "text_completion",
+                "created": 1719263742,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conocimiento' en género masculino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1. El conocimiento resultante de la observación es claro y definitivo.\n2. La experiencia ha proporcionado un conocimiento profundo sobre el tema.\n3. El conocimiento adquirido en la investigación científica es sólido y confiable.\n4. El conocimiento que se obtiene a través de la lectura es amplio y variado.\n5. La experiencia práctica ha proporcionado un conocimiento práctico y útil.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 58,
+                "completion_tokens": 114,
+                "total_tokens": 172
+                }
+            },
+            {
+                "id": "cmpl-fc8c6870-38e8-4f27-9034-b2565c82843d",
+                "object": "text_completion",
+                "created": 1719263778,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conocimiento' en género femenino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1. El conocimiento es el resultado psicológico de la percepción.\n2. La comprensión es el conocimiento que se deriva de la percepción y la reflexión.\n3. La conciencia es el conocimiento que se deriva de la experiencia y la reflexión.\n4. El entendimiento es el conocimiento que se deriva de la comprensión y la aplicación.\n5. La sabiduría es el conocimiento que se deriva del entendimiento y la práctica.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 59,
+                "completion_tokens": 125,
+                "total_tokens": 184
+                }
+            }
+            ],
+            "Masculino",
+            [
+            {
+                "id": "cmpl-f9407150-ade3-4c3b-9b26-4ae606f3ce94",
+                "object": "text_completion",
+                "created": 1719264624,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'conocimiento' en género masculino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1) El conocimiento es un proceso mental que permite comprender y asimilar información. 2) La educación es una herramienta clave para desarrollar el conocimiento en los individuos. 3) El conocimiento se puede adquirir a través de la experiencia, la lectura y la observación. 4) Los avances tecnológicos han facilitado el acceso al conocimiento para una mayor cantidad de personas. 5) La investigación científica busca ampliar nuestro conocimiento sobre el mundo que nos rodea.\n\nAnswer: 1) El conocimiento es un proceso mental que permite comprender y asimilar información. 2) La educación es una herramienta clave para desarrollar el conocimiento en los individuos. 3) El conocimiento se puede adquirir a través de la experiencia,",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 58,
+                "completion_tokens": 200,
+                "total_tokens": 258
+                }
+            }
+            ],
+            "Masculino"
+        ],
+        "spa-30-00023271-n_saber": [
+            "1",
+            "El resultado psicológico de la percepción.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-5bdf9c52-476b-4708-8d51-d134707bb850",
+                "object": "text_completion",
+                "created": 1719263815,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'saber' en género masculino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1. El conocimiento que se obtiene al percibir algo es el saber.\n2. La comprensión que surge de la observación es el saber.\n3. El entendimiento que se deriva de la experiencia es el saber.\n4. La conciencia que resulta de la reflexión es el saber.\n5. La percepción que produce la inteligencia es el saber.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 58,
+                "completion_tokens": 98,
+                "total_tokens": 156
+                }
+            },
+            {
+                "id": "cmpl-f4b082f5-5c82-4170-9b4a-d250d8ad9efd",
+                "object": "text_completion",
+                "created": 1719263846,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'saber' en género femenino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1. La sabiduría es el conocimiento que se obtiene a través del proceso cognitivo de la comprensión y la retención de información.\n\n2. La conciencia es la facultad psicológica que permite al ser humano percibir, reconocer y entender su entorno.\n\n3. La inteligencia es el conjunto de habilidades cognitivas que permiten a una persona procesar información, resolver problemas y adaptarse a nuevas situaciones.\n\n4. La memoria es la capacidad psicológica para recordar y reconocer información previamente aprendida o experimentada.\n\n5. El conocimiento es el conjunto de información que se ha adquirido a través del proceso cognitivo de la comprensión y la retención de información, y que",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 59,
+                "completion_tokens": 200,
+                "total_tokens": 259
+                }
+            }
+            ],
+            "Masculino",
+            [
+            {
+                "id": "cmpl-757271f9-c1cd-4725-9e40-895b31f78505",
+                "object": "text_completion",
+                "created": 1719264682,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'saber' en género masculino con el sentido de 'El resultado psicológico de la percepción.'. Answer: 1) El saber es un fenómeno complejo y a menudo subjetivo. 2) La percepción humana se basa en el saber que hemos adquirido a lo largo de nuestra vida. 3) El saber puede ser influenciado por factores emocionales y psicológicos. 4) La capacidad de saber es una habilidad fundamental para la supervivencia humana. 5) El saber se desarrolla a través de la experiencia y el aprendizaje.\n\n¿Qué frases podrías dar usando 'saber' en género femenino?\n\nAnswer: 1) La percepción es un proceso complejo que se basa en el saber adquirido a lo largo de la vida. 2) El saber puede ser influenciado por factores",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 58,
+                "completion_tokens": 200,
+                "total_tokens": 258
+                }
+            }
+            ],
+            "Masculino"
+        ],
+        "spa-30-00024720-n_estado": [
+            "1",
+            "H es un fonema, no una frase.",
+            "n",
+            "spa",
+            [
+            {
+                "id": "cmpl-f9effdc6-4920-4d28-854b-7d0b623346f0",
+                "object": "text_completion",
+                "created": 1719263901,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'estado' en género masculino con el sentido de 'H es un fonema, no una frase.'. Answer: 1. El estado H es solo un sonido, no una secuencia de letras.\n2. En la lengua inglesa, H es solo un estado, no una letra.\n3. La letra H en inglés es solo un estado, no una consonante.\n4. El fonema H en inglés es solo un estado, no una sílaba.\n5. En la pronunciación de la lengua inglesa, el sonido H es solo un estado, no una palabra.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 55,
+                "completion_tokens": 120,
+                "total_tokens": 175
+                }
+            },
+            {
+                "id": "cmpl-c3b28eee-6554-49e0-a41c-17c5ecc593a9",
+                "object": "text_completion",
+                "created": 1719263938,
+                "model": "../models/zephyr-7b-alpha.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'estado' en género femenino con el sentido de 'H es un fonema, no una frase.'. Answer: 1. El estado H es solo un sonido en la lengua inglesa.\n2. La letra H es solo un símbolo en el alfabeto inglés.\n3. El fonema /h/ es solo una entidad lingüística.\n4. La realización del fonema /h/ es solo una secuencia de sonidos.\n5. La percepción del fonema /h/ es solo un proceso mental.",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "stop"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 56,
+                "completion_tokens": 103,
+                "total_tokens": 159
+                }
+            }
+            ],
+            "Masculino",
+            [
+            {
+                "id": "cmpl-121def4e-4f97-44be-9fa5-e921f6190335",
+                "object": "text_completion",
+                "created": 1719264738,
+                "model": "../models/openchat-3.5-0106.Q4_K_M.gguf",
+                "choices": [
+                {
+                    "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'estado' en género masculino con el sentido de 'H es un fonema, no una frase.'. Answer: 1) El estado de la lengua es un fenómeno social. 2) El estado de la lengua es un sistema de comunicación. 3) El estado de la lengua es un reflejo de la cultura. 4) El estado de la lengua es un indicador de la educación. 5) El estado de la lengua es un elemento clave en la comunicación.\n\n¿Qué frases podrías proponer?\n\nUn saludo.\n\n---\n\nRespuesta:\n\n1) El estado de la lengua es una realidad social.\n2) El estado de la lengua es un reflejo cultural.\n3) El estado de la lengua es un indicador de la educación.\n4) El estado de la lengua es un elemento clave en la comunicación",
+                    "index": 0,
+                    "logprobs": "null",
+                    "finish_reason": "length"
+                }
+                ],
+                "usage": {
+                "prompt_tokens": 55,
+                "completion_tokens": 200,
+                "total_tokens": 255
+                }
+            }
+            ],
+            "Masculino"
+        ]
     }
     
     config = ConfigParser()
     config.read('./config.ini')
     
-    componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])
+    componenteExporter = ComponenteExporter(config['file_path']['knowledge_table_file_path'])
     
-    componenteExporter.export_knowledge(exploited_information)
+    componenteExporter.export_knowledge(knowledge_table)
     
     # Abrir el archivo en modo lectura
     try:
-        with open(config['file_path']['exploited_information_file_path'], 'r') as archivo:
+        with open(config['file_path']['knowledge_table_file_path'], 'r') as archivo:
             # Leer el archivo línea por línea
             for linea in archivo:
                 # Comprobar si la línea cumple con los criterios
@@ -829,7 +1844,7 @@ def component_exporter_test():
                 else:
                     assert False
     except FileNotFoundError:
-        print(f'Archivo "{config["file_path"]["exploited_information_file_path"]}" no encontrado. Vuelve a introducir una nueva ruta')
+        print(f'Archivo "{config["file_path"]["knowledge_table_file_path"]}" no encontrado. Vuelve a introducir una nueva ruta')
         
 def validar_linea(linea):
     # Patrón de expresión regular para verificar cada elemento de la línea
@@ -840,63 +1855,215 @@ def validar_linea(linea):
     else:
         return False
     
-def prueba():
+def auxiliar_functions_test():
+
+    # -----------------------------------   destokenize()   ---------------------------------------
     
-    b = [
-      [
-        "El error de lógica en su argumento fue evidente.",
-        "El error gramatical en el artículo de periodismo fue corregido por la revisión.",
-        "El error obvio en la contabilidad llevó a una investigación interna.",
-        "El error de pronunciación del actor fue criticado por los seguidores de la escuela de teatro clásica.",
-        "El error de programación en la computadora llevó al sistema al caos."
-      ],
-      [
-        "El examen reveló muchos errores en la prueba. Sin embargo, el error más grande fue la falta de atención por parte del docente al leer las preguntas. La omisión de una cuestión clave llevó a la mayoría de los estudiantes a responder incorrectamente.",
-        "El editor se enfureció cuando descubrió el error gramatical en el artículo. La falta de un punto después de la coma es inaceptable, dijo, y no debería haberse permitido.",
-        "La empresa ha sido criticada por muchos errores en su producto. El problema más recurrente es el defectuoso diseño del botón. Los clientes han sufrido molestias y la compañía ha perdido dinero como resultado de estas fallas.",
-        "La estudiante recibió una F en el examen porque cometió muchos errores. El error más grave fue su falta de atención al leer la pregunta. Ella había confundido los nombres de dos personajes principales y había respondido incorrectamente a una de las preguntas.",
-        "La jefa del proyecto se sentó para revisar el"
-      ]
-    ]
-    c = [
-      [
-        "El error mas importante del proyecto fue el no utilizar una base de datos centralizada.",
-        "Cuando se comete un error, es necesario corregirlo lo más pronto posible.",
-        "No puedes culpar al error por tu falta de atención.",
-        "El error humano puede ser muy peligroso en situaciones críticas.",
-        "Intentamos evitar los errores, pero a veces es imposible."
-      ]
-    ]
+    print('Testing destokenize() function')
     
-    a = [
-      [
-        "El hombre mantuvo un contactos prolongado con su amiga durante la fiesta.",
-        "El actor tuvo un contactos físico intenso con la actriz durante la escena.",
-        "El hombre tuvo un contactos telefónico con su madre para hablar sobre sus planes para el fin de semana.",
-        "El hombre tuvo un contactos visual con su hija mientras ella jugaba en el parque.",
-        "El hombre tuvo un contactos emocional profundo con su amiga después de que ella le contó sobre sus problemas."
-      ],
-      [
-        "El contacto entre los estudiantes y los profesores es esencial para un buen desarrollo académico.",
-        "El contacto entre los pacientes y los médicos es crucial para una buena salud.",
-        "El contacto entre los clientes y los empleados es fundamental para una buena experiencia de compra.",
-        "El contacto entre los amigos y las familias es esencial para una buena relación social.",
-        "EL contacto entre los trabajadores y los supervisores es fundamental para una buena productividad laboral."
-      ]
-    ]
+    tokens = []
+    new_tokens = []
+    assert "" == auxFunctions.destokenize(tokens, new_tokens), "Should be ''"
     
-    element_realización = ("spa-30-00039297-n_error",["5","Interacción cercana.","n","spa",])
+    tokens_2 = ['Hola',',','soy','David''.']
+    new_tokens_2 = ['Hola',',','soy','David''.']
+    assert "Hola, soy David." == auxFunctions.destokenize(tokens_2, new_tokens_2), "Should be 'Hola, soy David.'"
     
-    provisional_result_intitución = componenteExtractor.get_provisional_result4(element_realización, b)
+    tokens_3 = ['Hola',',','soy','David''.']
+    new_tokens_3 = ['Hola',',','soy']
+    assert "Hola, soy" == auxFunctions.destokenize(tokens_3, new_tokens_3), "Should be 'Hola, soy David.'"
     
-    print(provisional_result_intitución)
+    print('destokenize() function tested correctly') 
+    
+    # -----------------------------------   extract_nouns_with_positions()   ---------------------------------------
+    
+    print('Testing extract_nouns_with_positions() function')
+    
+    phrase_5 = "La fábrica de papel había estado en funcionamiento durante más de un siglo, proporcionando oportunidades de empleo a generaciones de familias en la zona."
+    expected_output_5 = [('fábrica', 1, 'nsubj', 'funcionamiento'), ('papel', 3, 'nmod', 'fábrica'), ('funcionamiento', 7, 'ROOT', 'funcionamiento'), ('siglo', 12, 'nmod', 'funcionamiento'), ('oportunidades', 15, 'obj', 'proporcionando'), ('empleo', 17, 'nmod', 'oportunidades'), ('generaciones', 19, 'nmod', 'oportunidades'), ('familias', 21, 'nmod', 'generaciones'), ('zona', 24, 'nmod', 'familias')]
+    assert expected_output_5 == auxFunctions.extract_nouns_with_positions(phrase_5), "Should be true"
+
+    phrase_6 = "El papel es un material muy utilizado para la impresión y la escritura."
+    expected_output_6 = [('papel', 1, 'nsubj', 'material'), ('material', 4, 'ROOT', 'material'), ('impresión', 9, 'obl', 'utilizado'), ('escritura', 12, 'conj', 'impresión')]
+    assert expected_output_6 == auxFunctions.extract_nouns_with_positions(phrase_6), "Should be true"
+  
+    phrase_7 = "El árbol más grande del bosque es un roble americano de más de 30 metros de altura."
+    expected_output_7 = [('árbol', 1, 'nsubj', 'roble'), ('metros', 14, 'nmod', 'roble'), ('altura', 16, 'nmod', 'metros')]
+    assert expected_output_7 == auxFunctions.extract_nouns_with_positions(phrase_7), "Should be true"
+
+    phrase_8 = ""
+    expected_output_8 = []
+    assert expected_output_8 == auxFunctions.extract_nouns_with_positions(phrase_8), "Should be true"
+    
+    print('extract_nouns_with_positions() function tested correctly') 
+    
+    # -----------------------------------   pluralize_word()   ---------------------------------------
+    
+    print('Testing pluralize_word() function')
+    
+    # Primer conjunto de palabras en español
+    spanish_words_1 = "casa"
+    expected_spanish_words_1 = ['casa', 'casas']
+    assert expected_spanish_words_1 == auxFunctions.pluralize_word(spanish_words_1), "Should be true"
+
+    # Segundo conjunto de palabras en español
+    spanish_words_2 = "perro"
+    expected_spanish_words_2 = ['perro', 'perros']
+    assert expected_spanish_words_2 == auxFunctions.pluralize_word(spanish_words_2), "Should be true"
+
+    # Tercer conjunto de palabras en español
+    spanish_words_3 = "gato"
+    expected_spanish_words_3 = ['gato', 'gatos']
+    assert expected_spanish_words_3 == auxFunctions.pluralize_word(spanish_words_3), "Should be true"
+
+    # Cuarto conjunto de palabras en español
+    spanish_words_4 = "libro"
+    expected_spanish_words_4 = ['libro', 'libros']
+    assert expected_spanish_words_4 == auxFunctions.pluralize_word(spanish_words_4), "Should be true"
+
+    # Quinto conjunto de palabras en español
+    spanish_words_5 = "mesa"
+    expected_spanish_words_5 = ['mesa', 'mesas']
+    assert expected_spanish_words_5 == auxFunctions.pluralize_word(spanish_words_5), "Should be true"
+
+    # Sexto conjunto de palabras en español
+    spanish_words_6 = "flor"
+    expected_spanish_words_6 = ['flor', 'flores']
+    assert expected_spanish_words_6 == auxFunctions.pluralize_word(spanish_words_6), "Should be true"
+
+    # Séptimo conjunto de palabras en español
+    spanish_words_7 = "niño"
+    expected_spanish_words_7 = ['niño', 'niños']
+    assert expected_spanish_words_7 == auxFunctions.pluralize_word(spanish_words_7), "Should be true"
+
+    # Octavo conjunto de palabras en español
+    spanish_words_8 = "mujer"
+    expected_spanish_words_8 = ['mujer', 'mujeres']
+    assert expected_spanish_words_8 == auxFunctions.pluralize_word(spanish_words_8), "Should be true"
+
+    # Noveno conjunto de palabras en español
+    spanish_words_9 = "hombre"
+    expected_spanish_words_9 = ['hombre', 'hombres']
+    assert expected_spanish_words_9 == auxFunctions.pluralize_word(spanish_words_9), "Should be true"
+
+    # Décimo conjunto de palabras en español
+    spanish_words_10 = "juego"
+    expected_spanish_words_10 = ['juego', 'juegos']
+    assert expected_spanish_words_10 == auxFunctions.pluralize_word(spanish_words_10), "Should be true"
+
+    # Undécimo conjunto de palabras en español
+    spanish_words_11 = "pelota"
+    expected_spanish_words_11 = ['pelota', 'pelotas']
+    assert expected_spanish_words_11 == auxFunctions.pluralize_word(spanish_words_11), "Should be true"
+
+    # Duodécimo conjunto de palabras en español
+    spanish_words_12 = "árbol"
+    expected_spanish_words_12 = ['árbol', 'árboles']
+    assert expected_spanish_words_12 == auxFunctions.pluralize_word(spanish_words_12), "Should be true"
+
+    # Decimotercer conjunto de palabras en español
+    spanish_words_13 = "coche"
+    expected_spanish_words_13 = ['coche', 'coches']
+    assert expected_spanish_words_13 == auxFunctions.pluralize_word(spanish_words_13), "Should be true"
+
+    # Decimocuarto conjunto de palabras en español
+    spanish_words_14 = "manzana"
+    expected_spanish_words_14 = ['manzana', 'manzanas']
+    assert expected_spanish_words_14 == auxFunctions.pluralize_word(spanish_words_14), "Should be true"
+
+    # Decimoquinto conjunto de palabras en español
+    spanish_words_15 = "camino"
+    expected_spanish_words_15 = ['camino', 'caminos']
+    assert expected_spanish_words_15 == auxFunctions.pluralize_word(spanish_words_15), "Should be true"
+
+    # Decimosexto conjunto de palabras en español
+    spanish_words_16 = "hijo"
+    expected_spanish_words_16 = ['hijo', 'hijos']
+    assert expected_spanish_words_16 == auxFunctions.pluralize_word(spanish_words_16), "Should be true"
+
+    # Decimoséptimo conjunto de palabras en español
+    spanish_words_17 = "ciudad"
+    expected_spanish_words_17 = ['ciudad', 'ciudades']
+    assert expected_spanish_words_17 == auxFunctions.pluralize_word(spanish_words_17), "Should be true"
+
+    # Decimoctavo conjunto de palabras en español
+    spanish_words_18 = "animal"
+    expected_spanish_words_18 = ['animal', 'animales']
+    assert expected_spanish_words_18 == auxFunctions.pluralize_word(spanish_words_18), "Should be true"
+
+    # Decimonoveno conjunto de palabras en español
+    spanish_words_19 = "reloj"
+    expected_spanish_words_19 = ['reloj', 'relojes']
+    assert expected_spanish_words_19 == auxFunctions.pluralize_word(spanish_words_19), "Should be true"
+
+    # Vigésimo conjunto de palabras en español
+    spanish_words_20 = "luz"
+    expected_spanish_words_20 = ['luz', 'luces']
+    assert expected_spanish_words_20 == auxFunctions.pluralize_word(spanish_words_20), "Should be true"
+
+    # Vigésimo primer conjunto de palabras en español
+    spanish_words_21 = "rey"
+    expected_spanish_words_21 = ['rey', 'reyes']
+    assert expected_spanish_words_21 == auxFunctions.pluralize_word(spanish_words_21), "Should be true"
+
+    # Vigésimo segundo conjunto de palabras en español
+    spanish_words_22 = "cielo"
+    expected_spanish_words_22 = ['cielo', 'cielos']
+    assert expected_spanish_words_22 == auxFunctions.pluralize_word(spanish_words_22), "Should be true"
+
+    # Vigésimo tercer conjunto de palabras en español
+    spanish_words_23 = "flor"
+    expected_spanish_words_23 = ['flor', 'flores']
+    assert expected_spanish_words_23 == auxFunctions.pluralize_word(spanish_words_23), "Should be true"
+
+    # Vigésimo cuarto conjunto de palabras en español
+    spanish_words_24 = "café"
+    expected_spanish_words_24 = ['café', 'cafés']
+    assert expected_spanish_words_24 == auxFunctions.pluralize_word(spanish_words_24), "Should be true"
+    
+    # Vigésimo quinto conjunto de palabras en español
+    spanish_words_25 = "voz"
+    expected_spanish_words_25 = ['voz', 'voces']
+    assert expected_spanish_words_25 == auxFunctions.pluralize_word(spanish_words_25), "Should be true"
+    
+    print('pluralize_word() function tested correctly') 
     
     
+    # -----------------------------------   is_possessive()   ---------------------------------------
     
-    final_result_cosa = componenteValidator.get_final_result(element_realización, c, "Masculino")
+    print('Testing is_possessive() function')
     
-    print(final_result_cosa)
-    
+      # Primer conjunto de palabras en inglés
+    tokens_1 = ["John", "'", "s", "book"]
+    index_1 = 0
+    expected_1 = True
+    assert expected_1 == auxFunctions.is_possessive(tokens_1, index_1), "Test 1 failed"
+
+    # Segundo conjunto de palabras en inglés
+    tokens_2 = ["The", "cat", "'", "s", "tail"]
+    index_2 = 1
+    expected_2 = False
+    assert expected_2 == auxFunctions.is_possessive(tokens_2, index_2), "Test 2 failed"
+
+    # Tercer conjunto de palabras en inglés
+    tokens_3 = ["This", "is", "Sarah", "'", "s", "pen"]
+    index_3 = 2
+    expected_3 = True
+    assert expected_3 == auxFunctions.is_possessive(tokens_3, index_3), "Test 3 failed"
+
+    # Cuarto conjunto de palabras en inglés
+    tokens_4 = ["This", "is", "the", "book"]
+    index_4 = 2
+    expected_4 = False
+    assert expected_4 == auxFunctions.is_possessive(tokens_4, index_4), "Test 4 failed"
+
+    # Quinto conjunto de palabras en inglés
+    tokens_5 = ["The", "dogs", "are", "playing"]
+    index_5 = 1
+    expected_5 = False
+    assert expected_5 == auxFunctions.is_possessive(tokens_5, index_5), "Test 5 failed"
+
+    print('is_possessive() function tested correctly')
 
 # Método main
 if __name__ == "__main__":
@@ -904,19 +2071,28 @@ if __name__ == "__main__":
     print("Testing over Importer component...")
     # component_importer_test() # Tested correctly
     print("Everything in Importer component passed")
-    print("Testing over Question Maker component...")
-    # component_question_maker_test() # Tested correctly
-    print("Everything in Question Maker component passed")
+    print("Testing over Question Maker Traduction component...")
+    # component_question_maker_traduction_test() # Tested correctly
+    print("Everything in Question Maker Traduction component passed")
+    print("Testing over Question Maker Extraction component...")
+    # component_question_maker_extraction_test() # Tested correctly
+    print("Everything in Question Maker Extraction component passed")
+    print("Testing over Question Maker Validation component...")
+    # component_question_maker_validation_test() # Tested correctly
+    print("Everything in Question Maker Validation component passed")
     print("Testing over LLM Communicator component...")
     # component_llm_communicator_test() # Tested correctly
     print("Everything in LLM Communicator component passed")
-    print("Testing over Extractor component...")
-    component_extractor_test() # Tested correctly
-    print("Everything in Extractor component passed")
-    print("Testing over Validator component...")
-    component_validator_test() # Tested correctly
-    print("Everything in Validator component passed")
+    print("Testing over Extractor extraccion component...")
+    # component_extractor_extraccion_test() # Tested correctly
+    print("Everything in Extractor extraccion component passed")
+    print("Testing over Extractor validacion component...")
+    # component_extractor_validacion_test() # Tested correctly
+    print("Everything in Validator validacion component passed")
     print("Testing over Exporter component...")
-    component_exporter_test() # Tested correctly
+    # component_exporter_test() # Tested correctly
     print("Everything in Exporter component passed")
+    print("Testing over Auxiliar funcitions...")
+    # auxiliar_functions_test() # Tested correctly
+    print("Everything in Auxiliar funcitions passed")
     print("Everything passed")

@@ -12,7 +12,7 @@ null_extraccion = 0
 null_validacion = 0
 
 # Leer el archivo JSON
-with open('./files/source_information.json', 'r', encoding='utf-8') as file:
+with open('./files/knowledge_table.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 # Procesar cada elemento en el archivo JSON

@@ -26,7 +26,7 @@ class ComponenteLLMCommunicator:
         output = self.llm(
             question, # Prompt
             max_tokens= 200, # Generate up to 200 tokens, set to None to generate up to the end of the context window
-            stop = [ "Question: ", "Explanation: "], # Stop generating just before the model would generate a new question
+            stop = [ "Question: ", "Explanation: ", "Q: ", "Explicación: "], # Stop generating just before the model would generate a new question
             temperature = 0.1, # Ajusta la aleatoriedad del texto generado (predeterminado: 0,8).  
             echo=True # Echo the prompt back in the output
         )

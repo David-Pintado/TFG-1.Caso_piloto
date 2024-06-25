@@ -13,7 +13,7 @@ def get_final_result(element, llm_extracted_answer_list, provisional_result):
     con la palabra en el género de provisional_result
     
     Parámetros:
-        - element = Elemento de la estructura de datos source_information, compuesto por key + attributes
+        - element = Elemento de la estructura de datos knowledge_table, compuesto por key + attributes
         - llm_extracted_answer_list (list) = Lista que se compone de una lista
                         - Contiene frases con la palabra en género provisional_result
     Retorna:

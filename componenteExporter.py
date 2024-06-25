@@ -5,10 +5,14 @@ class ComponenteExporter:
     def __init__(self, exploited_information_file_path):
         self.exploited_information_file_path = exploited_information_file_path
 
-    def export_knowledge(self, source_information):
+    def export_knowledge(self, knowledge_table):
+        
+            
+        """Función para exportar los resultados almacenados en knowledge_table en un archivo.
+        """
         
         with open(self.exploited_information_file_path, 'w', encoding='utf-8') as f:
-            for (offset_word,attributes) in source_information.items():
+            for (offset_word,attributes) in knowledge_table.items():
                 
                 # Extraccion de los elementos que van a formar parte de la exportacion
                 offset_word_splitted = offset_word.split('_')
