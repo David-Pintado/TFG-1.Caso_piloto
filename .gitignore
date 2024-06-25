@@ -10,6 +10,11 @@
 /knowledge_table_sin_gloss.json
 /wei_spa_30_word_genders.csv
 /Zephyr-7b-beta.txt
+venv/
+env/
+*.pyc
+__pycache__/
+.DS_Store
 /__pycache__
 auxFunctionLibrary/pythonLib/__pycache__/__init__.cpython-310.pyc
 auxFunctionLibrary/pythonLib/__pycache__/auxFunctions.cpython-310.pyc
