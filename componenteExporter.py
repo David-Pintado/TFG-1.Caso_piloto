@@ -8,7 +8,15 @@ class ComponenteExporter:
     def export_knowledge(self, knowledge_table):
         
             
-        """Función para exportar los resultados almacenados en knowledge_table en un archivo.
+        """
+        Método para exportar los resultados almacenados en `knowledge_table` a un archivo específico.
+
+            Parámetros:
+                - self: instancia de la clase que contiene este método.
+                - knowledge_table (dict): Un diccionario que contiene la información a exportar, compuesto por key + attributes.
+            Retorna:
+                - None: Este método no retorna ningún valor, pero crea un fichero con los datos del proceso.
+
         """
         
         with open(self.exploited_information_file_path, 'w', encoding='utf-8') as f:

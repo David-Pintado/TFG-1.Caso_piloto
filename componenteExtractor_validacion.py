@@ -6,85 +6,31 @@ from pythonLib import auxFunctions
 from unidecode import unidecode
 from nltk.tokenize import RegexpTokenizer
 
-def extract_llm_answers(llm_answer):
-    
-    """Función para extraer la respuesta del LLM. Si en la respuesta hay separadores de oraciones forma una lista con todas ellas.
-        Si no contiene separadores, (es una única frase) devuelve un solo String
-    
-        Parámetros:
-            - llm_answer = Respuesta del LLM sin tratar
-        Retorna:
-            - llm_extracted_answer (Lista o String). Respuesta del LLM extraída. 
-            
-    """
-
-    # Extraer el texto devuelto
-    return_answer_value = llm_answer['choices'][0]['text']
-    # Dividirlo en dos partes (la parte de la pregunta, la parte de la respuesta)
-    llm_extracted_answer = return_answer_value.split('Answer:')[1]
-    # Eliminar los saltos de linea
-    llm_extracted_answer = llm_extracted_answer.replace('\n',' ').replace('\n\n',' ').strip()
-    # Comprabar si tiene separadores de frases. Si no tiene es que es una traduccion
-    if(re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != [] and (len(re.split(r'\d+\)|\d+\.', llm_extracted_answer)) >= 4)):    
-        # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto como criterio de separación
-        llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:]
-        # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
-        # Quitar las comillas y barras de las frases
-        llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
-        return llm_extracted_answer
-    # Comprobar si tiene más de una frase. En ese caso puede que no tenga separadores pero que sean un conjunto de frases
-    elif(len(llm_extracted_answer.split('. ')) >= 4):
-        # Compilar la expresión regular directamente sin escapar
-        llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('. ')]
-        # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
-        # Quitar las comillas y barras de las frases
-        llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
-        return llm_extracted_answer
-    # Comprobar si tiene más de una frase (; ). En ese caso puede que no tenga separadores pero que sean un conjunto de frases
-    elif(len(llm_extracted_answer.split('; ')) >= 4):
-        # Compilar la expresión regular directamente sin escapar
-        llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('; ')]
-        # Quitar los espacios blancos del principio y final de las frases 
-        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
-        # Quitar las comillas y barras de las frases
-        llm_extracted_answer = [answer.replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "") for answer in llm_extracted_answer]
-        return llm_extracted_answer
-    # Si es una traducción tratarla
-    if type(llm_extracted_answer) is list:
-        if len(llm_extracted_answer) > 0:
-            llm_extracted_answer = llm_extracted_answer[0]
-        elif len(llm_extracted_answer) == 0:
-            llm_extracted_answer = ""
-    llm_extracted_answer = llm_extracted_answer.split(". ")[0].strip()
-    llm_extracted_answer = llm_extracted_answer.strip().replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "").capitalize()
-    if not llm_extracted_answer.endswith('.'):
-        llm_extracted_answer += '.'
-    print(llm_extracted_answer)
-    return llm_extracted_answer
-
 
 def get_result(element, llm_answer_list):
     
-    """Función para el obtener el resultado (género de las palabras) de la fase de validación.
-    
-       Parámetros:
-        - element = Elemento de la estructura de datos knowledge_table, compuesto por key + attributes
-        - llm_answer_list (list) = Lista que se compone de respuestas del LLM que necesitan ser extraídas
-       Retorna:
-        - result (Lista)
+    """
+    Método para obtener el resultado (género de las palabras) de la fase de validación.
+        
+        Parámetros:
+            - element (dict): Elemento de la estructura de datos 'knowledge_table', compuesto por key + attributes
+            - llm_answer_list (List[str]) = Lista que se compone de respuestas del LLM que necesitan ser tratadas
+
+        Retorna:
+            -  result (List[str])
                 - ["Masculino"]: La palabra es de género masculino
                 - ["Femenino"]: La palabra es de género femenino
-                - ["NULL", correctas, tipos_incorrectas, mensajes]: No se ha conseguido encontrar el género de la palabra
+                - ["NULL", correct (dict), incorrect_1 (dict), incorrect_2 (dict), incorrect_3 (dict), message (dict)]: 
+                        No se ha conseguido encontrar el género de la palabra
     """
+
     # Lista de respuesta extraídas del LLM
     llm_extracted_answer_list = []
     for llm_answer in llm_answer_list:
-        llm_extracted_answer_list.append(extract_llm_answers(llm_answer))
+        llm_extracted_answer_list.append(auxFunctions.extract_llm_answers_set_of_phrases(llm_answer))
 
     # Mensaje de información del estado de la entrada
-    message = "La entrada ha terminado su ejecución en la validación del resultado provisional."
+    message = "La entrada ha terminado su ejecución en la fase de validación."
     # Correctas: Frases correctas en las que se suman puntos.
     count_correct = 0
     # Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.
@@ -149,6 +95,7 @@ def get_result(element, llm_answer_list):
                 list_of_word_appearences.append(word_appearence)
         if len(list_of_word_appearences) != 0:
             nouns_with_positions = auxFunctions.extract_nouns_with_positions(phrase)
+            print(nouns_with_positions)
             word_position_list = list(position for (noun, position, _, _) in nouns_with_positions if noun in list_of_word_appearences)
             if len(word_position_list) >= 1:
                 word_position = word_position_list[0]

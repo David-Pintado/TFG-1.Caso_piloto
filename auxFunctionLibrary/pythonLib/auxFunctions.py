@@ -11,19 +11,18 @@ nltk.download('averaged_perceptron_tagger')
 nlp = spacy.load("es_core_news_sm")
 
 def pluralize_word(word):
-    """Función para obtener la forma plural de una palabra (En el caso de que esta sea plural, devolverá su plural)
-       En el caso de que la palabra sea compuesta, devolverá las permutaciones plurales de esa palabra en español
-       
-       Parámetros:
-        - word (string)= Palabra a pluralizar (Puede ser simple o compuesta)
-        
-       Retorna:
-        - pluralize_words_list (Array<string>)
-                - Si la palabra es simple la lista contendrá solo un elemento
-                - Si la palabra es compuesta la lista contendrá las permutaciones plurales de la palabra
-                    () 
+    
     """
-    # Lista de sufijos comunes para la formación del plural en español
+    Método para obtener la forma plural de una palabra en castellano. Si word es una palabra compuesta,
+    devuelve las permutaciones plurales de esa palabra.
+    
+        Parámetros:
+            - word (str): Palabra en castellano a pluralizar
+        Retorna:
+            - pluralize_words_list (List[str]): Lista de plurales de la palabra. Incluye la forma singular
+    """
+    
+    # Lista de sufijos comunes para la formación del plural en castellano
     suffixes = {
         'z': 'ces',
         'l': 'les',
@@ -67,15 +66,15 @@ def pluralize_word(word):
 
 
 def extract_nouns_with_positions(sentence):
+        
     """
-    Extrae los sustantivos de una frase junto con sus posiciones, excluyendo los que son parte de compuestos.
-
-    Args:
-    sentence (str): La frase de la que se extraerán los sustantivos.
-
-    Returns:
-    List[Tuple[str, int, str, str]]: Una lista de tuplas que contiene el sustantivo, su posición,
-                                     su dependencia y la palabra cabeza.
+    Método que extrae los sustantivos de una frase junto con sus posiciones.
+    
+        Parámetros:
+            - sentence (str): Oración sobre la que extraer los sustantivos
+        Retorna:
+            - nouns_with_positions (List[Tuple[str, int]]): Lista de tuplas que contienen el sustantivo junto a su posición 
+                                                            en la frase 'sentence' tokenizada
     """
     
     # Procesar la frase
@@ -87,17 +86,27 @@ def extract_nouns_with_positions(sentence):
     return nouns_with_positions
 
 def destokenize(original_tokens, new_tokens):
-    """Reconstruye una oración a partir de una lista de tokens, manejando contracciones y posesivos."""
+    
+    """
+    Método que reconstruye una oración a partir de una lista de tokens, manejando contracciones y posesivos.
+    
+        Parámetros:
+            - original_tokens (List[str]): Lista de tokens de la oración completa. Necesaria para saber información sobre cada token
+            - new_tokens (List[str]): Sublista de tokens de original_tokens.
+        Retorna:
+            - sentence (str): Oración resultante de la correcta unión de los tokens    
+    """
+    
     sentence = ''
     for i, token in enumerate(new_tokens):
-        # Check if the current token is a possessive
+        # Comprobar si el token actual es un posesivo
         is_current_possessive = is_possessive(original_tokens, i)
         
-        # Check for word-word junction (excluding punctuation and special cases)
+        # Verificar la unión palabra-palabra (excluyendo puntuación y casos especiales)
         if re.match(r'\w', token) and re.match(r'\w', new_tokens[i - 1]) and token not in ['.', ',', '!', '?', ':', ';'] and new_tokens[i - 1] not in ['¿', '¡']:
-            # Handle contractions (ends with "'s")
+            # Manejar las contracciones (termina en "'s")
             if re.match(r'\w', token) and i <= len(new_tokens) - 3 and new_tokens[i + 1] == "'" and not new_tokens[i + 2] == "s":
-                # If the current token is a possessive, don't add extra space
+                # Si el token actual es posesivo, no agregar espacio adicional
                 if is_current_possessive:
                     sentence += ' ' + token
                 else:
@@ -107,7 +116,7 @@ def destokenize(original_tokens, new_tokens):
             else:
                 sentence += ' ' + token
         else:
-            # Handle spaces after sentence-ending punctuations
+            # Manejar espacios después de las puntuaciones al final de la oración
             if token in [')',';',':',',','.', '!','¡','¿','?'] and i < len(new_tokens) - 1:
                 sentence += token + ' '
             elif token == "(":
@@ -117,10 +126,21 @@ def destokenize(original_tokens, new_tokens):
                     sentence += ' ' + token
                 else:
                     sentence += token
-    return sentence.strip()  # Remove leading/trailing spaces
+    return sentence.strip()  # Eliminar espacios iniciales/finales
 
 def is_possessive(tokens, index):
-    """Determina si la palabra en el índice dado es un posesivo."""
+    
+    """
+    Método para determinar si una palabra correspondiente al índice de una lista de tokens es un posesivo.
+    
+        Parámetros:
+            - tokens (List[str]): Lista de tokens
+            - index (number): Índice
+        Retorna:
+            - Valor booleano (True/False)
+            
+    """
+    
     # Etiquetar las partes de la oración
     pos_tags = nltk.pos_tag(tokens)
     
@@ -133,3 +153,92 @@ def is_possessive(tokens, index):
                 return True
     
     return False
+
+def extract_llm_answers_translation(llm_answer):
+    
+    """
+    Método para extraer la respuesta del LLM.
+    
+        Parámetros:
+            - llm_answer (str): Respuesta del LLM sin tratar. Contiene una única frase
+        Retorna:
+            - llm_extracted_answer (str): Respuesta del LLM extraída. 
+            
+    """
+    
+    # Eliminar los saltos de linea
+    llm_extracted_answer = llm_answer.replace('\n',' ').replace('\n\n',' ').strip()
+    # Si es una traducción tratarla
+    if type(llm_extracted_answer) is list:
+        if len(llm_extracted_answer) > 0:
+            llm_extracted_answer = llm_extracted_answer[0]
+        elif len(llm_extracted_answer) == 0:
+            llm_extracted_answer = ""
+    llm_extracted_answer = llm_extracted_answer.split(". ")[0].strip()
+    llm_extracted_answer = llm_extracted_answer.strip("'")
+    llm_extracted_answer = llm_extracted_answer.strip().replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "").capitalize()
+    if not llm_extracted_answer.endswith('.'):
+        llm_extracted_answer += '.'
+    return llm_extracted_answer
+
+
+def extract_llm_answers_set_of_phrases(llm_answer):
+    
+    """
+    Método para extraer la respuesta del LLM.
+    
+        Parámetros:
+            - llm_answer (str): Respuesta del LLM sin tratar. Contiene separadores de oraciones 
+        Retorna:
+            - llm_extracted_answer (List[str]): Respuesta del LLM extraída. Se forma una lista con las frases.
+            
+    """
+
+    # Eliminar los saltos de línea
+    llm_extracted_answer = llm_answer.replace('\n', ' ').replace('\n\n', ' ').strip()
+    # Comprobar si tiene separadores de frases.
+    if re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != [] and len(re.split(r'\d+\)|\d+\.', llm_extracted_answer)) >= 4:    
+        # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto o paréntesis como criterio de separación
+        llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:]
+        # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
+        # Quitar las comillas y barras de las frases
+        llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        return llm_extracted_answer
+    # Comprobar si tiene más de una frase separada por un punto seguido de un espacio
+    elif len(llm_extracted_answer.split('. ')) >= 4:
+        # Dividir el texto en frases utilizando el punto seguido de un espacio como criterio de separación
+        llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('. ')]
+        # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
+        # Quitar las comillas y barras de las frases
+        llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        return llm_extracted_answer
+    # Comprobar si tiene más de una frase separada por un punto y coma seguido de un espacio
+    elif len(llm_extracted_answer.split('; ')) >= 4:
+        # Dividir el texto en frases utilizando el punto y coma seguido de un espacio como criterio de separación
+        llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('; ')]
+        # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
+        # Quitar las comillas y barras de las frases
+        llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        return llm_extracted_answer
+    # Si no cumple ninguna de las condiciones anteriores, devolver la respuesta sin tratar
+    return llm_extracted_answer
+
+
+def save_json(file_path, json):
+    
+    """
+    Método para guardar datos JSON en un archivo en la ruta proporcionada.
+
+        Parámetros:
+            - file_path (str): Ruta completa donde se guarda el archivo JSON.
+            - json_data (str): Datos JSON que se escriben en el archivo.
+
+        Retorna:
+            - None
+    """
+    
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(json)

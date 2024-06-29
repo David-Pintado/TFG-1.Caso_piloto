@@ -8,9 +8,18 @@ class ComponenteLLMCommunicator:
         self.language_model_path = language_model_path 
         self.llm = None
 
-    # Metodo para cargar el modelo
     def load_model(self):
-        # load the model
+        
+        """
+        Método para cargar el modelo de lenguaje.
+
+            Parámetros:
+                - self: instancia de la clase que contiene este método.
+
+            Retorna:
+                - None: Este método no retorna ningún valor, pero carga el modelo en el atributo `llm` de la instancia.
+        """
+        
         print("Loading the model...")
         try:
             self.llm = Llama(model_path= self.language_model_path)
@@ -18,19 +27,36 @@ class ComponenteLLMCommunicator:
             print(f'LLM "{self.language_model_path}" no encontrado. Vuelve a introducir una nueva ruta') 
         print("Model loaded.")
     
-    # Metodo para realizar la pregunta al modelo. Devuelve lo obtenido.
+
     def run_the_model(self, prompt):
-        # run the model
+        
+        """
+        Método para ejecutar el modelo de lenguaje con un prompt dado y retornar la respuesta generada.
+
+            Parámetros:
+                - self: instancia de la clase que contiene este método.
+                - prompt (str): El prompt o pregunta que se envía al modelo.
+
+            Retorna:
+                - llm_answer (str): La respuesta generada por el modelo después de procesar el prompt.
+        """
+
         print("Running model...")
         question = f"Question: {prompt} Answer:"
         output = self.llm(
             question, # Prompt
-            max_tokens= 200, # Generate up to 200 tokens, set to None to generate up to the end of the context window
-            stop = [ "Question: ", "Explanation: ", "Q: ", "Explicación: "], # Stop generating just before the model would generate a new question
+            max_tokens= 200,  # Genera hasta 200 tokens, (None para generar hasta el final de la ventana de contexto)
+            stop = [ "Question: ", "Explanation: ", "Q: ", "Explicación: "], # Para el proceso cuando encuentra una nueva pregunta o una explicación
             temperature = 0.1, # Ajusta la aleatoriedad del texto generado (predeterminado: 0,8).  
-            echo=True # Echo the prompt back in the output
+            echo=True # Repite el mensaje nuevamente en la salida.
         )
         
-        print(json.dumps(output, indent=2, ensure_ascii=False))
+        # Imprimir la respuesta del LLM por consola
+        # print(json.dumps(output, indent=2, ensure_ascii=False))
         
-        return output
+        # Extraer el texto devuelto
+        llm_answer = output['choices'][0]['text']
+        # Dividirlo en dos partes (la parte de la pregunta, la parte de la respuesta). Obtener la respuesta
+        llm_answer = llm_answer.split('Answer:')[1]
+        
+        return llm_answer

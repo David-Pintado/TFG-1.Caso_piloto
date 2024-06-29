@@ -8,9 +8,22 @@ class ComponenteImporter:
         self.eng_synset_file = eng_synset_file
         self.most_used_words_file = most_used_words_file
 
-    # Método para generar el 'knowledge_table', un diccionario que sigue el siguiente esquema: 
-    #   Key=offset_word. Value = gloss, sense, part_of_speech, language
+
     def generate_data_structure(self):
+        
+        """
+        Método para generar una estructura de datos del WordNet en castellano.
+           
+            Parámetros:
+                - self: instancia de la clase que contiene este método.
+
+            Retorna:
+                - knowledge_table (dict): Un diccionario que contiene los datos necesarios del WordNet en castellano
+                                          para llevar a cabo el proceso de explotación de conocimiento en LLMs
+                        - key: offset_word
+                        - attributes: [sense, gloss, part_of_speech, language]
+        """
+        
         knowledge_table = {}
         offsets_glosses_array = {}
         words_set = {}
@@ -25,7 +38,7 @@ class ComponenteImporter:
             print(f'Archivo "{self.most_used_words_file}" no encontrado. Vuelve a introducir una nueva ruta') 
             
         # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario llamado offsets_glosses_array
-        # El esquema de este es: Key=offset. Value = gloss
+        # El esquema que sigue es: Key=offset. Value = gloss
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
             with open(self.spa_synset_file, 'r', encoding="utf-8") as archivo:
@@ -49,7 +62,7 @@ class ComponenteImporter:
             print(f'Archivo "{self.spa_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
         # Leer el archivo que contiene los variant en español y almacenarlo en un diccionario llamado knowledge_table
-        # El esquema de este es: Key=offset_word. Value = sense, part_of_speech, language
+        # El esquema que sigue es: Key=offset_word. Value = [sense, part_of_speech, language]
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
             with open(self.spa_variant_file, 'r', encoding="utf-8") as archivo:
@@ -76,22 +89,22 @@ class ComponenteImporter:
                     # Si es un synset en español y el tipo de palabra es sustantivo (noun=n)
                     if language == "spa" and part_of_speech == "n" and word in words_set:
 
-                        # Generar un número aleatorio entre 1 y 10
-                        numero_aleatorio = random.randint(1, 10)
+                        # # Generar un número aleatorio entre 1 y 10
+                        # numero_aleatorio = random.randint(1, 10)
 
-                        # Verificar si el número aleatorio es 1
-                        if numero_aleatorio == 10:
-                            # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
-                            knowledge_table[offset_word] = [sense, part_of_speech, language]
-                            count += 1
-                    if count > 14:
-                        break
+                        # # Verificar si el número aleatorio es 1
+                        # if numero_aleatorio == 10:
+                        # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
+                        knowledge_table[offset_word] = [sense, part_of_speech, language]
+                    #         count += 1
+                    # if count > 14:
+                    #     break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta')   
           
         # Modificar el knowledge_table añadiendo los glosses del offsets_glosses_array
-        # El esquema del knowledge_table será:  Key=offset_word. Value = sense, gloss, part_of_speech, language
+        # Sigue el siguiente esquema:  Key=offset_word. Value= [sense, gloss, part_of_speech, language]
         for word, element in knowledge_table.items(): 
             item_list = []
             item_list = [element[0], offsets_glosses_array[word.split('_')[0]].replace('_',' '), element[1], element[2]]
@@ -99,9 +112,20 @@ class ComponenteImporter:
         
         return knowledge_table
 
-    # Método para generar el data_structure del mcr en ingles. De esta manera las glosses que no tenga el de castellano
-    # se conseguirán de aquí, siendo traducidos por un modelo de lenguaje.
     def generate_eng_data_structure(self):
+        
+        """
+        Método para generar una estructura de datos del WordNet en inglés.
+           
+            Parámetros:
+                - self: instancia de la clase que contiene este método.
+
+            Retorna:
+                - eng_data_structure (dict): Un diccionario que contiene las glosas en inglés asociadas a cada synset.
+                        Los 'keys' son los offsets modificados ('eng' por 'spa') y los valores (attributes)
+                        son las glosas en inglés.
+        """
+          
         eng_data_structure = {}
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
@@ -118,9 +142,3 @@ class ComponenteImporter:
             print(f'Archivo "{self.eng_synset_file}" no encontrado. Vuelve a introducir una nueva ruta')
         
         return eng_data_structure   
-
-    # Método para guardar un archivo json en la ruta proporcionada
-    def save_json(self, file_path, json):
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(json)

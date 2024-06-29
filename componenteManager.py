@@ -4,21 +4,25 @@ import json
 from configparser import ConfigParser
 import sys
 sys.path.append("./auxFunctionLibrary")
-
+from pythonLib import auxFunctions
 from componenteImporter import ComponenteImporter
 from componenteLLMCommunicator import ComponenteLLMCommunicator
 import componenteQuestionMaker_extraccion
 import componenteQuestionMaker_validacion
 import componenteQuestionMaker_traduccion
+import componenteExtractor_traduccionGlosa
 import componenteExtractor_extraccion
 import componenteExtractor_validacion
 from componenteExporter import ComponenteExporter
 
 
 def knowledge_exploitation_process():
-    
-    """Función para realizar la explotación de conocimiento en los LLMs.
-       El resultado final se almacena en un fichero
+
+    """
+    Método para llevar a cabo el proceso completo de explotación de conocimiento en LLMs.
+                    
+        Retorna:
+            - knowledge_table (dic): Diccionario que contiene el conocimiento extraído junto a otros atributos.
     """
     
     config = ConfigParser()
@@ -54,9 +58,9 @@ def knowledge_exploitation_process():
             offset = offset_word.split('_')[0]
             eng_gloss = source_gloss_structure_eng[offset]
             attributes[1] = eng_gloss
-            prompt_traduction = componenteQuestionMaker_traduccion.generate_prompts((offset_word, attributes))
-            llm_answer = componenteLLMCommunicator_extraccion.run_the_model(prompt_traduction)
-            spa_gloss = componenteExtractor_extraccion.extract_llm_answers(llm_answer)
+            prompt_translation_list = componenteQuestionMaker_traduccion.generate_prompts((offset_word, attributes))
+            llm_answer = componenteLLMCommunicator_extraccion.run_the_model(prompt_translation_list[0])
+            spa_gloss = componenteExtractor_traduccionGlosa.get_result(None, [llm_answer])
             knowledge_table[offset_word] = [attributes[0], spa_gloss, attributes[2], attributes[3]]         
     
     # Explotar conocimiento. Se recorre dos veces el knowledge_table para evitar que la carga 
@@ -117,10 +121,10 @@ def knowledge_exploitation_process():
     json_source_gloss_structure_eng = json.dumps(source_gloss_structure_eng, indent=2, ensure_ascii=False)
     
     # Guardar el 'knowledge_table' en formato json en un archivo    
-    componenteImporter.save_json(file_path_knowledge_table_json,json_knowledge_table)
+    auxFunctions.save_json(file_path_knowledge_table_json,json_knowledge_table)
     
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
-    componenteImporter.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
+    auxFunctions.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
     
     # Inicializamos la clase para con la ruta del archivo a exportar
     componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])

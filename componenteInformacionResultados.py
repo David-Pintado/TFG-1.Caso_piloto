@@ -32,9 +32,9 @@ for key, value in data.items():
             incorrect_3_count += value[9].get("Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.", 0)
             total_frases += len(value[4][0]) + len(value[4][1])
         if len(value) > 10:
-            if value[10].get("Mensaje de información") == "La entrada ha terminado su ejecución en la extracción del resultado provisional.":
+            if value[10].get("Mensaje de información") == "La entrada ha terminado su ejecución en la fase de extracción.":
                 null_extraccion += 1
-            elif value[10].get("Mensaje de información") == "La entrada ha terminado su ejecución en la validación del resultado provisional.":
+            elif value[10].get("Mensaje de información") == "La entrada ha terminado su ejecución en la fase de validación.":
                 null_validacion += 1
 
     if len(value) > 7 and value[7] == "NULL":
@@ -45,9 +45,9 @@ for key, value in data.items():
             incorrect_3_count += value[11].get("Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.", 0)
             total_frases += len(value[6][0])
         if len(value) > 11:
-            if value[12].get("Mensaje de información") == "La entrada ha terminado su ejecución en la extracción del resultado provisional.":
+            if value[12].get("Mensaje de información") == "La entrada ha terminado su ejecución en la fase de extracción.":
                 null_extraccion += 1
-            elif value[12].get("Mensaje de información") == "La entrada ha terminado su ejecución en la validación del resultado provisional.":
+            elif value[12].get("Mensaje de información") == "La entrada ha terminado su ejecución en la fase de validación.":
                 null_validacion += 1
 
 # Calcular los porcentajes de frases incorrectas

@@ -1,6 +1,18 @@
 import re
 
 def extract_values(file_path):
+    
+    """
+    Método para extraer los valores de un archivo que contiene los resultados de una experimentación
+        del primer caso piloto.
+    
+        Parámetros:
+            - file_path (str): Path del fichero que contiene los resultados de la experimetación
+        Retorna:
+            - values (dict): Diccionario con los valores extraídos del archivo
+            
+    """
+    
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
 
@@ -20,6 +32,19 @@ def extract_values(file_path):
     return values
 
 def calculate_percentage(part, whole):
+    
+    """
+    Método para calcular el porcentaje de una parte en relación con el total.
+        
+        Parámetros:
+            - part (int o float): La parte del total.
+            - whole (int o float): El total.
+            
+        Retorna:
+            - percentage (float): El porcentaje que representa 'part' del 'whole'. 
+            Retorna 0 si 'whole' es 0 para evitar la división por cero.
+    """
+    
     return (part / whole) * 100 if whole > 0 else 0
 
 # Paths to the input files
