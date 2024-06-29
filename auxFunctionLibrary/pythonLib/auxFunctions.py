@@ -176,7 +176,7 @@ def extract_llm_answers_translation(llm_answer):
             llm_extracted_answer = ""
     llm_extracted_answer = llm_extracted_answer.split(". ")[0].strip()
     llm_extracted_answer = llm_extracted_answer.strip("'")
-    llm_extracted_answer = llm_extracted_answer.strip().replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "").capitalize()
+    llm_extracted_answer = llm_extracted_answer.strip().replace('"', '').replace("\"", "").replace('\\', '').replace("\\\"", "").replace("?", "").replace("¿", "").capitalize()
     if not llm_extracted_answer.endswith('.'):
         llm_extracted_answer += '.'
     return llm_extracted_answer
