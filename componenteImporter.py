@@ -97,7 +97,7 @@ class ComponenteImporter:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         knowledge_table[offset_word] = [sense, part_of_speech, language]
                     #         count += 1
-                    # if count > 14:
+                    # if count > 499:
                     #     break
                         
         except FileNotFoundError:

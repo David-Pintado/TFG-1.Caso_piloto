@@ -37,7 +37,7 @@ def knowledge_exploitation_process():
     file_path_source_gloss_structure_eng = config['file_path']['source_gloss_structure_eng']
     
     # Componente Importer para importar los datos de las fuentes 
-    componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['first_500_most_used_words_spa_file'])
+    componenteImporter = ComponenteImporter(config['file_path']['spa_variant_file'], config['file_path']['spa_synset_file'], config['file_path']['eng_synset_file'], config['file_path']['last_500_most_used_words_spa_file'])
     
     # Componente LLMCommunicator de la fase de extraccion
     componenteLLMCommunicator_extraccion = ComponenteLLMCommunicator(config['file_path']['extraction_results_language_model_path'])
