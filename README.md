@@ -15,10 +15,8 @@ Instrucciones para la configuración del entorno
 Estructura de directorios
 
 your_parent_directory/
-│
 ├── your_project_directory/
 │   ├── your_project_files...
-│
 ├── models/
 │   ├── zephyr-7b-alpha.Q4_K_M.gguf
 │   └── openchat-3.5-0106.Q4_K_M.gguf
