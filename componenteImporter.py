@@ -37,8 +37,8 @@ class ComponenteImporter:
         except FileNotFoundError:
             print(f'Archivo "{self.most_used_words_file}" no encontrado. Vuelve a introducir una nueva ruta') 
             
-        # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario llamado offsets_glosses_array
-        # El esquema que sigue es: Key=offset. Value = gloss
+        # Leer el archivo que contiene los synset en español y almacenarlo en un diccionario auxiliar
+        # llamado offsets_glosses_array. El esquema que sigue es: Key=offset. Value = [gloss]
         try:
             # Intentar abrir el archivo que se encuentra en la ruta proporcionada
             with open(self.spa_synset_file, 'r', encoding="utf-8") as archivo:

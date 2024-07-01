@@ -6,7 +6,7 @@ from pythonLib import auxFunctions
 
 def get_result(element, llm_answer_list):
     
-    """Método para el extraer la traducción de la glosa.
+    """Método para extraer la traducción de la glosa.
     
        Parámetros:
         - element (dict): Elemento de la estructura de datos knowledge_table, compuesto por key + attributes.

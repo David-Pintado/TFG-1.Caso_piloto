@@ -126,7 +126,7 @@ def knowledge_exploitation_process():
     # Guardar el 'source_gloss_structure_eng' en formato json en un archivo    
     auxFunctions.save_json(file_path_source_gloss_structure_eng,json_source_gloss_structure_eng)
     
-    # Inicializamos la clase para con la ruta del archivo a exportar
+    # Inicializar la instancia del Componente Exporter con la ruta del archivo a exportar
     componenteExporter = ComponenteExporter(config['file_path']['exploited_information_file_path'])
     
     # Realizar la exportación

@@ -6,7 +6,6 @@ class ComponenteExporter:
         self.exploited_information_file_path = exploited_information_file_path
 
     def export_knowledge(self, knowledge_table):
-        
             
         """
         Método para exportar los resultados almacenados en `knowledge_table` a un archivo específico.
