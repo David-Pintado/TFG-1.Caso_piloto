@@ -1,5 +1,4 @@
 
-import json
 from llama_cpp import Llama
 
 class ComponenteLLMCommunicator:
@@ -46,7 +45,7 @@ class ComponenteLLMCommunicator:
         output = self.llm(
             question, # Prompt
             max_tokens= 200,  # Genera hasta 200 tokens, (None para generar hasta el final de la ventana de contexto)
-            stop = [ "Question: ", "Explanation: ", "Q: ", "Explicación: "], # Para el proceso cuando encuentra una nueva pregunta o una explicación
+            stop = [ "Question: ", "Explanation: ", "Q: ", "Explicación: ", "\n\n# ¿", "\n\n¿", "\n\nPregunta: ¿"], # Para el proceso cuando encuentra una nueva pregunta o una explicación
             temperature = 0.1, # Ajusta la aleatoriedad del texto generado (predeterminado: 0,8).  
             echo=True # Repite el mensaje nuevamente en la salida.
         )

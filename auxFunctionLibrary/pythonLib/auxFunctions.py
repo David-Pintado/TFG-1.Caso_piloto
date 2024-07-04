@@ -197,31 +197,48 @@ def extract_llm_answers_set_of_phrases(llm_answer):
     # Eliminar los saltos de línea
     llm_extracted_answer = llm_answer.replace('\n', ' ').replace('\n\n', ' ').strip()
     # Comprobar si tiene separadores de frases.
-    if re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != [] and len(re.split(r'\d+\)|\d+\.', llm_extracted_answer)) >= 4:    
+    if re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:] != [] and len(re.split(r'\d+\)|\d+\.', llm_extracted_answer)) >= 5: 
         # Dividir el texto en frases utilizando cualquier secuencia de un número seguido de un punto o paréntesis como criterio de separación
         llm_extracted_answer = re.split(r'\d+\)|\d+\.', llm_extracted_answer)[1:]
         # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
         llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        # Si empieza por '-' eliminarlo
+        llm_extracted_answer = [answer[1:].strip() if answer.startswith('-') else answer for answer in llm_extracted_answer]
         return llm_extracted_answer
     # Comprobar si tiene más de una frase separada por un punto seguido de un espacio
-    elif len(llm_extracted_answer.split('. ')) >= 4:
+    elif len(llm_extracted_answer.split('. ')) >= 5:
         # Dividir el texto en frases utilizando el punto seguido de un espacio como criterio de separación
         llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('. ')]
         # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
         llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        # Si empieza por '-' eliminarlo
+        llm_extracted_answer = [answer[1:].strip() if answer.startswith('-') else answer for answer in llm_extracted_answer]
         return llm_extracted_answer
     # Comprobar si tiene más de una frase separada por un punto y coma seguido de un espacio
-    elif len(llm_extracted_answer.split('; ')) >= 4:
+    elif len(llm_extracted_answer.split('; ')) >= 5:
         # Dividir el texto en frases utilizando el punto y coma seguido de un espacio como criterio de separación
         llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split('; ')]
         # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
         llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
         # Quitar las comillas y barras de las frases
         llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        # Si empieza por '-' eliminarlo
+        llm_extracted_answer = [answer[1:].strip() if answer.startswith('-') else answer for answer in llm_extracted_answer]
+        return llm_extracted_answer
+    # Comprobar si tiene más de una frase separada por un punto y coma seguido de un espacio
+    elif len(llm_extracted_answer.split(', ')) >= 5:
+        # Dividir el texto en frases utilizando el punto y coma seguido de un espacio como criterio de separación
+        llm_extracted_answer = [phrase for phrase in llm_extracted_answer.split(', ')]
+        # Quitar los espacios blancos del principio y final de las frases y asegurarse de que cada frase termine con un punto
+        llm_extracted_answer = [answer.strip() + '.' if not answer.strip().endswith('.') else answer.strip() for answer in llm_extracted_answer]
+        # Quitar las comillas y barras de las frases
+        llm_extracted_answer = [answer.replace('"', '').replace("'", "").replace('\\', '') for answer in llm_extracted_answer]
+        # Si empieza por '-' eliminarlo
+        llm_extracted_answer = [answer[1:].strip() if answer.startswith('-') else answer for answer in llm_extracted_answer]
         return llm_extracted_answer
     # Si no cumple ninguna de las condiciones anteriores, devolver la respuesta sin tratar
     return llm_extracted_answer
