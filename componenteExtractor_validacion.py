@@ -126,7 +126,7 @@ def get_result(element, llm_answer_list):
                 # Sumar Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
                 count_incorrect_1 += 1
         else:
-            # Sumamos a Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+            # Sumar Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
             count_incorrect_2 += 1
         # Vaciar la lista
         list_of_word_appearences = []
