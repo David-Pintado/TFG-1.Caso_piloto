@@ -96,20 +96,70 @@ class ComponenteImporter:
                         # if numero_aleatorio == 10:
                         # Añadimos al diccionario: Key=word. Value = [synset, sense, part_of_speech, language]
                         knowledge_table[offset_word] = [sense, part_of_speech, language]
-                    #         count += 1
-                    # if count > 499:
+                    #     count += 1
+                    # if count > 19:
                     #     break
                         
         except FileNotFoundError:
             print(f'Archivo "{self.spa_variant_file}" no encontrado. Vuelve a introducir una nueva ruta')   
           
+        # Definir los atributos de element que tienen un valor por defecto al inicio del proceso
+        extraction_llm_answers = {
+            "Extraction LLM answers": []
+        }
+        validation_llm_answers = {   
+            "Validation LLM answers": []
+        }
+        extraction_gender = {
+            "Extraction gender": "NULL"
+        }
+        validation_gender = {
+            "Validation gender": "NULL"
+        }  
+        correct_phrases = {
+            "Correctas": 0
+        }
+        incorrect_phrases_1 = {
+            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase": 0
+        }
+        incorrect_phrases_2 = {
+            "Incorrectas de tipo 2: la palabra a analizar no aparece en la frase": 0
+        }
+        incorrect_phrases_3 = {
+            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género": 0
+        }
+        information_message = {
+            "Mensaje de información": "NULL"
+        }
+
         # Modificar el knowledge_table añadiendo los glosses del offsets_glosses_array
-        # Sigue el siguiente esquema:  Key=offset_word. Value= [sense, gloss, part_of_speech, language]
-        for word, element in knowledge_table.items(): 
-            item_list = []
-            item_list = [element[0], offsets_glosses_array[word.split('_')[0]].replace('_',' '), element[1], element[2]]
-            knowledge_table[word] = item_list
-        
+        # Sigue el siguiente esquema:  Key=offset_word. Value= [sense_index, gloss, part_of_speech, language, extraction_llm_answers, validation_llm_answers, extraction_gender, validation_gender, correct_phrases, incorrect_phrases_1, incorrect_phrases_2, incorrect_phrases_3, information_message]
+        for word, element in knowledge_table.items():
+            sense_index = element[0]
+            gloss = offsets_glosses_array[word.split('_')[0]].replace('_', ' ')
+            part_of_speech = element[1]
+            language = element[2]
+            
+            # Crear el nuevo formato de diccionario
+            item_dict = {
+                "Sense index": sense_index,
+                "Gloss": gloss,
+                "Part of speech": part_of_speech,
+                "Language": language,
+                "Extraction LLM answers": extraction_llm_answers["Extraction LLM answers"],
+                "Validation LLM answers": validation_llm_answers["Validation LLM answers"],
+                "Extraction gender": extraction_gender["Extraction gender"],
+                "Validation gender": validation_gender["Validation gender"],
+                "Correctas": correct_phrases["Correctas"],
+                "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase": incorrect_phrases_1["Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase"],
+                "Incorrectas de tipo 2: la palabra a analizar no aparece en la frase": incorrect_phrases_2["Incorrectas de tipo 2: la palabra a analizar no aparece en la frase"],
+                "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género": incorrect_phrases_3["Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género"],
+                "Mensaje de información": information_message["Mensaje de información"]
+            }
+            
+            # Actualizar el knowledge_table con el nuevo formato
+            knowledge_table[word] = item_dict
+
         return knowledge_table
 
     def generate_eng_data_structure(self):

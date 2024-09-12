@@ -17,11 +17,8 @@ def get_result(element, llm_answer_list):
             - llm_answer_list (List[str]) = Lista que se compone de respuestas del LLM que necesitan ser tratadas
 
         Retorna:
-            -  result (List[str])
-                - ["Masculino"]: La palabra es de género masculino
-                - ["Femenino"]: La palabra es de género femenino
-                - ["NULL", correct (dict), incorrect_1 (dict), incorrect_2 (dict), incorrect_3 (dict), message (dict)]: 
-                        No se ha conseguido encontrar el género de la palabra
+            -  element (dict): Elemento de la estructura de datos 'knowledge_table', compuesto por key + attributes
+            con los atributos modificados.    
     """
 
     # Lista de respuesta extraídas del LLM
@@ -33,11 +30,11 @@ def get_result(element, llm_answer_list):
     message = "La entrada ha terminado su ejecución en la fase de validación."
     # Correctas: Frases correctas en las que se suman puntos.
     count_correct = 0
-    # Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.
+    # Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase.
     count_incorrect_1 = 0
-    # Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+    # Incorrectas de tipo 2: la palabra a analizar no aparece en la frase
     count_incorrect_2 = 0
-    # Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+    # Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género
     count_incorrect_3 = 0
     # Variables de puntuación de la categoría del resultado de la fase de extracción
     gender_points = 0
@@ -47,8 +44,6 @@ def get_result(element, llm_answer_list):
     plural_word = auxFunctions.pluralize_word(word)
     # Resultado de la fase
     answer = ""
-    # Resultado del método
-    result = []
     # Marcadores de género femenino
     array_female = [
         'la', 'las', 'una', 'unas', 'esa', 'esta', 'esas', 'estas', 
@@ -67,9 +62,9 @@ def get_result(element, llm_answer_list):
     ]
     # Marcadores del género del resultado de la fase de extracción
     gender_terms = []
-    if element[1][5].lower() == "femenino":
+    if element[1]["Extraction gender"].lower() == "femenino":
         gender_terms = array_female
-    elif element[1][5].lower() == "masculino":
+    elif element[1]["Extraction gender"].lower() == "masculino":
         gender_terms = array_male  
         
     # Umbral general    
@@ -109,7 +104,7 @@ def get_result(element, llm_answer_list):
                         count_correct += 1
                         gender_points += 0.5
                     else:
-                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género
                         count_incorrect_3 += 1
                 elif len(search_article_phrase) > 1:
                     reversed_search_article_phrase = search_article_phrase[::-1][:2]
@@ -120,46 +115,34 @@ def get_result(element, llm_answer_list):
                         count_correct += 1
                         gender_points += 0.5
                     else:
-                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.
+                        # Sumar Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género
                         count_incorrect_3 += 1
             else:
-                # Sumar Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase. en caso de que no haya nouns
+                # Sumar Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase. en caso de que no haya nouns
                 count_incorrect_1 += 1
         else:
-            # Sumar Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.
+            # Sumar Incorrectas de tipo 2: la palabra a analizar no aparece en la frase
             count_incorrect_2 += 1
         # Vaciar la lista
         list_of_word_appearences = []
 
     # Calculamos la diferencia maxima que pueden tener los distintos generos en base a la longitud de la lamina de pruebas 
     if gender_points >=  list_minimum_appearences:
-        answer = element[1][5]
+        answer = element[1]["Extraction gender"]
     else:
         answer = "NULL"
-        
-    # Devolver el contenido completo del resultado de la fase de validación
+    # Comprobar el tipo de resultado obtenido en la fase de validación
     if answer == "NULL":
-        # Primer elemento
-        correct_message = {
-            "Correctas.": count_correct
-        }
-        # Segundo elemento
-        incorrect_message_1 = {
-            "Incorrectas de tipo 1: Generacion de palabras con otro part of speech. La palabra que buscamos no está como noun en la frase.": count_incorrect_1
-        }
-        # Tercer elemento
-        incorrect_message_2 = {
-            "Incorrectas de tipo 2: La palabra que buscamos no aparece en la frase.": count_incorrect_2
-        }
-        # Cuarto elemento
-        incorrect_message_3 = {
-            "Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género.": count_incorrect_3
-        }
-        # Quinto elemento
-        information_message = {
-            "Mensaje de información" : message
-        }
-        result = [answer, correct_message, incorrect_message_1, incorrect_message_2, incorrect_message_3, information_message]
-    else:
-        result = [answer]
-    return result
+        # Modificar el número de frases correctas
+        element[1]["Correctas"] = count_correct
+        # Modificar el número de frases incorrectas de tipo 1
+        element[1]["Incorrectas de tipo 1: Generacion de palabras con otro part of speech. la palabra a analizar no está como sustantivo en la frase"] = count_incorrect_1
+        # Modificar el número de frases incorrectas de tipo 2
+        element[1]["Incorrectas de tipo 2: la palabra a analizar no aparece en la frase"] = count_incorrect_2
+        # Modificar el número de frases incorrectas de tipo 3
+        element[1]["Incorrectas de tipo 3: La palabra aparece en la frase, pero no viene precedida de un articulo que indique su género"] = count_incorrect_3
+        # Modificar el mensaje de información de la fase en la que el proceso acaba
+        element[1]["Mensaje de información"] = message
+    # Modificar el resultado de la fase de extracción
+    element[1]["Validation gender"] = answer
+    return (element[0], element[1])

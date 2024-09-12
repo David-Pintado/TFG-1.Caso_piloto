@@ -2,8 +2,8 @@
 
 class ComponenteExporter:
     
-    def __init__(self, exploited_information_file_path):
-        self.exploited_information_file_path = exploited_information_file_path
+    def __init__(self, knowledge_table_file_path):
+        self.knowledge_table_file_path = knowledge_table_file_path
 
     def export_knowledge(self, knowledge_table):
             
@@ -18,26 +18,22 @@ class ComponenteExporter:
 
         """
         
-        with open(self.exploited_information_file_path, 'w', encoding='utf-8') as f:
+        with open(self.knowledge_table_file_path, 'w', encoding='utf-8') as f:
             for (offset_word,attributes) in knowledge_table.items():
                 
                 # Extraccion de los elementos que van a formar parte de la exportacion
                 offset_word_splitted = offset_word.split('_')
                 offset = offset_word_splitted[0]
                 word = offset_word_splitted[1]
-                sense = attributes[0]
-                gloss = attributes[1]
-                part_of_speech = attributes[2]
-                language = attributes[3]
-                knowledge = ""
-                if attributes[5] == "NULL":
-                    knowledge = "NULL"
-                else:
-                    knowledge = attributes[7]
+                sense_index = attributes["Sense index"]
+                gloss = attributes["Gloss"]
+                part_of_speech = attributes["Part of speech"]
+                language = attributes["Language"]
+                gender = attributes["Validation gender"]
                 final_element = "------"
                 
                 # Almacenar los valores entre comillas en una lista
-                valores_con_comillas = [f'"{offset}"', f'"{word}"', f'"{sense}"', f'"{gloss}"', f'"{part_of_speech}"', f'"{language}"', f'"{knowledge}"', f'"{final_element}"']
+                valores_con_comillas = [f'"{offset}"', f'"{word}"', f'"{sense_index}"', f'"{gloss}"', f'"{part_of_speech}"', f'"{language}"', f'"{gender}"', f'"{final_element}"']
 
                 # Unir los valores con comas
                 line = ', '.join(valores_con_comillas) + ",\n"

@@ -12,9 +12,10 @@ def get_result(element, llm_answer_list):
         - element (dict): Elemento de la estructura de datos knowledge_table, compuesto por key + attributes.
         - llm_answer_list (list): Lista que se compone de respuestas del LLM que necesitan ser extraídas.
        Retorna:
-        - result (str): Traducción de la glosa extraída y tratada.
+        - element (dict): Elemento de la estructura de datos 'knowledge_table', compuesto por key + attributes
+            con los atributos modificados.  
     """
     
-    result = auxFunctions.extract_llm_answers_translation(llm_answer_list[0])
+    element[1]["Gloss"] = auxFunctions.extract_llm_answers_translation(llm_answer_list[0])
 
-    return result
+    return element

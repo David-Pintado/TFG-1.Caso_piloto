@@ -167,7 +167,7 @@ def extract_llm_answers_translation(llm_answer):
     """
     
     # Eliminar los saltos de linea
-    llm_extracted_answer = llm_answer.replace('\n',' ').replace('\n\n',' ').strip()
+    llm_extracted_answer = llm_answer.replace('\n',' ').replace('\n\n',' ').strip().strip(".")
     # Si es una traducción tratarla
     if type(llm_extracted_answer) is list:
         if len(llm_extracted_answer) > 0:

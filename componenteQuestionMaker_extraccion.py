@@ -14,7 +14,7 @@ def generate_prompts(element):
     
     offset_word = element[0]
     word = offset_word.split('_')[1]
-    gloss = element[1][1]
+    gloss = element[1]["Gloss"]
     question1 = f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo '{word}' en género masculino con el sentido de '{gloss}'."
     question2 = f"Como experto en lingüística, proporciona cinco frases utilizando el sustantivo '{word}' en género femenino con el sentido de '{gloss}'."
     prompt_list = [question1, question2]

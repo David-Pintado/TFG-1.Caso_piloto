@@ -73,3 +73,128 @@ llm_load_print_meta: UNK token        = 0 '<unk>'
 llm_load_print_meta: PAD token        = 2 '</s>'
 llm_load_print_meta: LF token         = 13 '<0x0A>'
 llm_load_tensors: ggml ctx size =    0.15 MiB
+llm_load_tensors:        CPU buffer size =  4165.37 MiB
+...............................................................................................
+llama_new_context_with_model: n_ctx      = 512
+llama_new_context_with_model: n_batch    = 512
+llama_new_context_with_model: n_ubatch   = 512
+llama_new_context_with_model: flash_attn = 0
+llama_new_context_with_model: freq_base  = 10000.0
+llama_new_context_with_model: freq_scale = 1
+llama_kv_cache_init:        CPU KV buffer size =    64.00 MiB
+llama_new_context_with_model: KV self size  =   64.00 MiB, K (f16):   32.00 MiB, V (f16):   32.00 MiB
+llama_new_context_with_model:        CPU  output buffer size =     0.12 MiB
+llama_new_context_with_model:        CPU compute buffer size =    81.01 MiB
+llama_new_context_with_model: graph nodes  = 1030
+llama_new_context_with_model: graph splits = 1
+AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 1 | AVX512_VBMI = 1 | AVX512_VNNI = 1 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | 
+Model metadata: {'tokenizer.ggml.padding_token_id': '2', 'tokenizer.ggml.unknown_token_id': '0', 'tokenizer.ggml.eos_token_id': '2', 'general.architecture': 'llama', 'llama.rope.freq_base': '10000.000000', 'llama.context_length': '32768', 'general.name': 'huggingfaceh4_zephyr-7b-alpha', 'llama.embedding_length': '4096', 'llama.feed_forward_length': '14336', 'llama.attention.layer_norm_rms_epsilon': '0.000010', 'llama.rope.dimension_count': '128', 'tokenizer.ggml.bos_token_id': '1', 'llama.attention.head_count': '32', 'llama.block_count': '32', 'llama.attention.head_count_kv': '8', 'general.quantization_version': '2', 'tokenizer.ggml.model': 'llama', 'general.file_type': '15'}
+Using fallback chat format: llama-2
+Model loaded.
+Running model...
+
+llama_print_timings:        load time =   21409.45 ms
+llama_print_timings:      sample time =      44.85 ms /   119 runs   (    0.38 ms per token,  2653.35 tokens per second)
+llama_print_timings: prompt eval time =   21409.34 ms /    57 tokens (  375.60 ms per token,     2.66 tokens per second)
+llama_print_timings:        eval time =   31527.58 ms /   118 runs   (  267.18 ms per token,     3.74 tokens per second)
+llama_print_timings:       total time =   53125.93 ms /   175 tokens
+{
+  "id": "cmpl-99ae5429-6e9c-4c9a-9674-258c38926a8b",
+  "object": "text_completion",
+  "created": 1723891131,
+  "model": "../../models/zephyr-7b-alpha.Q4_K_M.gguf",
+  "choices": [
+    {
+      "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género masculino con el sentido de 'la parte sólida de la superficie de la Tierra'. Answer: 1. La tierra es un elemento esencial para la vida humana. 2. La tierra es una fuente inagotable de recursos naturales. 3. La tierra es el hogar de los seres vivos más diversos y complejos. 4. La tierra es un recurso que se está agotando a una velocidad alarmantemente rápida. 5. La tierra es la única parte del planeta que puede ser cultivada para alimentar a la humanidad.",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 57,
+    "completion_tokens": 118,
+    "total_tokens": 175
+  }
+}
+Running model...
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =   21409.45 ms
+llama_print_timings:      sample time =      56.30 ms /   139 runs   (    0.41 ms per token,  2468.70 tokens per second)
+llama_print_timings: prompt eval time =    7600.58 ms /    25 tokens (  304.02 ms per token,     3.29 tokens per second)
+llama_print_timings:        eval time =   41549.01 ms /   138 runs   (  301.08 ms per token,     3.32 tokens per second)
+llama_print_timings:       total time =   49379.91 ms /   163 tokens
+{
+  "id": "cmpl-5bf89352-133a-4152-92e1-51fc4d4e8cc8",
+  "object": "text_completion",
+  "created": 1723891184,
+  "model": "../../models/zephyr-7b-alpha.Q4_K_M.gguf",
+  "choices": [
+    {
+      "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'tierra' en género femenino con el sentido de 'la parte sólida de la superficie de la Tierra'. Answer: 1. La tierra es un recurso natural valioso que debemos cuidar y proteger para garantizar su supervivencia. 2. La tierra es nuestro hogar, nuestra morada, nuestra patria. 3. La tierra es el lugar en el que vivimos, trabajamos y crecemos. 4. La tierra es un elemento fundamental de la naturaleza, sin la cual no podríamos existir. 5. La tierra es una fuente inagotable de recursos naturales, pero también una responsabilidad para preservar y proteger.",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 58,
+    "completion_tokens": 138,
+    "total_tokens": 196
+  }
+}
+Running model...
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =   21409.45 ms
+llama_print_timings:      sample time =      43.91 ms /   114 runs   (    0.39 ms per token,  2595.98 tokens per second)
+llama_print_timings: prompt eval time =    5177.55 ms /    19 tokens (  272.50 ms per token,     3.67 tokens per second)
+llama_print_timings:        eval time =   32656.63 ms /   113 runs   (  289.00 ms per token,     3.46 tokens per second)
+llama_print_timings:       total time =   38005.18 ms /   132 tokens
+{
+  "id": "cmpl-e76603c3-439e-40f4-9b0a-b5054a3f3e96",
+  "object": "text_completion",
+  "created": 1723891233,
+  "model": "../../models/zephyr-7b-alpha.Q4_K_M.gguf",
+  "choices": [
+    {
+      "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género masculino con el sentido de 'NULL'. Answer: 1. El piloto nulo no está presente en la cabina.\n2. La falta de un piloto nulo es una característica importante del avión.\n3. El piloto nulo es necesario para simular situaciones extremas.\n4. El piloto nulo es útil para entrenar a los pilotos en situaciones de emergencia.\n5. La falta de un piloto nulo puede ser una falla en el sistema de seguridad del avión.",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 46,
+    "completion_tokens": 113,
+    "total_tokens": 159
+  }
+}
+Running model...
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =   21409.45 ms
+llama_print_timings:      sample time =      77.48 ms /   200 runs   (    0.39 ms per token,  2581.41 tokens per second)
+llama_print_timings: prompt eval time =    3780.47 ms /    13 tokens (  290.81 ms per token,     3.44 tokens per second)
+llama_print_timings:        eval time =   61453.19 ms /   199 runs   (  308.81 ms per token,     3.24 tokens per second)
+llama_print_timings:       total time =   65569.30 ms /   212 tokens
+{
+  "id": "cmpl-bf617407-0ef7-477a-b198-d2b98cefac69",
+  "object": "text_completion",
+  "created": 1723891271,
+  "model": "../../models/zephyr-7b-alpha.Q4_K_M.gguf",
+  "choices": [
+    {
+      "text": "Question: Como experto en lingüística, proporciona cinco frases utilizando el sustantivo 'piloto' en género femenino con el sentido de 'NULL'. Answer: 1. La pilota es una bola pequeña y redonda utilizada en deportes como tenis o fútbol. Sin embargo, en este contexto, la palabra \"pilota\" se usa como un sustantivo femenino que significa \"nulo\", \"ninguno\", \"cero\".\n\nEjemplos:\n- La pilota de votos fue nula en el último referendo.\n- El resultado final del partido fue 3-0, con una pilota de goles en contra para el equipo perdedor.\n- En la prueba de matemáticas, la pilota de puntuaciones fue cero para todos los estudiantes.\n\n2. La pilota es un personaje secundario en la serie de televisión \"Friends\". Sin embargo, en este contexto, la palabra \"pilota\" se usa",
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 47,
+    "completion_tokens": 200,
+    "total_tokens": 247
+  }
+}
